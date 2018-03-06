@@ -1,42 +1,52 @@
 package com.utils.exception;
 
-import java.util.Objects;
-
 /**
- * 自定义异常: 标记删除异常
- * @author Jason Xie 2016-11-23 
+ * 自定义异常: 删除异常
  *
+ * @author Jason Xie 2016-11-23
  */
 public class DeleteRowsException extends RuntimeException {
-	/**
-	 * 断言是否抛出标记删除异常，数据变更行数必须为1
-	 * @param rows Number 影响行数
-	 */
-	public static void asserts(Number rows) {
-		if (1 != rows.longValue()) throw new DeleteRowsException("删除失败，影响行数:".concat(Objects.toString(rows.intValue())));
-	}
-	/**
-	 * 断言是否抛出批量标记删除异常，数据变更行数必须大于1
-	 * @param rows Number 影响行数
-	 * @param batch boolean 是否为批量删除
-	 */
-	public static void asserts(Number rows, boolean batch) {
-		if (rows.longValue() > 0) throw new DeleteRowsException("删除失败，影响行数:".concat(Objects.toString(rows.intValue())));
-	}
+    /**
+     * 断言是否抛出删除异常，数据变更行数必须为1
+     *
+     * @param rows long 影响行数
+     */
+    public static void asserts(long rows) {
+        if (1 != rows) throw new DeleteRowsException(String.format("删除失败，影响行数:%d", rows));
+    }
 
-	public DeleteRowsException() {
-		super();
-	}
+    public static void asserts(int rows) {
+        asserts((long) rows);
+    }
 
-	public DeleteRowsException(String msg) {
-		super(msg);
-	}
+    /**
+     * 断言是否为批量删除
+     * 断言是否抛出批量删除异常，数据变更行数必须大于0
+     *
+     * @param rows long 影响行数
+     */
+    public static void batch(long rows) {
+        if (rows > 0) throw new DeleteRowsException(String.format("批量删除失败，影响行数:%d", rows));
+    }
 
-	public DeleteRowsException(String msg, Throwable cause) {
-		super(msg, cause);
-	}
+    public static void batch(int rows) {
+        batch((long) rows);
+    }
 
-	public DeleteRowsException(Throwable cause) {
-		super(cause);
-	}
+
+    public DeleteRowsException() {
+        super();
+    }
+
+    public DeleteRowsException(String msg) {
+        super(msg);
+    }
+
+    public DeleteRowsException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
+
+    public DeleteRowsException(Throwable cause) {
+        super(cause);
+    }
 }

@@ -27,14 +27,6 @@
     <!-- 文件日志 -->
     <appender name="DEBUG" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_HOME}/${APP_NAME}.debug.log</file>
-        <!-- ThresholdFilter:临界值过滤器，过滤掉 TRACE 和 DEBUG 级别的日志 -->
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>DEBUG</level>
-            <!--
-            <onMatch>ACCEPT</onMatch>
-            <onMismatch>DENY</onMismatch>
-            -->
-        </filter>
         <encoder>
             <pattern>%d{HHmmss.SSS} %5level - %caller{2}%m%n</pattern>
             <charset>UTF-8</charset>
@@ -131,14 +123,17 @@
     -  root接到下级传递的信息，交给已经配置好的名为“STDOUT”的appender处理，“STDOUT”appender将信息打印到控制台；
     -->
     <!--<logger name="ch.qos.logback"/ >-->
-    <!-- show parameters for hibernate sql 专为 Hibernate 定制 -->
+    <!--
     <logger name="org.hibernate.type.EnumType" level="TRACE" />
     <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" />
     <logger name="org.hibernate.type.descriptor.sql.BasicExtractor" level="DEBUG" />
     <logger name="org.hibernate.SQL" level="TRACE" />
     <logger name="org.hibernate.engine.QueryParameters" level="DEBUG" />
     <logger name="org.hibernate.engine.query.HQLQueryPlan" level="DEBUG" />
+-->
     <logger name="org.hibernate.hql.internal" level="INFO" />
+    <!-- 打印编译完成的sql语句 -->
+    <logger name="org.hibernate.resource.jdbc.internal.ResourceRegistryStandardImpl" level="TRACE"/>
     <logger name="org.mongodb.driver" level="INFO" />
     <logger name="org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor" level="INFO" />
     <logger name="org.springframework.data.redis.core.RedisConnectionUtils" level="INFO" />

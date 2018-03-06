@@ -238,7 +238,6 @@ public class ExcelReader {
 
     public String text() {
         return value().map(v -> {
-            if(Objects.isNull(v)) return null;
             if (v instanceof Double) return Num.of(v).toBigDecimal().toPlainString(); // 解决科学计数法 toString()问题
             else return v.toString();
         }).orElse(null);
@@ -257,7 +256,7 @@ public class ExcelReader {
     }
 
     public Dates date() {
-        return value().map(v -> Objects.isNull(v) ? null : Num.of(v.toString()).toDate()).orElse(null);
+        return value().map(v -> Num.of(v.toString()).toDate()).orElse(null);
     }
     /**
      * 获取公式 不使用占位符替换行号

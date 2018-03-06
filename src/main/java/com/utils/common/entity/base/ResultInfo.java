@@ -304,7 +304,7 @@ public class ResultInfo<E> {
      * @return Optional<String>
      */
     public Optional<String> write(@NonNull final File file) {
-        return FWrite.of(file).write(this.toString()).getFilePath();
+        return FWrite.of(file).write(this.toString()).getAbsolute();
     }
 
     /**

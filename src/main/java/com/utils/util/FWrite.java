@@ -48,7 +48,7 @@ public class FWrite {
         return this;
     }
 
-    public Optional<String> getFilePath() {
+    public Optional<String> getAbsolute() {
         return Objects.isNull(file) ? Optional.empty() : Optional.of(file.getAbsolutePath());
     }
     public Optional<String> getFileName() {
@@ -116,17 +116,17 @@ public class FWrite {
         try {
             log.debug("{}", FWrite.of("logs", "test.txt")
                     .write("aaa")
-                    .getFilePath()
+                    .getAbsolute()
                     .get());
             log.debug("{}", FWrite.of("logs", "test.txt")
                     .append()
                     .write("bbb")
-                    .getFilePath()
+                    .getAbsolute()
                     .get());
             log.debug("{}", FWrite.of("logs", "test.txt")
                     .append()
                     .write("ccc".getBytes(Charsets.UTF_8))
-                    .getFilePath()
+                    .getAbsolute()
                     .get());
         } catch (Exception e) {
             e.printStackTrace();
