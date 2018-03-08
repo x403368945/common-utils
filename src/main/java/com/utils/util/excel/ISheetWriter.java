@@ -4,6 +4,7 @@ import com.utils.common.entity.excel.Position;
 import com.utils.common.entity.excel.Rownum;
 import com.utils.enums.DataType;
 import com.utils.util.Util;
+import lombok.Builder;
 import lombok.Cleanup;
 import lombok.NonNull;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -32,43 +33,56 @@ import java.util.function.Supplier;
  * @author Jason Xie on 2017/11/7.
  */
 public interface ISheetWriter {
+    @Builder
+    class Options {
+        /**
+         * POI Excel 复制行规则，默认设置，会复制单元格值
+         * 只有 XSSFWorkbook 支付行复制操作
+         */
+        @Builder.Default
+        private CellCopyPolicy cellCopyPolicy = new CellCopyPolicy().createBuilder().build();
+        /**
+         * 写入单元格依赖的样式库
+         */
+        @Builder.Default
+        private CloneStyles cloneStyles = new CloneStyles(null, null);
+        /**
+         * 是否对公式执行 rebuild 操作
+         */
+        @Builder.Default
+        private boolean rebuildFormula = false;
+    }
+
     /**
      * POI Excel 复制行规则，默认设置，会复制单元格值
      */
-    CellCopyPolicy getCellCopyPolicy();
-    /**
-     * 写入单元格依赖的样式库
-     */
-    CloneStyles getCloneStyles();
-    /**
-     * 是否对公式执行 rebuild 操作
-     */
-    boolean getRebuildFormula();
+    Options getOps();
+
     Workbook getWorkbook();
+
     Sheet getSheet();
+
     /**
      * 当前操作行
      */
     Row getRow();
+
     /**
      * 当前操作列
      */
     Cell getCell();
 
     /**
-     * 指定行复制规则
-     *
-     * @param cellCopyPolicy CellCopyPolicy
-     * @return <T extends ISheetWriter>
-     */
-    <T extends ISheetWriter> T setCellCopyPolicy(final CellCopyPolicy cellCopyPolicy);
-    /**
      * 指定样式库
      *
      * @param stylesTable StylesTable 样式库
      * @return <T extends ISheetWriter>
      */
-    <T extends ISheetWriter> T setCloneStyles(final StylesTable stylesTable);
+    default <T extends ISheetWriter> T setCloneStyles(final StylesTable stylesTable) {
+        getOps().cloneStyles = new CloneStyles(stylesTable, getWorkbook());
+        return (T) this;
+    }
+
     /**
      * 指定样式库；从指定 {path}{name}.xlsx 文件读取样式库
      *
@@ -86,22 +100,6 @@ public interface ISheetWriter {
         }
         return (T) this;
     }
-
-    /**
-     * 打开此开关之后，写入的所有公式都会基于当前行行号重构；默认 false（关闭）
-     * 警告：公式重构只支持普通行公式替换，合计行不支持，若合计行使用此功能将会造成公式计算失败
-     * 替换规则说明：假设当前行号为100
-     * 公式：A1+B1 > A100+B100
-     * 公式：SUM(A1:C1) > SUM(A100:C100)
-     * 公式：A1*C1 > A100*C100
-     * 公式：A1*C1-D1 > A100*C100-D100
-     * 公式(错误案例演示)：A1+A2+A3 > A100+A100+A100；因为：A1+A2+A3 属于跨行计算
-     * 公式(错误案例演示)：SUM(A1:A3) > SUM(A100:A100)；因为：A1:A3 属于跨行计算
-     * 以上案例说明，只支持横向的单行公式，不支持跨行和跨表
-     *
-     * @return <T extends ISheetWriter>
-     */
-    <T extends ISheetWriter> T setRebuildFormula(final boolean open);
 
     /**
      * 复制指定行到目标行
@@ -123,9 +121,9 @@ public interface ISheetWriter {
      * @return <T extends ISheetWriter>
      */
     default <T extends ISheetWriter> T copy(final int fromRowIndex, int toRowIndex, final int count) {
-        if(getSheet() instanceof XSSFSheet) {
+        if (getSheet() instanceof XSSFSheet) {
             for (int i = 0; i < count; i++) {
-                ((XSSFSheet)getSheet()).copyRows(fromRowIndex, fromRowIndex, toRowIndex++, getCellCopyPolicy());
+                ((XSSFSheet) getSheet()).copyRows(fromRowIndex, fromRowIndex, toRowIndex++, getOps().cellCopyPolicy);
             }
         } else {
             row(fromRowIndex);
@@ -147,20 +145,21 @@ public interface ISheetWriter {
         final Sheet sheet = getSheet();
         final Row srcRow = getRow();
         if (sheet instanceof XSSFSheet) {
-            ((XSSFSheet) sheet).copyRows(Arrays.asList(srcRow), toRowIndex, getCellCopyPolicy());
+            ((XSSFSheet) sheet).copyRows(Arrays.asList(srcRow), toRowIndex, getOps().cellCopyPolicy);
         } else if (sheet instanceof SXSSFSheet) {
             // 参考:org.apache.poi.xssf.usermodel.XSSFRow > copyRowFrom
             // 自定义实现 SXSSFSheet 复制行操作
             // 只支持单行复制
             // 公式列只支持替换行号
-            final CellCopyPolicy policy = getCellCopyPolicy();
+            final CellCopyPolicy policy = getOps().cellCopyPolicy;
             final SXSSFRow destRow = (SXSSFRow) sheet.createRow(toRowIndex);
             srcRow.forEach(srcCell -> { // 循环复制单元格
                 SXSSFCell destCell = destRow.createCell(srcCell.getColumnIndex(), srcCell.getCellTypeEnum());
                 { // 参考: org.apache.poi.xssf.usermodel.XSSFCell > copyCellFrom
                     if (policy.isCopyCellValue()) {
                         CellType copyCellType = srcCell.getCellTypeEnum();
-                        if (copyCellType == CellType.FORMULA && !policy.isCopyCellFormula()) copyCellType = srcCell.getCachedFormulaResultTypeEnum();
+                        if (copyCellType == CellType.FORMULA && !policy.isCopyCellFormula())
+                            copyCellType = srcCell.getCachedFormulaResultTypeEnum();
                         switch (copyCellType) {
                             case NUMERIC:
                                 if (DateUtil.isCellDateFormatted(srcCell)) {
@@ -301,6 +300,7 @@ public interface ISheetWriter {
 
     /**
      * 清除当前行所有单元格内容，跳过公式，公式列不清除；保留单元格样式
+     *
      * @return <T extends ISheetWriter>
      */
     default <T extends ISheetWriter> T clearRowContent() {
@@ -310,8 +310,10 @@ public interface ISheetWriter {
         });
         return (T) this;
     }
+
     /**
      * 清除当前单元格内容，跳过公式，公式列不清除；保留单元格样式
+     *
      * @return <T extends ISheetWriter>
      */
     default <T extends ISheetWriter> T clearCellContent() {
@@ -413,11 +415,11 @@ public interface ISheetWriter {
         if (Objects.isNull(data.getType())) data.setType(DataType.Text);
         switch (data.getType()) {
             case Date:
-                if(Objects.nonNull(data.getValue())) writeDate(data.getDate().date());
+                if (Objects.nonNull(data.getValue())) writeDate(data.getDate().date());
                 break;
             case Number:
             case Percent:
-                if(Objects.nonNull(data.getValue())) writeNumber(data.getNumber().doubleValue());
+                if (Objects.nonNull(data.getValue())) writeNumber(data.getNumber().doubleValue());
                 break;
             default:
                 writeText(data.getText());
@@ -508,7 +510,7 @@ public interface ISheetWriter {
             final Supplier<String> supplier = () -> { // 获取公式
                 if (formula.indexOf("{0}") > 0) { // 当公式使用 {0} 占位行号时，将 {0} 替换成行号
                     return formula.replace("{0}", (getRow().getRowNum() + 1) + "");
-                } else if (getRebuildFormula()) { // 判断如果开启公式重构，则执行公式重构方法
+                } else if (getOps().rebuildFormula) { // 判断如果开启公式重构，则执行公式重构方法
                     // 重构规则说明：假设当前行号为100
                     // 公式：A1+B1 > A100+B100
                     // 公式：SUM(A1:C1) > SUM(A100:C100)
@@ -533,7 +535,7 @@ public interface ISheetWriter {
      * @return <T extends ISheetWriter>
      */
     default <T extends ISheetWriter> T writeStyle(final int styleIndex) {
-        writeStyle(getCloneStyles().clone(styleIndex));
+        writeStyle(getOps().cloneStyles.clone(styleIndex));
         return (T) this;
     }
 
@@ -548,16 +550,17 @@ public interface ISheetWriter {
         return (T) this;
     }
 
-    /**
-     * 强制刷新公式，自动调整列宽
-     * @return  <T extends ISheetWriter>
-     */
-    default <T extends ISheetWriter> T flush() {
-        XSSFFormulaEvaluator.evaluateAllFormulaCells(getWorkbook());
-        Sheet sheet = getSheet();
-        for (Cell cell : sheet.getRow(0)) {
-            sheet.autoSizeColumn(cell.getColumnIndex());
-        }
-        return (T) this;
-    }
+//    /**
+//     * 强制刷新公式，自动调整列宽
+//     *
+//     * @return <T extends ISheetWriter>
+//     */
+//    default <T extends ISheetWriter> T flush() {
+//        XSSFFormulaEvaluator.evaluateAllFormulaCells(getWorkbook());
+//        Sheet sheet = getSheet();
+//        for (Cell cell : sheet.getRow(0)) {
+//            sheet.autoSizeColumn(cell.getColumnIndex());
+//        }
+//        return (T) this;
+//    }
 }

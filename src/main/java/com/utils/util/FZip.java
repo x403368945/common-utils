@@ -1,7 +1,6 @@
 package com.utils.util;
 
-import lombok.Cleanup;
-import lombok.Getter;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedOutputStream;
@@ -15,7 +14,6 @@ import java.nio.file.StandardOpenOption;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -26,11 +24,34 @@ import java.util.zip.ZipOutputStream;
  * 例2：当 from = D:\files\content.txt ；则默认 to = D:\files\content.zip <br>
  * @author Jason Xie on 2017/10/30.
  */
+@AllArgsConstructor
 @Slf4j
 public class FZip {
-    public static FZip build() {
-        return new FZip();
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class Options {
+        /**
+         * 是否递归压缩子目录, true:是，false：否
+         */
+        @Builder.Default
+        private boolean isRecursion = true;
+        /**
+         * Consumer<Integer> 压缩进度回调
+         */
+        private Consumer<Integer> progress;
+        /**
+         * 设置不包含文件的正则表达式
+         */
+        private Predicate<String> exclude;
     }
+    public static FZip ofDefault() {
+        return of(Options.builder().build());
+    }
+    public static FZip of(final Options ops) {
+        return new FZip(ops, null,null);
+    }
+    final Options ops;
     /**
      * 源文件或目录：绝对路径
      */
@@ -41,18 +62,7 @@ public class FZip {
      */
     @Getter
     private File to;
-    /**
-     * 是否递归压缩子目录, true:是，false：否
-     */
-    private boolean isRecursion = true;
-    /**
-     * Consumer<Integer> 压缩进度回调
-     */
-    private Consumer<Integer> progress;
-    /**
-     * 设置不包含文件的正则表达式
-     */
-    private Predicate<String> exclude;
+
 
     public FZip from(File from) {
         this.from = from;
@@ -68,25 +78,6 @@ public class FZip {
     }
     public FZip to(String to, String... names) {
         return to(FPath.of(to, names).file());
-    }
-
-    public FZip recursion(boolean recursion) {
-        isRecursion = recursion;
-        return this;
-    }
-
-    /**
-     * 指定压缩进度回调
-     * @param progress Consumer<Integer>
-     * @return FZip
-     */
-    public FZip progress(Consumer<Integer> progress) {
-        this.progress = progress;
-        return this;
-    }
-    public FZip exclude(String regex) {
-        this.exclude = Pattern.compile(regex).asPredicate();
-        return this;
     }
 
     public String getFromFileName() {
@@ -118,7 +109,7 @@ public class FZip {
         }
 //        Dates dates = Dates.now();
         final File[] files = from.isDirectory()
-                ? from.listFiles((dir, name) -> Objects.isNull(exclude) || !exclude.test(name))
+                ? from.listFiles((dir, name) -> Objects.isNull(ops.exclude) || !ops.exclude.test(name))
                 : new File[]{from};
         Asserts.notNull(files, "压缩目录文件列表为空");
         @Cleanup final BufferedOutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(to.toPath()));
@@ -126,10 +117,10 @@ public class FZip {
         int p = 0; // 进度
         for (int i = 0; i < files.length; i++) {
             write(files[i], zipOutputStream, Paths.get(""));
-            if (Objects.nonNull(progress)) {
+            if (Objects.nonNull(ops.progress)) {
                 if((int)((i + 1.0) / files.length * 100) > p) {
                     p = (int)((i + 1.0) / files.length * 100);
-                    progress.accept(p);
+                    ops.progress.accept(p);
                 }
             }
         }
@@ -142,7 +133,7 @@ public class FZip {
     }
     private void write(final File source, final ZipOutputStream output, final Path parent) throws Exception {
         if (source.isDirectory()) {
-            if (isRecursion)
+            if (ops.isRecursion)
                 for (Path path : Files.newDirectoryStream(source.toPath()))
                     write(path.toFile(), output, parent.resolve(source.getName()));
         } else {
@@ -162,7 +153,7 @@ public class FZip {
 
     public static void main(String[] args) {
         try {
-            FZip zip = FZip.build()
+            FZip zip = FZip.ofDefault()
                     .from("src/test/files/json")
                     .to("src/test/files/temp/json.zip")
                     .zip();

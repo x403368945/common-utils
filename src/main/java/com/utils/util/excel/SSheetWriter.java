@@ -7,11 +7,11 @@ import com.utils.enums.DataType;
 import com.utils.util.Asserts;
 import com.utils.util.Dates;
 import lombok.Cleanup;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.xssf.model.StylesTable;
 import org.apache.poi.xssf.streaming.SXSSFCell;
 import org.apache.poi.xssf.streaming.SXSSFRow;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
@@ -33,7 +33,8 @@ import java.util.function.Supplier;
  */
 @Slf4j
 public class SSheetWriter implements ISheetWriter {
-    private SSheetWriter(final SXSSFSheet sheet) {
+    private SSheetWriter(final SXSSFSheet sheet, final Options ops) {
+        this.ops = Objects.isNull(ops) ? Options.builder().build() : ops;
         this.workbook = sheet.getWorkbook();
         this.sheet = sheet;
         this.sheet.trackAllColumnsForAutoSizing(); // 自动调整列宽
@@ -42,24 +43,17 @@ public class SSheetWriter implements ISheetWriter {
     }
 
     public static SSheetWriter of(final SXSSFSheet sheet) {
+        return of(sheet, null);
+    }
+    public static SSheetWriter of(final SXSSFSheet sheet, final Options ops) {
         Asserts.notEmpty(sheet, "参数【sheet】是必须的");
-        return new SSheetWriter(sheet);
+        return new SSheetWriter(sheet, ops);
     }
 
-    /**
-     * POI Excel 复制行规则，默认设置，会复制单元格值
-     */
-    private CellCopyPolicy cellCopyPolicy = new CellCopyPolicy().createBuilder().build();
+    @Getter
+    private final Options ops;
     private final SXSSFWorkbook workbook;
     private final SXSSFSheet sheet;
-    /**
-     * 写入单元格依赖的样式库
-     */
-    private CloneStyles cloneStyles = new CloneStyles(null, null);
-    /**
-     * 是否对公式执行 rebuild 操作
-     */
-    private boolean rebuildFormula = false;
     /**
      * 当前操作行
      */
@@ -75,32 +69,6 @@ public class SSheetWriter implements ISheetWriter {
         return reader;
     }
 
-    @Override
-    public CellCopyPolicy getCellCopyPolicy() {
-        return this.cellCopyPolicy;
-    }
-    @Override
-    public SSheetWriter setCellCopyPolicy(CellCopyPolicy cellCopyPolicy) {
-        this.cellCopyPolicy = cellCopyPolicy;
-        return this;
-    }
-    @Override
-    public CloneStyles getCloneStyles() {
-        return this.cloneStyles;
-    }
-    public SSheetWriter setCloneStyles(final StylesTable stylesTable) {
-        this.cloneStyles = new CloneStyles(stylesTable, workbook);
-        return this;
-    }
-    @Override
-    public boolean getRebuildFormula() {
-        return rebuildFormula;
-    }
-    @Override
-    public SSheetWriter setRebuildFormula(final boolean open) {
-        this.rebuildFormula = open;
-        return this;
-    }
     @Override
     public Workbook getWorkbook() {
         return this.workbook;
@@ -148,6 +116,7 @@ public class SSheetWriter implements ISheetWriter {
     }
 
     public static void main(String[] args) {
+        Paths.get("logs").toFile().mkdir();
         List<Cell> cellDatas = new ArrayList<>();
         { // 普通写入
             Supplier supplier = () -> {
@@ -307,8 +276,9 @@ public class SSheetWriter implements ISheetWriter {
                     workbook.createSheet("Sheet1");
                     workbook.getSheetAt(0).setDefaultColumnWidth(15);
                     XSheetWriter.of(workbook.getSheetAt(0)).row(rownum);
-                    XSheetWriter.of(workbook.getSheetAt(0))
-                            .setRebuildFormula(true) // 开启公式重构
+                    XSheetWriter.of(workbook.getSheetAt(0),
+                            Options.builder().rebuildFormula(true).build() // 开启公式重构
+                    )
                             .row(rownum)
                             .cell(0).writeNumber(100)
                             .cell(1).writeNumber(2)

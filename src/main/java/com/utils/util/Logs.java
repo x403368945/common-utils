@@ -1,5 +1,6 @@
 package com.utils.util;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
@@ -31,9 +32,10 @@ public final class Logs {
         }
     }
 
-    private String filePath = null;
-    private FileWriter writer = null;
+    private final String filePath;
+    private final FileWriter writer;
 
+    @SneakyThrows
     private Logs(Class<?> clazz, String uid) {
         String home = System.getProperty("catalina.home");
         if (Objects.isNull(home)) home = System.getProperty("user.dir");
@@ -45,13 +47,9 @@ public final class Logs {
                 clazz.getSimpleName(),
                 new SimpleDateFormat("yyyyMMddHHmmssSSS").format(System.currentTimeMillis()) + uid + ".log"
         ).toAbsolutePath().toString();
-        try {
-            File file = new File(filePath);
-            file.getParentFile().mkdirs();
-            writer = new FileWriter(file, true);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        File file = new File(filePath);
+        file.getParentFile().mkdirs();
+        writer = new FileWriter(file, true);
     }
 
     /**

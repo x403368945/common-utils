@@ -11,6 +11,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import java.security.MessageDigest;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -381,6 +382,21 @@ public class Util {
 			log.error(e.getMessage(), e);
 			return Optional.empty();
 		}
+	}
+	/**
+	 * 切割list
+	 *
+	 * @param list List 需要切割的集合
+	 * @param size int 每个集合的大小
+	 * @return List<List<T>>
+	 */
+	public static <T> List<List<T>> partition(final List<T> list, final int size) {
+		final int max = list.size();
+		return Stream.iterate(0, n -> n + 1)
+				.limit(max / size + Math.min(1, max % size))
+				.map(n -> list.subList(n * size, Math.min(max, (n + 1) * size)))
+//				.map(n -> list.stream().skip(n * size).limit(size).collect(Collectors.toList()))
+				.collect(Collectors.toList());
 	}
 
 	public static void main(String[] args) {

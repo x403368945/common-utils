@@ -2,9 +2,7 @@ package com.utils.util;
 
 import com.alibaba.fastjson.JSON;
 import com.utils.util.FPath.FileName;
-import lombok.Cleanup;
-import lombok.Getter;
-import lombok.SneakyThrows;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
@@ -13,7 +11,6 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
 
@@ -21,14 +18,45 @@ import java.util.*;
 /**
  * 文件复制操作
  * 注：copy() 方法不支持指定目标文件绝对路径；即目标永远是目录，而不是确切的文件名；若要复制到指定目标文件，请调用copyTo() 方法指定
+ *
  * @author Jason Xie on 2017/10/30.
  */
+@AllArgsConstructor
 @Slf4j
 public class FCopy {
-    public static FCopy build() {
-        return new FCopy();
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class Options {
+        /**
+         * 是否重命名文件为uuid文件,true:重命名，false不重命名
+         */
+        private boolean isRename;
+//		/**
+//		 * 是否校验源文件，true：源文件不存在则抛出异常， false：源文件不存在不抛出异常，返回null
+//		 */
+//		private boolean isCheck = true;
+        /**
+         * 需要复制的文件名
+         */
+        private List<String> names;
+        /**
+         * 源文件不存在时，是否忽略，不进行复制操作，也不抛异常
+         * 但获取复制的新文件时可能抛出异常
+         */
+        @Builder.Default
+        private boolean ignore = false;
     }
 
+    public static FCopy ofDefault() {
+        return of(Options.builder().build());
+    }
+
+    public static FCopy of(final Options ops) {
+        return new FCopy(ops, null, null, null);
+    }
+
+    private final Options ops;
     /**
      * 源文件或目录：绝对路径
      */
@@ -39,23 +67,6 @@ public class FCopy {
      */
     @Getter
     private File to;
-    /**
-     * 是否重命名文件为uuid文件,true:重命名，false不重命名
-     */
-    private boolean isRename;
-//		/**
-//		 * 是否校验源文件，true：源文件不存在则抛出异常， false：源文件不存在不抛出异常，返回null
-//		 */
-//		private boolean isCheck = true;
-    /**
-     * 需要复制的文件名
-     */
-    private List<String> names;
-    /**
-     * 源文件不存在时，是否忽略，不进行复制操作，也不抛异常
-     * 但获取复制的新文件时可能抛出异常
-     */
-    private boolean ignore = false;
 
     /**
      * 存储复制后产生的新文件集合
@@ -80,19 +91,21 @@ public class FCopy {
     public FCopy to(String to, String... names) {
         return to(FPath.of(to, names).file());
     }
+
     /**
      * 将文件重命名为 uuid 文件名
      */
     public FCopy rename() {
-        isRename = true;
+        ops.isRename = true;
         return this;
     }
+
     /**
      * 源文件不存在时，忽略，不进行复制操作，也不抛异常
      * 但获取复制的新文件时可能抛出异常
      */
     public FCopy ignoreNotFound() {
-        ignore = true;
+        ops.ignore = true;
         return this;
     }
 
@@ -101,12 +114,12 @@ public class FCopy {
 //			return this;
 //		}
     public FCopy names(List<String> names) {
-        this.names = names;
+        ops.names = names;
         return this;
     }
 
     public FCopy names(String... names) {
-        this.names = Arrays.asList(names);
+        ops.names = Arrays.asList(names);
         return this;
     }
 
@@ -150,19 +163,19 @@ public class FCopy {
         Asserts.notNull(from, "请指定源文件或目录");
         Asserts.notNull(to, "请指定目标文件或目录");
         if (!from.exists()) {
-            if (ignore) return this;
+            if (ops.ignore) return this;
             throw new FileNotFoundException("源文件不存在:".concat(from.getAbsolutePath()));
         }
         if (from.isFile()) {
             // from 为文件则直接复制，忽略 names 属性
-            copy(from, to.toPath().resolve(isRename ? FileName.of(from.getName()).getUuidFileName() : from.getName()).toFile());
+            copy(from, to.toPath().resolve(ops.isRename ? FileName.of(from.getName()).getUuidFileName() : from.getName()).toFile());
         } else if (from.isDirectory()) {
             // from 为目录，则遍历 names 文件名集合
-            Asserts.notEmpty(names, "请指定需要复制的源文件名");
-            for (String name : names) {
+            Asserts.notEmpty(ops.names, "请指定需要复制的源文件名");
+            for (String name : ops.names) {
                 copy(
                         from.toPath().resolve(name).toFile(),
-                        to.toPath().resolve(isRename ? FileName.of(name).getUuidFileName() : name).toFile()
+                        to.toPath().resolve(ops.isRename ? FileName.of(name).getUuidFileName() : name).toFile()
                 );
             }
         } else {
@@ -175,6 +188,7 @@ public class FCopy {
      * 复制目录下的所有文件到指定目录；不包含原始目录名【只复制原始目录下的文件及子目录】 <br>
      * {src}/* > {dist}/ <br>
      * dir/[1.txt,2.txt,3.txt] > newDir/[1.txt,2.txt,3.txt]
+     *
      * @return FCopy
      */
     @SneakyThrows
@@ -182,7 +196,7 @@ public class FCopy {
         Asserts.notNull(from, "请指定源文件或目录");
         Asserts.notNull(to, "请指定目标文件或目录");
         if (!from.exists()) {
-            if (ignore) return this;
+            if (ops.ignore) return this;
             throw new FileNotFoundException("源目录不存在:".concat(from.getAbsolutePath()));
         }
         Asserts.isTrue(from.isDirectory(), "复制源不是目录");
@@ -195,6 +209,7 @@ public class FCopy {
         }
         return this;
     }
+
     @SneakyThrows
     private void copyDir(final File src, final File dist) {
         if (src.isDirectory()) {
@@ -227,7 +242,7 @@ public class FCopy {
     public static void main(String[] args) {
         Dates dates = Dates.now();
         {
-            FCopy copy = FCopy.build()
+            FCopy copy = FCopy.ofDefault()
                     .from("src/test/files/temp", "json.zip")
                     .to("src/test/files/temp", FileName.of("json.zip").getUuidFileName())
                     .copyTo();
@@ -238,7 +253,7 @@ public class FCopy {
             log.debug(JSON.toJSONString(copy.getNewFiles()));
         }
         {
-            FCopy copy = FCopy.build()
+            FCopy copy = FCopy.ofDefault()
                     .from("src/test/files/temp", "json.zip")
                     .to("src/test/files/temp", "json-bak.zip")
                     .copyTo();
@@ -249,7 +264,7 @@ public class FCopy {
             log.debug(JSON.toJSONString(copy.getNewFiles()));
         }
         {
-            FCopy copy = FCopy.build()
+            FCopy copy = FCopy.ofDefault()
                     .from("src/test/files/libs", "README.md")
                     .to("src/test/files/temp")
                     .copy();
@@ -261,7 +276,7 @@ public class FCopy {
         }
 
         {
-            FCopy copy = FCopy.build()
+            FCopy copy = FCopy.ofDefault()
                     .from("src/test/files/temp", "json.zip")
                     .rename()
                     .to("src/test/files/temp")
@@ -274,7 +289,7 @@ public class FCopy {
         }
 
         {
-            FCopy copy = FCopy.build()
+            FCopy copy = FCopy.ofDefault()
                     .from("src/test/files/libs")
                     .names("alipay-sdk-java20180104135026.jar", "alipay-sdk-java20180104135026-source.jar", "README.md")
                     .rename()
@@ -287,7 +302,7 @@ public class FCopy {
             log.debug(JSON.toJSONString(copy.getNewFiles()));
         }
         {
-            FCopy copy = FCopy.build()
+            FCopy copy = FCopy.ofDefault()
                     .from("src/test/files/temp/libs")
                     .to("src/test/files/temp/test")
                     .copyDir();

@@ -22,30 +22,40 @@ import java.util.stream.Stream;
  *
  * @author Jason Xie on 2017/11/21.
  */
-@NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class CodeImage {
-    /**
-     * 验证码位数
-     */
-    @Builder.Default
-    private int length = 4;
-    /**
-     * 验证码宽度
-     */
-    @Builder.Default
-    private int width = 60;
-    /**
-     * 验证码高度
-     */
-    @Builder.Default
-    private int height = 20;
-    /**
-     * 图片类型
-     */
-    @Builder.Default
-    private Image type = Image.JPEG;
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class Options {
+        /**
+         * 验证码位数
+         */
+        @Builder.Default
+        private int length = 4;
+        /**
+         * 验证码宽度
+         */
+        @Builder.Default
+        private int width = 60;
+        /**
+         * 验证码高度
+         */
+        @Builder.Default
+        private int height = 20;
+        /**
+         * 图片类型
+         */
+        @Builder.Default
+        private Image type = Image.JPEG;
+    }
+    public static CodeImage ofDefault() {
+        return of(Options.builder().build());
+    }
+    public static CodeImage of(final Options ops) {
+        return new CodeImage(ops, null);
+    }
+    private final Options ops;
     /**
      * 图片
      */
@@ -59,37 +69,37 @@ public class CodeImage {
      * @return CodeImage
      */
     public CodeImage generate(@NonNull final Consumer<String> consumer) {
-        image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        image = new BufferedImage(ops.width, ops.height, BufferedImage.TYPE_INT_RGB);
         // 获取图形上下文
         final Graphics g = image.getGraphics();
         // 生成随机类
         final Random random = new Random();
         // 设定背景色
         g.setColor(getRandColor(200, 250));
-        g.fillRect(0, 0, width, height);
+        g.fillRect(0, 0, ops.width,ops. height);
         // 设定字体
         g.setFont(new Font("Times New Roman", Font.PLAIN,
-                height / 4 + 12
+                ops.height / 4 + 12
 //                Math.max(18, (int)(height/1.2))
         ));
-        for (int i = 0; i < Math.max(80, width * height / 25); i++) {
+        for (int i = 0; i < Math.max(80, ops.width * ops.height / 25); i++) {
             // 随机产生最少80条干扰线
             g.setColor(getRandColor(100, 200));
-            final int x = random.nextInt(width);
-            final int y = random.nextInt(height);
-            final int xl = random.nextInt(width / 4 + 12);
-            final int yl = random.nextInt(height / 4 + 12);
+            final int x = random.nextInt(ops.width);
+            final int y = random.nextInt(ops.height);
+            final int xl = random.nextInt(ops.width / 4 + 12);
+            final int yl = random.nextInt(ops.height / 4 + 12);
             g.drawLine(x, y, x + xl, y + yl);
         }
         // 取随机产生的认证码
-        final String code = RandomStringUtils.randomAlphanumeric(length);
-        for (int i = 0; i < length; i++) {
+        final String code = RandomStringUtils.randomAlphanumeric(ops.length);
+        for (int i = 0; i < ops.length; i++) {
             // 将认证码显示到图象中
             g.setColor(new Color(random.nextInt(100), random.nextInt(100), random.nextInt(100)));
 //            g.drawString(Objects.toString(code.charAt(i)), i * 17 + random.nextInt(17), 15);
             g.drawString(Objects.toString(code.charAt(i)),
-                    width / length * i + random.nextInt(width / length - 12), // y = 0 则文字在左侧
-                    height / 2 + random.nextInt((int) (height / 2.5)) // y = height 则文字在底部
+                    ops.width / ops.length * i + random.nextInt(ops.width / ops.length - 12), // y = 0 则文字在左侧
+                    ops.height / 2 + random.nextInt((int) (ops.height / 2.5)) // y = height 则文字在底部
             );
         }
         // 图象生效
@@ -116,8 +126,8 @@ public class CodeImage {
     @SneakyThrows
     public File write(@NonNull final File file) {
         Asserts.notEmpty(image, "请先生成图片:generate(System.out::println)");
-        if (!ImageIO.write(image, type.name(), file)) {
-            throw new IOException(String.format("Could not write an image of format %s to %s", type.name(), file.getAbsolutePath()));
+        if (!ImageIO.write(image, ops.type.name(), file)) {
+            throw new IOException(String.format("Could not write an image of format %s to %s", ops.type.name(), file.getAbsolutePath()));
         }
         return file;
     }
@@ -125,50 +135,51 @@ public class CodeImage {
     @SneakyThrows
     public void write(@NonNull final OutputStream outputStream) {
         Asserts.notEmpty(image, "请先生成图片:generate(System.out::println)");
-        if (!ImageIO.write(image, type.name(), outputStream))
-            throw new IOException("Could not write an image of format ".concat(type.name()));
+        if (!ImageIO.write(image, ops.type.name(), outputStream))
+            throw new IOException("Could not write an image of format ".concat(ops.type.name()));
     }
 
     @SneakyThrows
     public String base64() {
         Asserts.notEmpty(image, "请先生成图片:generate(System.out::println)");
         @Cleanup final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        if (!ImageIO.write(image, type.name(), byteArrayOutputStream)) {
-            throw new IOException("Could not write an image of format ".concat(type.name()));
+        if (!ImageIO.write(image, ops.type.name(), byteArrayOutputStream)) {
+            throw new IOException("Could not write an image of format ".concat(ops.type.name()));
         }
-        return type.base64(Base64.encoder(byteArrayOutputStream.toByteArray()));
+        return ops.type.base64(Base64.encoder(byteArrayOutputStream.toByteArray()));
     }
 
     public static void main(String[] args) {
         try {
             System.out.println(
-                    CodeImage.builder()
-                            .type(Image.JPEG)
-                            .build()
+                    CodeImage.ofDefault()
                             .generate(System.out::println)
                             .base64()
             );
             System.out.println(
-                    CodeImage.builder()
-                            .type(Image.PNG)
-                            .build()
+                    CodeImage.of(
+                            CodeImage.Options.builder()
+                                    .type(Image.PNG)
+                                    .build()
+                    )
                             .generate(System.out::println)
                             .write(Paths.get("logs", "验证码.png").toAbsolutePath().toFile())
             );
             System.out.println(
-                    CodeImage.builder()
-                            .type(Image.JPEG)
-                            .length(6)
-                            .width(200)
-                            .height(40)
-                            .build()
+                    CodeImage.of(
+                            CodeImage.Options.builder()
+                                    .type(Image.JPEG)
+                                    .length(6)
+                                    .width(200)
+                                    .height(40)
+                                    .build()
+                    )
                             .generate(System.out::println)
                             .write(Paths.get("logs", "验证码.jpeg").toAbsolutePath().toFile())
             );
             Stream.iterate(0, n->n+1).limit(100).forEach(i ->
                     System.out.println(
-                            CodeImage.builder()
-                                    .build()
+                            CodeImage.ofDefault()
                                     .generate(System.out::println)
                                     .write(
                                             Paths.get("logs", Util.uuid().concat(".jpeg")).toAbsolutePath().toFile()

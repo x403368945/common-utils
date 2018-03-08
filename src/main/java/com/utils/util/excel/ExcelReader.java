@@ -90,12 +90,22 @@ public class ExcelReader {
         return dataFormatter;
     }
 
+    /**
+     * 按索引选择读取sheet
+     * @param index int sheet索引
+     * @return ExcelReader
+     */
     public ExcelReader sheet(final int index) {
         sheet = workbook.getSheetAt(index);
         lastRowIndex = sheet.getLastRowNum();
         return this;
     }
 
+    /**
+     * 按名称选择读取sheet
+     * @param name String sheet名称
+     * @return ExcelReader
+     */
     public ExcelReader sheet(final String name) {
         sheet = workbook.getSheet(name);
         lastRowIndex = sheet.getLastRowNum();
@@ -111,6 +121,11 @@ public class ExcelReader {
         return this;
     }
 
+    /**
+     * 选择读取行
+     * @param rowIndex int 行索引
+     * @return ExcelReader
+     */
     public ExcelReader row(final int rowIndex) {
         this.rowIndex = rowIndex;
         this.row = sheet.getRow(rowIndex);
@@ -119,7 +134,7 @@ public class ExcelReader {
     }
 
     /**
-     * 指定当前操作行
+     * 选择读取行
      *
      * @param rownum Rownum 数据行
      * @return ExcelReader
@@ -142,20 +157,22 @@ public class ExcelReader {
         return this;
     }
 
+    /**
+     * 选择读取列
+     * @param columnIndex int 列索引
+     * @return ExcelReader
+     */
     public ExcelReader cell(final int columnIndex) {
         this.cell = Objects.isNull(row) ? null : row.getCell(columnIndex);
         return this;
     }
 
-    public LinkedHashMap<Integer, Object> rowObject() {
-        LinkedHashMap<Integer, Object> map = new LinkedHashMap<>();
-        for (int i = 0; i < row.getLastCellNum(); i++) {
-            map.put(i, cell(i).value().orElse(null));
-        }
-        return map;
-    }
+    /**
+     * 获取头部列名加索引
+     * @return {@link Header}
+     */
     public List<Header> headers() {
-        List<Header> headers = new ArrayList<>();
+        final List<Header> headers = new ArrayList<>();
         String label;
         for (int i = 0; i < row.getLastCellNum(); i++) {
             cell(i);
@@ -164,8 +181,14 @@ public class ExcelReader {
         }
         return headers;
     }
-    public Map<String, Integer> mapHeaders() {
-        Map<String, Integer> map = new HashMap<>();
+
+    /**
+     * 获取头部列名加索引
+     * 警告：重复的列名将会被覆盖；若不能保证列名不重复，请使用 {@link ExcelReader#headers()}
+     * @return Map<String, Integer>
+     */
+    public LinkedHashMap<String, Integer> mapHeaders() {
+        final LinkedHashMap<String, Integer> map = new LinkedHashMap<>();
         for (int i = 0; i < row.getLastCellNum(); i++) {
             map.put(cell(i).textOfEmpty().trim(), i);
         }
@@ -173,22 +196,75 @@ public class ExcelReader {
         return map;
     }
 
+    /**
+     * 获取当前行，整行数据
+     * @return LinkedHashMap<Integer, Object>
+     */
+    public LinkedHashMap<Integer, Object> rowObject() {
+        final LinkedHashMap<Integer, Object> map = new LinkedHashMap<>();
+        for (int i = 0; i < row.getLastCellNum(); i++) {
+            map.put(i, cell(i).value().orElse(null));
+        }
+        return map;
+    }
+    /**
+     * 获取当前行指定列数据
+     * @param headers List<Header> 来自 {@link ExcelReader#headers()}
+     * @return LinkedHashMap<String, Object>
+     */
+    public LinkedHashMap<String, Object> rowObject(final List<Header> headers) {
+        final LinkedHashMap<String, Object> map = new LinkedHashMap<>();
+        headers.forEach(header -> map.put(header.getLabel(), cell(header.getIndex()).value()));
+        return map;
+    }
+    /**
+     * 获取当前行指定列数据
+     * @param mapHeaders Map<String, Integer> 来自 {@link ExcelReader#mapHeaders()}
+     * @return LinkedHashMap<String, Object>
+     */
+    public LinkedHashMap<String, Object> rowObject(final Map<String, Integer> mapHeaders) {
+        final LinkedHashMap<String, Object> map = new LinkedHashMap<>();
+        mapHeaders.forEach((key, value) -> map.put(key, cell(value).value().orElse(null)));
+        return map;
+    }
+
+    /**
+     * 数据是否已读完
+     * @return boolean true：最后一行已经读完
+     */
     public boolean hasEnd() {
         return rowIndex > lastRowIndex;
     }
 
-    public boolean isNotEmpty() {
+    /**
+     * 判断单元格是否非空
+     * @return boolean true：非空，false：空
+     */
+    public boolean cellNotEmpty() {
         return Objects.nonNull(this.cell);
     }
 
+    /**
+     * 判断单元格是否为空
+     * @return boolean true：空，false：非空
+     */
     private boolean cellEmpty() {
         return Objects.isNull(cell) || Objects.equals(CellType.BLANK, cell.getCellTypeEnum());
     }
 
+    /**
+     * 返回单元格数据原始值
+     * @return Optional<Object>
+     */
     public Optional<Object> value() {
         return value(false);
     }
 
+    /**
+     * 获取单元格数据
+     * @param format boolean 返回时是否格式化单元格数据；true：是，false：否
+     * @return Optional<Object>
+     */
     public Optional<Object> value(final boolean format) {
         if (cellEmpty()) return Optional.empty();
         switch (cell.getCellTypeEnum()) {
@@ -236,6 +312,10 @@ public class ExcelReader {
         return Optional.of(cell.getStringCellValue());
     }
 
+    /**
+     * 获取单元格文本，保留null值
+     * @return String
+     */
     public String text() {
         return value().map(v -> {
             if (v instanceof Double) return Num.of(v).toBigDecimal().toPlainString(); // 解决科学计数法 toString()问题
@@ -243,18 +323,33 @@ public class ExcelReader {
         }).orElse(null);
     }
 
+    /**
+     * 获取单元格文本，null值默认为空字符串 ""
+     * @return String
+     */
     public String textOfEmpty() {
         return Optional.ofNullable(text()).orElse("");
     }
-
+    /**
+     * 获取单元格数值，空值和非数字默认为null
+     * @return {@link Num}
+     */
     public Num number() {
         return value().map(Num::of).orElse(null);
     }
 
+    /**
+     * 获取单元格数值，空值和非数字默认为0
+     * @return {@link Num}
+     */
     public Num numberOfZore() {
         return value().map(v -> Num.of(v.toString(), 0)).orElse(Num.of(0));
     }
 
+    /**
+     * 获取单元格日期对象
+     * @return {@link Dates}
+     */
     public Dates date() {
         return value().map(v -> Num.of(v.toString()).toDate()).orElse(null);
     }
@@ -280,13 +375,26 @@ public class ExcelReader {
         return null;
     }
 
+    /**
+     * 获取样式索引
+     * @return Integer
+     */
     public Integer sindex() {
         return Objects.isNull(cell) ? null : (int) cell.getCellStyle().getIndex();
     }
 
+    /**
+     * 获取格式化之后的字符串
+     * @return String
+     */
     public String dataFormat() {
         return Objects.isNull(cell) ? null : cell.getCellStyle().getDataFormatString();
     }
+
+    /**
+     * 获取单元格数据类型
+     * @return {@link DataType}
+     */
     public DataType type() {
         if(Objects.isNull(cell)) return null;
         switch (cell.getCellTypeEnum()){

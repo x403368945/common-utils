@@ -83,7 +83,7 @@ public class Maps<K, V> {
     }
 
     public static void main(String[] args) {
-        { // 方案一demo
+        { // demo
             log.debug(
                     Maps.ofSS()
                             .put("111", "Jason")
