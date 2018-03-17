@@ -39,7 +39,7 @@ public enum Quarter {
      */
     public static List<Header> buildHeaders(List<Header> headers, int startIndex) {
         if (Objects.isNull(headers)) headers = new ArrayList<>();
-        Header.HeaderBuilder builder = Header.builder().type(DataType.Number);
+        Header.HeaderBuilder builder = Header.builder().type(DataType.NUMBER);
         {
             builder.group(One.comment);
             headers.add(builder.index(startIndex++).label("1月").build());

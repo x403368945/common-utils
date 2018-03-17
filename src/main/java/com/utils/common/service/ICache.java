@@ -29,11 +29,12 @@ public interface ICache<V> {
     @Builder
     @Data
     class DBInfo {
-        public static DBInfo of(int index, String name, String comment) {
+        public static DBInfo of(final int index, final String name, final String comment, final Class clazz) {
             return DBInfo.builder()
                     .index(index)
                     .name(name)
                     .comment(comment)
+                    .clazz(clazz.getSimpleName())
                     .build();
         }
         /**

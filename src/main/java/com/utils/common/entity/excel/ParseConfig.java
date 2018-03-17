@@ -139,13 +139,13 @@ public class ParseConfig implements IJson {
             List<Header> headers = new ArrayList<>();
             Header.HeaderBuilder builder = Header.builder();
             builder.group("主营业务收入");
-            headers.add(builder.index(index++).label("产品/项目/服务名称").type(DataType.Text).build());
-            headers.add(builder.index(index++).label("规格型号").type(DataType.Text).build());
-            headers.add(builder.index(index++).label("单价").type(DataType.Number).build());
-            headers.add(builder.index(index++).label("上年实际").type(DataType.Number).build());
-            headers.add(builder.index(index++).label("本年预算").type(DataType.Number).build());
+            headers.add(builder.index(index++).label("产品/项目/服务名称").type(DataType.TEXT).build());
+            headers.add(builder.index(index++).label("规格型号").type(DataType.TEXT).build());
+            headers.add(builder.index(index++).label("单价").type(DataType.NUMBER).build());
+            headers.add(builder.index(index++).label("上年实际").type(DataType.NUMBER).build());
+            headers.add(builder.index(index++).label("本年预算").type(DataType.NUMBER).build());
 
-            builder.group("第一季度").type(DataType.Number);
+            builder.group("第一季度").type(DataType.NUMBER);
             headers.add(builder.index(index++).label("1月").tag("销售量").build());
             headers.add(builder.index(index++).label("1月").tag("销售额").build());
             headers.add(builder.index(index++).label("2月").tag("销售量").build());
@@ -155,7 +155,7 @@ public class ParseConfig implements IJson {
             headers.add(builder.index(index++).label("合计").tag("销售量").build());
             headers.add(builder.index(index++).label("合计").tag("销售额").build());
 
-            builder.group("第二季度").type(DataType.Number);
+            builder.group("第二季度").type(DataType.NUMBER);
             headers.add(builder.index(index++).label("4月").tag("销售量").build());
             headers.add(builder.index(index++).label("4月").tag("销售额").build());
             headers.add(builder.index(index++).label("5月").tag("销售量").build());
@@ -165,7 +165,7 @@ public class ParseConfig implements IJson {
             headers.add(builder.index(index++).label("合计").tag("销售量").build());
             headers.add(builder.index(index++).label("合计").tag("销售额").build());
 
-            builder.group("第三季度").type(DataType.Number);
+            builder.group("第三季度").type(DataType.NUMBER);
             headers.add(builder.index(index++).label("7月").tag("销售量").build());
             headers.add(builder.index(index++).label("7月").tag("销售额").build());
             headers.add(builder.index(index++).label("8月").tag("销售量").build());
@@ -175,7 +175,7 @@ public class ParseConfig implements IJson {
             headers.add(builder.index(index++).label("合计").tag("销售量").build());
             headers.add(builder.index(index++).label("合计").tag("销售额").build());
 
-            builder.group("第四季度").type(DataType.Number);
+            builder.group("第四季度").type(DataType.NUMBER);
             headers.add(builder.index(index++).label("10月").tag("销售量").build());
             headers.add(builder.index(index++).label("10月").tag("销售额").build());
             headers.add(builder.index(index++).label("11月").tag("销售量").build());

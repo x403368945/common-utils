@@ -335,8 +335,15 @@ public class Util {
 	 * 将首字母变成小写
 	 * @param text String 处理字符串
 	 */
-	public static String firstLowerCase(String text) {
+	public static String firstLower(String text) {
 		return text.replaceFirst("^[A-Z]", (String.valueOf(text.charAt(0))).toLowerCase());
+	}
+	/**
+	 * 将首字母变成大写
+	 * @param text String 处理字符串
+	 */
+	public static String firstUpper(String text) {
+		return text.replaceFirst("^[a-z]", (String.valueOf(text.charAt(0))).toUpperCase());
 	}
 	/**
 	 * obj.toString之后打印日志，并返回原对象

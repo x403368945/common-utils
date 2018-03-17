@@ -37,7 +37,7 @@ public enum Month {
      */
     public static List<Header> buildHeaders(List<Header> headers) {
         if (Objects.isNull(headers)) headers = new ArrayList<>();
-        Header.HeaderBuilder builder = Header.builder().type(DataType.Number);
+        Header.HeaderBuilder builder = Header.builder().type(DataType.NUMBER);
         {
             headers.add(builder.index(headers.size()).label("1月").build());
             headers.add(builder.index(headers.size()).label("2月").build());

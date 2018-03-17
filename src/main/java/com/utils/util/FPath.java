@@ -156,7 +156,7 @@ public class FPath {
     @SneakyThrows
     public String read() {
         { // 按字符读取文件内容不会出现乱码
-            log.debug("read file：{}", path.toString());
+            log.debug("read file:{}", path.toString());
             if (!path.toFile().exists()){
                 log.warn("文件不存在：{}", path.toAbsolutePath());
                 return null;

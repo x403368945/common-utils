@@ -53,7 +53,7 @@ public class FCopy {
     }
 
     public static FCopy of(final Options ops) {
-        return new FCopy(ops, null, null, null);
+        return new FCopy(ops, null, null, new ArrayList<>());
     }
 
     private final Options ops;
@@ -72,7 +72,7 @@ public class FCopy {
      * 存储复制后产生的新文件集合
      */
     @Getter
-    private List<File> newFiles = new ArrayList<>();
+    private List<File> newFiles;
 
     public FCopy from(File from) {
         this.from = from;

@@ -151,9 +151,9 @@ public class XSheetWriter implements ISheetWriter {
                     // 文本居中样式，可追加的样式对象
                     CellStyles centerStyle = CellStyles.builder().alignment(HorizontalAlignment.CENTER).build();
                     { // 后面 >>>>>> 测试样式库引用 <<<<<< 会使用到
-                        cellDatas.add(Cell.builder().sindex((int) greenStyle.getIndex()).text("绿色单元格").type(DataType.Text).build());
-                        cellDatas.add(Cell.builder().sindex((int) blueStyle.getIndex()).text("蓝色单元格").type(DataType.Text).build());
-                        cellDatas.add(Cell.builder().sindex((int) redStyle.getIndex()).text("红色单元格").type(DataType.Text).build());
+                        cellDatas.add(Cell.builder().sindex((int) greenStyle.getIndex()).text("绿色单元格").type(DataType.TEXT).build());
+                        cellDatas.add(Cell.builder().sindex((int) blueStyle.getIndex()).text("蓝色单元格").type(DataType.TEXT).build());
+                        cellDatas.add(Cell.builder().sindex((int) redStyle.getIndex()).text("红色单元格").type(DataType.TEXT).build());
                     }
                     XSheetWriter sheetWriter = XSheetWriter.of(workbook.getSheetAt(0))
                             .row(rownum)

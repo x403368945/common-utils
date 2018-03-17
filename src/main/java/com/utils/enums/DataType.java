@@ -13,13 +13,13 @@ import java.util.stream.Stream;
  */
 public enum DataType {
     /** 数值*/
-    Number("数值", CellType.NUMERIC),
+    NUMBER("数值", CellType.NUMERIC),
     /** 文本*/
-    Text("文本", CellType.STRING),
+    TEXT("文本", CellType.STRING),
     /** 日期*/
-    Date("日期", CellType.NUMERIC),
+    DATE("日期", CellType.NUMERIC),
     /** 百分比*/
-    Percent("百分比", CellType.NUMERIC),
+    PERCENT("百分比", CellType.NUMERIC),
     ;
     /**
      * 枚举属性说明

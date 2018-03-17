@@ -33,10 +33,10 @@ public interface IRepository<E> extends QuerydslPredicateExecutor<E> {
 	 * 按ID删除，物理删除
 	 * @param id String 数据ID
 	 * @param userId String 操作用户ID
-	 * @return long 影响行数
+	 * @return E 删除对象实体
 	 * @throws Exception 删除失败异常
 	 */
-	default long deleteById(@NonNull final String id, @NonNull final String userId) throws Exception {
+	default E deleteById(@NonNull final String id, @NonNull final String userId) throws Exception {
 		throw new NullPointerException(this.getClass().getName() + "：方法【deleteById(@NonNull final String userId, @NonNull final String id)】未实现");
 	}
 

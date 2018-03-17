@@ -35,8 +35,7 @@ public enum Code {
     DOWNLOAD_PERMISSION("无下载权限"),
     URL_INVALID("链接已失效"),
     CHECK_EMAIL("邮件发送失败，请检查邮箱是否正确"),
-    COMPUTING("正在计算"),
-    ACTIVITY_NOT_FOUND("活动未创建"),;
+    ;
     /**
      * 枚举属性说明
      */

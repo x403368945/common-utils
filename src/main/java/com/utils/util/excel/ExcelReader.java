@@ -177,7 +177,7 @@ public class ExcelReader {
         for (int i = 0; i < row.getLastCellNum(); i++) {
             cell(i);
             if (Util.isNotEmpty(label = text()))
-                headers.add(Header.builder().index(i).label(label.trim()).type(DataType.Text).sindex(sindex()).build());
+                headers.add(Header.builder().index(i).label(label.trim()).type(DataType.TEXT).sindex(sindex()).build());
         }
         return headers;
     }
@@ -399,13 +399,13 @@ public class ExcelReader {
         if(Objects.isNull(cell)) return null;
         switch (cell.getCellTypeEnum()){
             case NUMERIC:
-                if(DateUtil.isCellDateFormatted(cell)) return DataType.Date;
-                else if(Optional.ofNullable(dataFormat()).orElse("").endsWith("%")) return DataType.Percent;
-                else return DataType.Number;
+                if(DateUtil.isCellDateFormatted(cell)) return DataType.DATE;
+                else if(Optional.ofNullable(dataFormat()).orElse("").endsWith("%")) return DataType.PERCENT;
+                else return DataType.NUMBER;
             case FORMULA:
-                if(CellType.NUMERIC == cell.getCachedFormulaResultTypeEnum()) return DataType.Number;
+                if(CellType.NUMERIC == cell.getCachedFormulaResultTypeEnum()) return DataType.NUMBER;
         }
-        return DataType.Text;
+        return DataType.TEXT;
     }
 
     @SneakyThrows

@@ -16,7 +16,6 @@ import org.apache.poi.xssf.model.StylesTable;
 import org.apache.poi.xssf.streaming.SXSSFCell;
 import org.apache.poi.xssf.streaming.SXSSFRow;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
 import org.apache.poi.xssf.usermodel.XSSFHyperlink;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 
@@ -412,13 +411,13 @@ public interface ISheetWriter {
             writeFormula(data.getFormula());
             return (T) this; // 如果单元格有公式，则写完公式就跳出，所以需要提前return (T) this;
         }
-        if (Objects.isNull(data.getType())) data.setType(DataType.Text);
+        if (Objects.isNull(data.getType())) data.setType(DataType.TEXT);
         switch (data.getType()) {
-            case Date:
+            case DATE:
                 if (Objects.nonNull(data.getValue())) writeDate(data.getDate().date());
                 break;
-            case Number:
-            case Percent:
+            case NUMBER:
+            case PERCENT:
                 if (Objects.nonNull(data.getValue())) writeNumber(data.getNumber().doubleValue());
                 break;
             default:
