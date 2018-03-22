@@ -230,6 +230,10 @@ public class FCopy {
             to.getParentFile().mkdirs();
             FPath.of(to.getParentFile()).chmod(755);
         }
+        if (ops.ignore && !from.exists()) {
+            log.debug("忽略不存在的源文件：{}", from.getAbsolutePath());
+            return;
+        }
         log.debug("{} > {}", from.getAbsolutePath(), to.getAbsolutePath());
 //        Files.copy(from.toPath(), to.toPath(), StandardCopyOption.REPLACE_EXISTING);
         @Cleanup final FileChannel fromFileChannel = FileChannel.open(from.toPath(), EnumSet.of(StandardOpenOption.READ));

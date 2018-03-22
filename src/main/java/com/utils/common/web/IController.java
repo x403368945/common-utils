@@ -24,7 +24,7 @@ public interface IController<E> {
 		{
 		    // 方法头注解
 /*
-            @RequestMapping(method = {RequestMethod.POST})
+            @PostMapping
             @ResponseBody
 */
             // 方法接参模板,@RequestBody(required = false)，设置为false可以让请求先过来，如果参数为空再抛出异常，保证本次请求能得到响应
@@ -59,7 +59,7 @@ public interface IController<E> {
 		{
             // 方法头注解
 /*
-            @RequestMapping(value = "/{id}", method = {RequestMethod.PUT})
+            @PutMapping("/{id}")
             @ResponseBody
 */
             // 方法接参模板,@RequestBody(required = false)，设置为false可以让请求先过来，如果参数为空再抛出异常，保证本次请求能得到响应
@@ -94,7 +94,7 @@ public interface IController<E> {
 		{
             // 方法头注解
 /*
-            @RequestMapping(value = "/{id}", method = {RequestMethod.DELETE})
+            @DeleteMapping("/{id}")
             @ResponseBody
 */
             // 方法接参模板
@@ -129,7 +129,7 @@ public interface IController<E> {
 		{
             // 方法头注解
 /*
-            @RequestMapping(value = "/{id}", method = {RequestMethod.PATCH})
+            @PatchMapping("/{id}")
             @ResponseBody
 */
             // 方法接参模板
@@ -164,7 +164,7 @@ public interface IController<E> {
 		{
             // 方法头注解
 /*
-            @RequestMapping(method = {RequestMethod.PATCH})
+            @PatchMapping
             @ResponseBody
 */
             // 方法接参模板，params 设置默认值为 "{}" 的目的在于，保证不会因为未传参数进不了方法
@@ -201,7 +201,7 @@ public interface IController<E> {
 		{
             // 方法头注解
 /*
-            @RequestMapping(value = "/{id}", method = {RequestMethod.GET})
+            @GetMapping("/{id}")
             @ResponseBody
 */
             // 方法接参模板
@@ -234,7 +234,7 @@ public interface IController<E> {
         {
             // 方法头注解
 /*
-            @RequestMapping(method = {RequestMethod.GET})
+            @GetMapping
             @ResponseBody
 */
             // 方法接参模板，params 设置默认值为 "{}" 的目的在于，保证不会因为未传参数进不了方法
@@ -269,16 +269,21 @@ public interface IController<E> {
 	 * @param paramsInfo ParamsInfo 参数对象
 	 * @return ResultInfo<E>
 	 */
-	default ResultInfo<E> search(final int pageIndex, final int pageSize, final ParamsInfo paramsInfo) {
+	default ResultInfo<E> search(
+			final int pageIndex,
+			final int pageSize,
+			final ParamsInfo paramsInfo) {
 		{
             // 方法头注解
 /*
-            @RequestMapping(value = "/{pageIndex}/{pageSize}", method = {RequestMethod.GET})
+            @GetMapping("/{pageIndex}/{pageSize}")
             @ResponseBody
 */
             // 方法接参模板，params 设置默认值为 "{}" 的目的在于，保证不会因为未传参数进不了方法
 /*
-            @PathVariable final int pageIndex, @PathVariable final int pageSize, @RequestParam(name = "params", required = false, defaultValue = "{}") final ParamsInfo paramsInfo) {
+            @PathVariable final int pageIndex,
+            @PathVariable final int pageSize,
+            @RequestParam(name = "params", required = false, defaultValue = "{}") final ParamsInfo paramsInfo) {
 */
             // 代码模板
 /*

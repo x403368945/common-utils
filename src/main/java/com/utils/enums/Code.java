@@ -20,8 +20,9 @@ public enum Code {
     USER_PWD_FAILURE("用户名密码错误"),
     USER_DISABLED("账户已禁用"),
     USER_LOCKED("账户已锁定"),
-    USER_EXPIRED("账户已过期或未激活，激活链接已发送至邮箱"),
+    USER_EXPIRED("账户已过期"),
     USER_CREDENTAILS_EXPIRED("证书已过期"),
+    USER_REGIST_AUTH("账户认证审核中"),
     PWD_ERROR("密码错误"),
     EMAIL_EXIST("邮箱已存在"),
     IMAGE_CODE_ERROR("图片验证码输入错误"),
@@ -35,6 +36,7 @@ public enum Code {
     DOWNLOAD_PERMISSION("无下载权限"),
     URL_INVALID("链接已失效"),
     CHECK_EMAIL("邮件发送失败，请检查邮箱是否正确"),
+    OLD_PASSWORD_ERROR("原密码输入错误"),
     ;
     /**
      * 枚举属性说明

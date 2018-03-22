@@ -9,7 +9,7 @@ public enum ContentType {
     stream(".*（ 二进制流）", "application/octet-stream"),
     xlsx(".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
     html(".html", "text/html"),
-    json(".html", "application/json"),
+    json(".json", "application/json"),
     xml(".xml", "text/xml")
     ;
     public final String comment;
