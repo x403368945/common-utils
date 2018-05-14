@@ -156,7 +156,24 @@ public class ExcelReader {
         }
         return this;
     }
-
+    /**
+     * 删除行，保留空行
+     *
+     * @return ExcelReader
+     */
+    public ExcelReader clearRow() {
+        sheet.removeRow(row);
+        return this;
+    }
+    /**
+     * 删除行，整行上移
+     *
+     * @return ExcelReader
+     */
+    public ExcelReader deleteRow() {
+        sheet.shiftRows(rowIndex, rowIndex, 1);
+        return this;
+    }
     /**
      * 选择读取列
      * @param columnIndex int 列索引
