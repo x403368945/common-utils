@@ -16,49 +16,49 @@ import java.util.List;
  * @param <E>
  */
 @NoRepositoryBean
-public interface IRepository<E> extends QuerydslPredicateExecutor<E> {
+public interface IRepository<E, ID> extends QuerydslPredicateExecutor<E> {
 	/**
 	 * 修改数据
-	 * @param id String 数据ID
+	 * @param id ID 数据ID
 	 * @param userId String 操作用户ID
 	 * @param obj E 实体对象
 	 * @return long 影响行数
 	 * @throws Exception 更新异常
 	 */
-	default long update(@NonNull final String id, @NonNull final String userId, @NonNull final E obj) throws Exception {
+	default long update(@NonNull final ID id, @NonNull final String userId, @NonNull final E obj) throws Exception {
 		throw new NullPointerException(this.getClass().getName() + "：方法【update(@NonNull final String id, @NonNull final String userId, @NonNull final E obj)】未实现");
 	}
 
 	/**
 	 * 按ID删除，物理删除
-	 * @param id String 数据ID
+	 * @param id ID 数据ID
 	 * @param userId String 操作用户ID
 	 * @return E 删除对象实体
 	 * @throws Exception 删除失败异常
 	 */
-	default E deleteById(@NonNull final String id, @NonNull final String userId) throws Exception {
+	default E deleteById(@NonNull final ID id, @NonNull final String userId) throws Exception {
 		throw new NullPointerException(this.getClass().getName() + "：方法【deleteById(@NonNull final String userId, @NonNull final String id)】未实现");
 	}
 
 	/**
 	 * 按ID删除，标记删除
-	 * @param id String 数据ID
+	 * @param id ID 数据ID
 	 * @param userId String 操作用户ID
 	 * @return long 影响行数
 	 * @throws Exception 删除失败异常
 	 */
-	default long markDeleteById(@NonNull final String id, @NonNull final String userId) throws Exception {
+	default long markDeleteById(@NonNull final ID id, @NonNull final String userId) throws Exception {
 		throw new NullPointerException(this.getClass().getName() + "：方法【markDeleteById(@NonNull final String id, @NonNull final String userId)】未实现");
 	}
 
 	/**
 	 * 批量操作按ID删除，标记删除
-	 * @param ids List<String> 数据ID
+	 * @param ids List<ID> 数据ID
 	 * @param userId String 操作用户ID
 	 * @return long 影响行数
 	 * @throws Exception 删除失败异常
 	 */
-	default long markDeleteById(@NonNull final List<String> ids, @NonNull final String userId) throws Exception {
+	default long markDeleteById(@NonNull final List<ID> ids, @NonNull final String userId) throws Exception {
 		throw new NullPointerException(this.getClass().getName() + "：方法【markDeleteById(@NonNull final List<String> ids, @NonNull final String userId)】未实现");
 	}
 

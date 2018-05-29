@@ -26,14 +26,14 @@ import java.util.stream.Stream;
 public class Sorts {
     public static OrderSpecifier[] qdslOrder(final Sorts defaultSort, Sorts... sorts) {
         if (Util.isEmpty(sorts)) return new OrderSpecifier[]{defaultSort.qdsl()};
-        final List<OrderSpecifier> list = Stream.of(sorts).map(v -> v.qdsl()).collect(Collectors.toList());
+        final List<OrderSpecifier> list = Stream.of(sorts).map(Sorts::qdsl).collect(Collectors.toList());
         return list.toArray(new OrderSpecifier[list.size()]);
     }
 
     public static Sort jpaOrder(final Sorts defaultSort, Sorts... sorts) {
         return Util.isEmpty(sorts)
                 ? (Util.isEmpty(defaultSort) ? null : defaultSort.jpa())
-                : Stream.of(sorts).map(v -> v.jpa()).reduce((s, v) -> s.and(v)).orElse(null);
+                : Stream.of(sorts).map(Sorts::jpa).reduce((s, v) -> s.and(v)).orElse(null);
     }
 
     private OrderSpecifier qdsl;

@@ -56,7 +56,7 @@ public class Http {
     public Http url(String url, Object... args) {
         if (Objects.nonNull(args)) {
             for (Object value : args) // 替换 url 参数占位符
-                url = url.replaceFirst("\\{([a-zA-Z0-9]+)?\\}", value.toString());
+                url = url.replaceFirst("\\{([a-zA-Z0-9]+)?}", value.toString());
         }
         this.url = url;
         return this;

@@ -10,23 +10,23 @@ public enum RegisterSource {
     /**
      * 管理员指定
      */
-    System("管理员指定"),
+    SYSTEM("管理员指定"),
     /**
      * PC-浏览器注册
      */
-    Web("PC-浏览器注册"),
+    WEB("PC-浏览器注册"),
     /**
      * Android App注册
      */
-    Android("Android App注册"),
+    ANDROID("Android App注册"),
     /**
      * IOS App注册
      */
-    Ios("IOS App注册"),
+    IOS("IOS App注册"),
     /**
      * 微信注册
      */
-    Wechat("微信注册");
+    WECHAT("微信注册");
     /**
      * 枚举属性说明
      */

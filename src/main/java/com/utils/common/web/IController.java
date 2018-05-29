@@ -12,7 +12,7 @@ import com.utils.enums.Code;
  * @author Jason Xie 2017年7月14日 上午11:23:18
  * @param <E>
  */
-public interface IController<E> {
+public interface IController<E, ID> {
 	/**
 	 * 保存
 	 * URL:/{模块url前缀}
@@ -51,11 +51,11 @@ public interface IController<E> {
 	 * 修改数据
 	 * URL:/{模块url前缀}/{id}
 	 * 参数：params=JSONObject
-	 * @param id String 数据ID
+	 * @param id ID 数据ID
 	 * @param paramsInfo ParamsInfo 参数对象
 	 * @return ResultInfo<E>
 	 */
-	default ResultInfo<E> update(final String id, ParamsInfo paramsInfo) {
+	default ResultInfo<E> update(final ID id, ParamsInfo paramsInfo) {
 		{
             // 方法头注解
 /*
@@ -87,10 +87,10 @@ public interface IController<E> {
 	 * 按ID删除，物理删除
 	 * URL:/{模块url前缀}/{id}
 	 * 参数：{id}数据ID；
-	 * @param id String  数据ID
+	 * @param id ID  数据ID
 	 * @return ResultInfo<Object>
 	 */
-	default ResultInfo<Object> deleteById(final String id) {
+	default ResultInfo<Object> deleteById(final ID id) {
 		{
             // 方法头注解
 /*
@@ -125,7 +125,7 @@ public interface IController<E> {
 	 * @param id String 数据ID
 	 * @return ResultInfo<Object>
 	 */
-	default ResultInfo<Object> markDeleteById(final String id) {
+	default ResultInfo<Object> markDeleteById(final ID id) {
 		{
             // 方法头注解
 /*
@@ -197,7 +197,7 @@ public interface IController<E> {
 	 * @param id 数据ID
 	 * @return ResultInfo<E>
 	 */
-	default ResultInfo<E> getById(final String id) {
+	default ResultInfo<E> getById(final ID id) {
 		{
             // 方法头注解
 /*

@@ -1,7 +1,5 @@
 package com.utils.util;
 
-import org.apache.poi.ss.formula.functions.T;
-
 import java.util.*;
 
 import static com.utils.enums.Code.PARAMS_ERROR;
@@ -56,7 +54,7 @@ public class Params {
      * @param values T[] 数组
      * @param message String 异常消息内容
      */
-    public static void notEmpty(final T[] values, final String message) {
+    public static <T> void notEmpty(final T[] values, final String message) {
         if (Objects.isNull(values) || values.length == 0) throw PARAMS_ERROR.exception(message);
     }
 

@@ -14,17 +14,17 @@ import java.util.Optional;
  * @author Jason Xie 2017年7月14日 上午11:23:18
  * @param <E>
  */
-public interface ISearchService<E> {
+public interface ISearchService<E, ID> {
 //	IRepository<E> getFindRepository();
 
 	/**
 	 * 按ID查询对象
-	 * @param id 数据ID
+	 * @param id ID 数据ID
 	 * @return Optional<E> 实体对象
 	 * @throws Exception 查询异常
 	 */
-	default Optional<E> getById(@NonNull final String id) throws Exception {
-		throw new NullPointerException(this.getClass().getName() + "：方法【getById(@NonNull final String id)】未实现");
+	default Optional<E> getById(@NonNull final ID id) throws Exception {
+		throw new NullPointerException(this.getClass().getName() + "：方法【getById(@NonNull final ID id)】未实现");
 	}
 	/**
 	 * 按条件查询列表
