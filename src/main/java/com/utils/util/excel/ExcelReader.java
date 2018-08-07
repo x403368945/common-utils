@@ -28,7 +28,7 @@ import java.util.function.Consumer;
  */
 
 @Slf4j
-public class ExcelReader {
+public class ExcelReader implements ICellReader {
     private ExcelReader(final Workbook workbook) {
         this.workbook = workbook;
     }
@@ -72,6 +72,7 @@ public class ExcelReader {
     /**
      * 当前操作列
      */
+    @Getter
     private Cell cell;
     /**
      * 当前行索引
@@ -85,7 +86,7 @@ public class ExcelReader {
     private int lastRowIndex;
     private DataFormatter dataFormatter;
 
-    private DataFormatter getDataFormatter() {
+    public DataFormatter getDataFormatter() {
         if (Objects.isNull(dataFormatter)) dataFormatter = new DataFormatter();
         return dataFormatter;
     }
@@ -253,178 +254,6 @@ public class ExcelReader {
         return rowIndex > lastRowIndex;
     }
 
-    /**
-     * 判断单元格是否非空
-     * @return boolean true：非空，false：空
-     */
-    public boolean cellNotEmpty() {
-        return Objects.nonNull(this.cell);
-    }
-
-    /**
-     * 判断单元格是否为空
-     * @return boolean true：空，false：非空
-     */
-    private boolean cellEmpty() {
-        return Objects.isNull(cell) || Objects.equals(CellType.BLANK, cell.getCellTypeEnum());
-    }
-
-    /**
-     * 返回单元格数据原始值
-     * @return Optional<Object>
-     */
-    public Optional<Object> value() {
-        return value(false);
-    }
-
-    /**
-     * 获取单元格数据
-     * @param format boolean 返回时是否格式化单元格数据；true：是，false：否
-     * @return Optional<Object>
-     */
-    public Optional<Object> value(final boolean format) {
-        if (cellEmpty()) return Optional.empty();
-        switch (cell.getCellTypeEnum()) {
-            case STRING:
-                return Optional.of(cell.getStringCellValue());
-            case NUMERIC:
-                if (format) {
-                    String formatPattern = cell.getCellStyle().getDataFormatString();
-                    final CellStyle style = cell.getCellStyle();
-                    if (Util.isEmpty(formatPattern)) {
-                        formatPattern = BuiltinFormats.getBuiltinFormat(style.getDataFormat());
-                    }
-                    return Optional.of(getDataFormatter().formatRawCellContents(cell.getNumericCellValue(), style.getDataFormat(), formatPattern));
-                }
-                return Optional.of(DateUtil.isCellDateFormatted(cell) ? cell.getDateCellValue().getTime() : cell.getNumericCellValue());
-            case BOOLEAN:
-                return Optional.of(cell.getBooleanCellValue());
-            case FORMULA:
-                if (format) {
-                    String formatPattern = cell.getCellStyle().getDataFormatString();
-                    final CellStyle style = cell.getCellStyle();
-                    if (Util.isEmpty(formatPattern)) {
-                        formatPattern = BuiltinFormats.getBuiltinFormat(style.getDataFormat());
-                    }
-                    return Optional.of(new DataFormatter().formatRawCellContents(cell.getNumericCellValue(), style.getDataFormat(), formatPattern));
-                }
-                switch (cell.getCachedFormulaResultTypeEnum()) {
-                    case _NONE:
-                        break;
-                    case NUMERIC:
-                        return Optional.of(cell.getNumericCellValue());
-                    case STRING:
-                        return Optional.of(cell.getStringCellValue());
-                    case FORMULA:
-                        break;
-                    case BLANK:
-                        break;
-                    case BOOLEAN:
-                        break;
-                    case ERROR:
-                        break;
-                }
-        }
-        cell.setCellType(CellType.STRING);
-        return Optional.of(cell.getStringCellValue());
-    }
-
-    /**
-     * 获取单元格文本，保留null值
-     * @return String
-     */
-    public String text() {
-        return value().map(v -> {
-            if (v instanceof Double) return Num.of(v).toBigDecimal().toPlainString(); // 解决科学计数法 toString()问题
-            else return v.toString();
-        }).orElse(null);
-    }
-
-    /**
-     * 获取单元格文本，null值默认为空字符串 ""
-     * @return String
-     */
-    public String textOfEmpty() {
-        return Optional.ofNullable(text()).orElse("");
-    }
-    /**
-     * 获取单元格数值，空值和非数字默认为null
-     * @return {@link Num}
-     */
-    public Num number() {
-        return value().map(Num::of).orElse(null);
-    }
-
-    /**
-     * 获取单元格数值，空值和非数字默认为0
-     * @return {@link Num}
-     */
-    public Num numberOfZore() {
-        return value().map(v -> Num.of(v.toString(), 0)).orElse(Num.of(0));
-    }
-
-    /**
-     * 获取单元格日期对象
-     * @return {@link Dates}
-     */
-    public Dates date() {
-        return value().map(v -> Num.of(v.toString()).toDate()).orElse(null);
-    }
-    /**
-     * 获取公式 不使用占位符替换行号
-     * @return String
-     */
-    public String formula() {
-        return formula(false);
-    }
-
-    /**
-     * 获取公式
-     * @param holder boolean 公式中间的行号是否使用{0}占位；true是，false否
-     * @return String
-     */
-    public String formula(boolean holder) {
-        if (cellEmpty()) return null;
-        if(Objects.equals(CellType.FORMULA, cell.getCellTypeEnum()))
-            return holder
-                    ? cell.getCellFormula().replaceAll("(?<=[A-Z])" + (rowIndex + 1), "{0}") // 获取到的公式将会使用正则替换为行占位符
-                    : cell.getCellFormula();
-        return null;
-    }
-
-    /**
-     * 获取样式索引
-     * @return Integer
-     */
-    public Integer sindex() {
-        return Objects.isNull(cell) ? null : (int) cell.getCellStyle().getIndex();
-    }
-
-    /**
-     * 获取格式化之后的字符串
-     * @return String
-     */
-    public String dataFormat() {
-        return Objects.isNull(cell) ? null : cell.getCellStyle().getDataFormatString();
-    }
-
-    /**
-     * 获取单元格数据类型
-     * @return {@link DataType}
-     */
-    public DataType type() {
-        if(Objects.isNull(cell)) return null;
-        switch (cell.getCellTypeEnum()){
-            case NUMERIC:
-                if(DateUtil.isCellDateFormatted(cell)) return DataType.DATE;
-                else if(Optional.ofNullable(dataFormat()).orElse("").endsWith("%")) return DataType.PERCENT;
-                else return DataType.NUMBER;
-            case FORMULA:
-                if(CellType.NUMERIC == cell.getCachedFormulaResultTypeEnum()) return DataType.NUMBER;
-        }
-        return DataType.TEXT;
-    }
-
     @SneakyThrows
     public void close() {
         workbook.close();
@@ -452,10 +281,10 @@ public class ExcelReader {
                     );
                     sb.append("</tr>\n");
                 } while (!reader.next().hasEnd());
-//                System.out.println(FWrite.build().to(Path.TEMP.file(file.getName() + ".html")).write(sb.toString()).getFilePath().orElse(null));
+                System.out.println(FWrite.of("", "src", "test", "files", "temp",file.getName() + ".html").write(sb.toString()).getAbsolute().orElse(null));
             };
-//            read.accept(Path.EXCEL.file("test.xlsx"));
-//            read.accept(Path.EXCEL.file("test.xls"));
+            read.accept(FPath.of("", "src", "test", "files", "excel", "test.xls").file());
+            read.accept(FPath.of("", "src", "test", "files", "excel", "test.xlsx").file());
         }
         {
             Consumer<File> read = (file) -> {
@@ -472,10 +301,11 @@ public class ExcelReader {
                     map.get(reader.cell(A).textOfEmpty())
                             .add(Objects.isNull(reader.cell(B).text()) ? reader.cell(C).text() : reader.cell(B).text());
                 } while (!reader.next().hasEnd());
-//                System.out.println(FWrite.build().to(Path.TEMP.file(file.getName() + ".json")).writeJson(map).getFilePath().orElse(null));
+
+                System.out.println(FWrite.of("", "src", "test", "files", "temp",file.getName() + ".json").writeJson(map).getAbsolute().orElse(null));
             };
-//            read.accept(Path.EXCEL.file("地区划分.xlsx"));
-//            read.accept(Path.EXCEL.file("地区划分.xls"));
+            read.accept(FPath.of("", "src", "test", "files", "excel", "地区划分.xls").file());
+            read.accept(FPath.of("", "src", "test", "files", "excel", "地区划分.xlsx").file());
         }
     }
 }

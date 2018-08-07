@@ -32,7 +32,7 @@ import java.util.function.Supplier;
  * @author Jason Xie on 2017/11/7.
  */
 @Slf4j
-public class SSheetWriter implements ISheetWriter {
+public class SSheetWriter implements ISheetWriter<SSheetWriter> {
     private SSheetWriter(final SXSSFSheet sheet, final Options ops) {
         this.ops = Objects.isNull(ops) ? Options.builder().build() : ops;
         this.workbook = sheet.getWorkbook();
