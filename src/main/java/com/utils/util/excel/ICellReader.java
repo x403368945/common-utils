@@ -10,7 +10,9 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
- * Excel 单元格读取
+ * Cell单元格读取操作
+ *
+ * @author Jason Xie on 2018-8-8.
  */
 public interface ICellReader {
     /**
@@ -86,6 +88,7 @@ public interface ICellReader {
                             .orElse(BuiltinFormats.getBuiltinFormat(style.getDataFormat()));
                     return Optional.of(new DataFormatter().formatRawCellContents(getCell().getNumericCellValue(), style.getDataFormat(), formatPattern));
                 }
+                // Cell.getCachedFormulaResultTypeEnum() 可以判断公式计算结果得出的数据类型；前置条件必须是 Cell.getCellTypeEnum() = CellType.FORMULA
                 switch (getCell().getCachedFormulaResultTypeEnum()) {
                     case _NONE:
                         break;

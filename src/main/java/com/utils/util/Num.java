@@ -80,7 +80,7 @@ public class Num {
      */
     public static Num of(Object value) {
         if (Objects.isNull(value)) return new Num();
-        return of(value.toString());
+        return of(Objects.toString(value));
     }
     /**
      * 构造数字处理对象， 不能为null，转换失败则抛出异常

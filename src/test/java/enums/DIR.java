@@ -1,21 +1,24 @@
 package enums;
 
+import com.alibaba.fastjson.JSON;
 import com.utils.util.FPath;
 import com.utils.util.FWrite;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.function.Consumer;
 
 /**
  * 单元测试文件定义目录
+ *
  * @author Jason Xie on 2017/12/13.
  */
 public enum DIR {
     ROOT("项目根目录", Paths.get("").toAbsolutePath().toString()),
     FILES("test/files目录", ROOT.absolute("src", "test", "files")),
-    TEMP("文件上传及临时文件存储目录", FILES.absolute("temp")),
-    ;
+    TEMP("文件上传及临时文件存储目录", FILES.absolute("temp")),;
     /**
      * 枚举属性说明
      */
@@ -26,14 +29,17 @@ public enum DIR {
         this.comment = comment;
         this.path = path;
     }
+
     /**
      * 获取文件路径操作对象
+     *
      * @param names String[] 追加目录名或文件名
      * @return FPath
      */
     public FPath fpath(String... names) {
         return FPath.of(this.path, names);
     }
+
     /**
      * 获取绝对路径
      *
@@ -81,5 +87,20 @@ public enum DIR {
         for (DIR dir : DIR.values()) {
             System.out.println(dir.absolute());
         }
+        run(3, 3, 6, 1);
+        run(3, 4, 6, 1);
+        run(3, 3, 6, 2);
+        run(3, 4, 6, 2);
+        run(3, 3, 6, 3);
+        run(3, 4, 6, 3);
+        run(3, 5, 6, 3);
     }
+
+    public static void run(int start, int end, int to, int count) {
+        System.out.println(JSON.toJSONString(Arrays.asList(start, end, to, count)) + "****************************************");
+        for (int i = 0; i < count; i++) {
+            System.out.println(to + i + (i * (end - start)));
+        }
+    }
+
 }

@@ -9,7 +9,8 @@ import java.util.Objects;
 
 /**
  * 样式库依赖对象
- * @author Jason Xie on 2017/11/20.
+ *
+ * @author Jason Xie on 2018-8-8.
  */
 class CloneStyles {
     CloneStyles(final StylesTable fromStyleTable, final Workbook toWorkbook) {
