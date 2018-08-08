@@ -175,5 +175,36 @@ public class ExcelRewriter implements ISheetWriter<ExcelRewriter>, ISheetReader<
             rwriter.getWorkbook().write(fileOutputStream);
             log.debug("写入路径：" + path.toAbsolutePath());
         }
+        {
+            ExcelRewriter rwriter = ExcelRewriter
+                    .of(
+                            FCopy.ofDefault()
+                                    .from("src/test/files/excel/联系人.xls")
+                                    .rename().to("src/test/files/temp/")
+                                    .copy()
+                                    .getNewFile()
+                                    .orElseThrow(() -> new RuntimeException("文件复制失败")),
+                            Options.builder().build()
+                    )
+                    .sheet(0)
+                    .row(1);
+            rwriter
+                    .cell(0).writeNumber(1)
+                    .cell(2).writeByCellType("187-0000-0000")
+
+                    .next()
+                    .cell(0).writeNumber(2)
+                    .cell(2).writeByCellType("187-0000-0001")
+
+                    .next()
+                    .cell(0).writeNumber(3)
+                    .cell(2).writeByCellType("187-0000-0002")
+            ;
+
+            Path path = Paths.get("logs", "重写.xls").toAbsolutePath();
+            @Cleanup FileOutputStream fileOutputStream = new FileOutputStream(path.toFile());
+            rwriter.getWorkbook().write(fileOutputStream);
+            log.debug("写入路径：" + path.toAbsolutePath());
+        }
     }
 }
