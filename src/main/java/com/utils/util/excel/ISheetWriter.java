@@ -1,13 +1,11 @@
 package com.utils.util.excel;
 
-import com.utils.util.Util;
 import lombok.Builder;
 import lombok.Cleanup;
 import lombok.NonNull;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackageAccess;
-import org.apache.poi.ss.formula.functions.T;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.eventusermodel.XSSFReader;
@@ -179,12 +177,15 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
      * @return <T extends ISheetWriter>
      */
     default T appendStyleOfRow(@NonNull final CellStyles cellStyles) {
-        getRow().forEach(cell -> {
-//            // 当索引为 0 ，表示未附加任何样式，需要新建样式
-//            if (0 == cell.getCellStyle().getIndex()) cell.setCellStyle(cellStyles.createCellStyle(workbook));
-//            else cell.setCellStyle(cellStyles.appendClone(workbook, (CellStyle) cell.getCellStyle()));
-            cell.setCellStyle(cellStyles.appendClone(getSheet().getWorkbook(), cell.getCellStyle()));
-        });
+        for (int i = 0; i < getRow().getLastCellNum(); i++) {
+            cellOfNew(i).getCell().setCellStyle(cellStyles.appendClone(getSheet().getWorkbook(), getCell().getCellStyle()));
+        }
+//        getRow().forEach(cell -> {
+////            // 当索引为 0 ，表示未附加任何样式，需要新建样式
+////            if (0 == cell.getCellStyle().getIndex()) cell.setCellStyle(cellStyles.createCellStyle(workbook));
+////            else cell.setCellStyle(cellStyles.appendClone(workbook, (CellStyle) cell.getCellStyle()));
+//            cell.setCellStyle(cellStyles.appendClone(getSheet().getWorkbook(), cell.getCellStyle()));
+//        });
         return (T) this;
     }
 
@@ -327,7 +328,7 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
                         // Sheet sheet, int fromStratRowIndex, int fromEndRowIndex, int toRowIndex, int repeatCount, CellCopyPolicy cellCopyPolicy
                         if (Objects.isNull(cellCopyPolicy)) cellCopyPolicy = defaultCellCopyPolicy;
                         final XSSFSheet xsheet = (XSSFSheet) sheet;
-                        for (int i = 0; i <= repeatCount; i++) {
+                        for (int i = 0; i < repeatCount; i++) {
                             xsheet.copyRows(fromStratRowIndex, fromEndRowIndex, toRowIndex + i + (i * (fromEndRowIndex - fromStratRowIndex)), cellCopyPolicy);
                         }
                     }),

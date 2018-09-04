@@ -124,13 +124,13 @@ public class ExcelReader implements ISheetReader<ExcelReader>, ICellReader {
     }
 
     @Override
-    public ExcelReader setRowIndex(int rowIndex) {
+    public ExcelReader setRowIndex(final int rowIndex) {
         this.rowIndex = rowIndex;
         return this;
     }
 
     @Override
-    public ExcelReader row(Row row) {
+    public ExcelReader row(final Row row) {
         if (Objects.nonNull(row)) rowIndex = row.getRowNum();
         this.row = row;
         this.cell = null;
@@ -138,7 +138,7 @@ public class ExcelReader implements ISheetReader<ExcelReader>, ICellReader {
     }
 
     @Override
-    public ExcelReader cell(Cell cell) {
+    public ExcelReader cell(final Cell cell) {
         this.cell = cell;
         return this;
     }
@@ -153,7 +153,7 @@ public class ExcelReader implements ISheetReader<ExcelReader>, ICellReader {
         String label;
         for (int i = 0; i < row.getLastCellNum(); i++) {
             cell(i);
-            if (Util.isNotEmpty(label = text()))
+            if (Util.isNotEmpty(label = stringValue()))
                 headers.add(Header.builder().index(i).label(label.trim()).type(DataType.TEXT).sindex(sindex()).build());
         }
         return headers;
@@ -163,12 +163,12 @@ public class ExcelReader implements ISheetReader<ExcelReader>, ICellReader {
      * 获取头部列名加索引
      * 警告：重复的列名将会被覆盖；若不能保证列名不重复，请使用 {@link ExcelReader#headers()}
      *
-     * @return Map<String ,   Integer>
+     * @return Map<String   ,       Integer>
      */
     public LinkedHashMap<String, Integer> mapHeaders() {
         final LinkedHashMap<String, Integer> map = new LinkedHashMap<>();
         for (int i = 0; i < row.getLastCellNum(); i++) {
-            map.put(cell(i).textOfEmpty().trim(), i);
+            map.put(cell(i).stringOfEmpty().trim(), i);
         }
         map.remove("");
         return map;
@@ -177,7 +177,7 @@ public class ExcelReader implements ISheetReader<ExcelReader>, ICellReader {
     /**
      * 获取当前行，整行数据
      *
-     * @return LinkedHashMap<Integer       ,               Object>
+     * @return LinkedHashMap<Integer   ,       Object>
      */
     public LinkedHashMap<Integer, Object> rowObject() {
         final LinkedHashMap<Integer, Object> map = new LinkedHashMap<>();
@@ -191,7 +191,7 @@ public class ExcelReader implements ISheetReader<ExcelReader>, ICellReader {
      * 获取当前行指定列数据
      *
      * @param headers List<Header> 来自 {@link ExcelReader#headers()}
-     * @return LinkedHashMap<String       ,               Object>
+     * @return LinkedHashMap<String                               ,                                                               Object>
      */
     public LinkedHashMap<String, Object> rowObject(final List<Header> headers) {
         final LinkedHashMap<String, Object> map = new LinkedHashMap<>();
@@ -203,7 +203,7 @@ public class ExcelReader implements ISheetReader<ExcelReader>, ICellReader {
      * 获取当前行指定列数据
      *
      * @param mapHeaders Map<String, Integer> 来自 {@link ExcelReader#mapHeaders()}
-     * @return LinkedHashMap<String       ,               Object>
+     * @return LinkedHashMap<String                               ,                                                               Object>
      */
     public LinkedHashMap<String, Object> rowObject(final Map<String, Integer> mapHeaders) {
         final LinkedHashMap<String, Object> map = new LinkedHashMap<>();
@@ -233,11 +233,11 @@ public class ExcelReader implements ISheetReader<ExcelReader>, ICellReader {
                     sb.append("<tr>\n");
                     columnIndexs.forEach(index ->
                             sb.append("<td class=\"text-x-small p-3" + (index == 0 ? " text-left" : "") + "\">")
-                                    .append(reader.cell(index).textOfEmpty())
+                                    .append(reader.cell(index).stringOfEmpty())
                                     .append("</td>\n")
                     );
                     sb.append("</tr>\n");
-                } while (!reader.next().hasEnd());
+                } while (Objects.nonNull(reader.next()));
                 System.out.println(FWrite.of(String.format("src/test/files/temp/%s.html", file.getName())).write(sb.toString()).getAbsolute().orElse(null));
             };
             read.accept(FPath.of("src/test/files/excel/test.xls").file());
@@ -251,13 +251,13 @@ public class ExcelReader implements ISheetReader<ExcelReader>, ICellReader {
                 @Cleanup ExcelReader reader = ExcelReader.of(file).sheet(3).row(1); // 读取第 4 个 sheet ，从第 2 行开始
                 Map<String, TreeSet<String>> map = new LinkedHashMap<>();
                 do {
-                    map.put(reader.cell(A).textOfEmpty(), new TreeSet<>());
-                } while (!reader.next().hasEnd());
+                    map.put(reader.cell(A).stringOfEmpty(), new TreeSet<>());
+                } while (Objects.nonNull(reader.next()));
                 reader.row(1);
                 do {
-                    map.get(reader.cell(A).textOfEmpty())
-                            .add(Objects.isNull(reader.cell(B).text()) ? reader.cell(C).text() : reader.cell(B).text());
-                } while (!reader.next().hasEnd());
+                    map.get(reader.cell(A).stringOfEmpty())
+                            .add(Objects.isNull(reader.cell(B).stringValue()) ? reader.cell(C).stringValue() : reader.cell(B).stringValue());
+                } while (Objects.nonNull(reader.next()));
 
                 System.out.println(FWrite.of(String.format("src/test/files/temp/%s.json", file.getName())).writeJson(map).getAbsolute().orElse(null));
             };

@@ -30,12 +30,12 @@ public interface ICellReader {
     DataFormatter getDataFormatter();
 
     /**
-     * 判断单元格是否非空，对 {@link ICellReader#cellEmpty} 取反
+     * 判断单元格是否非空，对 {@link ICellReader#cellIsNull} 取反
      *
      * @return boolean true：非空，false：空
      */
-    default boolean cellNotEmpty() {
-        return !cellEmpty();
+    default boolean cellNotNull() {
+        return !cellIsNull();
     }
 
     /**
@@ -43,7 +43,25 @@ public interface ICellReader {
      *
      * @return boolean true：空，false：非空
      */
-    default boolean cellEmpty() {
+    default boolean cellIsNull() {
+        return Objects.isNull(getCell());
+    }
+
+    /**
+     * 判断单元格是否非空，对 {@link ICellReader#cellIsBlank} 取反
+     *
+     * @return boolean true：非空，false：空
+     */
+    default boolean cellNotBlank() {
+        return !cellIsBlank();
+    }
+
+    /**
+     * 判断单元格是否为空，cell对象不存在 或者 单元格类型为CellType.BLANK，表示单元格为空
+     *
+     * @return boolean true：空，false：非空
+     */
+    default boolean cellIsBlank() {
         return Objects.isNull(getCell()) || Objects.equals(CellType.BLANK, getCell().getCellTypeEnum());
     }
 
@@ -63,7 +81,7 @@ public interface ICellReader {
      * @return Optional<Object>
      */
     default Optional<Object> value(final boolean format) {
-        if (cellEmpty()) return Optional.empty();
+        if (cellIsBlank()) return Optional.empty();
         switch (getCell().getCellTypeEnum()) {
             case STRING:
                 return Optional.of(getCell().getStringCellValue());
@@ -115,7 +133,7 @@ public interface ICellReader {
      *
      * @return String
      */
-    default String text() {
+    default String stringValue() {
         return value().map(v -> {
             if (v instanceof Double) return Num.of(v).toBigDecimal().toPlainString(); // 解决科学计数法 toString()问题
             else return v.toString();
@@ -127,8 +145,8 @@ public interface ICellReader {
      *
      * @return String
      */
-    default String textOfEmpty() {
-        return Optional.ofNullable(text()).orElse("");
+    default String stringOfEmpty() {
+        return Optional.ofNullable(stringValue()).orElse("");
     }
 
     /**
@@ -136,7 +154,7 @@ public interface ICellReader {
      *
      * @return {@link Num}
      */
-    default Num number() {
+    default Num numberValue() {
         return value().map(Num::of).orElse(null);
     }
 
@@ -154,7 +172,7 @@ public interface ICellReader {
      *
      * @return {@link Dates}
      */
-    default Dates date() {
+    default Dates dateValue() {
         return value().map(v -> Num.of(v.toString()).toDate()).orElse(null);
     }
 
@@ -164,7 +182,7 @@ public interface ICellReader {
      * @return String
      */
     default String formula() {
-        return formula(null);
+        return formula(() -> getCell().getRowIndex());
     }
 
     /**
@@ -174,10 +192,10 @@ public interface ICellReader {
      * @return String
      */
     default String formula(Supplier<Integer> rowIndex) {
-        if (cellEmpty()) return null;
+        if (cellIsBlank()) return null;
         if (Objects.equals(CellType.FORMULA, getCell().getCellTypeEnum()))
             return Objects.nonNull(rowIndex)
-                    ? getCell().getCellFormula().replaceAll("(?<=[A-Z])" + (rowIndex.get() + 1), "{0}") // 获取到的公式将会使用正则替换为行占位符
+                    ? getCell().getCellFormula().replaceAll(String.format("(?<=[A-Z])%d", rowIndex.get() + 1), "{0}") // 获取到的公式将会使用正则替换为行占位符
                     : getCell().getCellFormula();
         return null;
     }
@@ -216,5 +234,15 @@ public interface ICellReader {
                 if (CellType.NUMERIC == getCell().getCachedFormulaResultTypeEnum()) return DataType.NUMBER;
         }
         return DataType.TEXT;
+    }
+
+    /**
+     * 获取单元格数据类型
+     *
+     * @return {@link CellType}
+     */
+    default CellType cellType() {
+        if (Objects.isNull(getCell())) return null;
+        return getCell().getCellTypeEnum();
     }
 }

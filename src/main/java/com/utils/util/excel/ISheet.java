@@ -2,15 +2,18 @@ package com.utils.util.excel;
 
 import lombok.NonNull;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
  * Sheet 读写需要的基本方法
- * @author Jason Xie on 2018-8-8.
  *
+ * @author Jason Xie on 2018-8-8.
  */
 public interface ISheet<T> {
     /**
@@ -27,7 +30,6 @@ public interface ISheet<T> {
      */
     Row getRow();
 
-
     /**
      * 获取行索引，getRowIndex() = getRow().getRowNum()
      *
@@ -36,12 +38,22 @@ public interface ISheet<T> {
     int getRowIndex();
 
     /**
+     * 获取行号，getRownum() = getRowIndex() + 1
+     *
+     * @return int
+     */
+    default int getRownum() {
+        return getRowIndex() + 1;
+    }
+
+    /**
      * 设置当前操作行索引
      *
      * @param rowIndex int
      * @return <T extends ISheet>
      */
     T setRowIndex(final int rowIndex);
+
     /**
      * 设置当前操作行
      *
@@ -89,5 +101,18 @@ public interface ISheet<T> {
     default T cell(final int columnIndex) {
         cell(Objects.isNull(getRow()) ? null : getRow().getCell(columnIndex));
         return (T) this;
+    }
+
+    /**
+     * 获取当前操作行所有列的数据类型，便于后面写入时确定数据类型
+     *
+     * @return Map<Integer   [   columnIndex   ]   ,       CellType>
+     */
+    default Map<Integer, CellType> cellTypes() {
+        final Map<Integer, CellType> cellTypes = new HashMap<>();
+        getRow().forEach(cell ->
+                cellTypes.put(cell.getColumnIndex(), cell.getCellTypeEnum())
+        );
+        return cellTypes;
     }
 }

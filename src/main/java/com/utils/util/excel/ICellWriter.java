@@ -1,6 +1,7 @@
 package com.utils.util.excel;
 
 import com.utils.enums.DataType;
+import com.utils.util.Dates;
 import com.utils.util.Num;
 import com.utils.util.Util;
 import org.apache.poi.ss.usermodel.Cell;
@@ -10,8 +11,11 @@ import org.apache.poi.ss.usermodel.CellType;
 import javax.annotation.Nonnull;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
+
+import static com.utils.util.Dates.Pattern.yyyy_MM_dd;
 
 /**
  * Cell单元格写入操作
@@ -88,11 +92,25 @@ public interface ICellWriter<T extends ICellWriter> {
     /**
      * 自动识别当前写入单元格的数据类型，无法识别的都以字符串写入<br>
      * 尽量使用明确数据类型的方法写入，避免错误
+     *
      * @param value Object 写入值
      * @return <T extends ICellWriter>
      */
     default T writeByCellType(final Object value) {
+        if (Objects.isNull(value)) return setCellBlank();
+//        if (Objects.isNull(getCell().getCellTypeEnum())) return writeText(Objects.toString(value));
         return write(getCell().getCellTypeEnum(), value);
+    }
+
+    /**
+     * 向当前单元格写入数据
+     *
+     * @param cellTypes Map<Integer[columnIndex], CellType> 写入数据单元格类型集合
+     * @param value     Object 写入值
+     * @return <T extends ICellWriter>
+     */
+    default T write(final Map<Integer, CellType> cellTypes, final Object value) {
+        return write(cellTypes.getOrDefault(getCell().getColumnIndex(), CellType.STRING), value);
     }
 
     /**
@@ -115,6 +133,8 @@ public interface ICellWriter<T extends ICellWriter> {
                     final String v = Objects.toString(value).trim();
                     if (v.matches("^\\d+$")) writeNumber(Num.of(value).longValue());
                     else if (v.matches("^\\d+\\.\\d+$")) writeNumber(Num.of(value).doubleValue());
+                    else if (v.matches("^\\d{4}-\\d{1,2}-\\d{1,2}$"))
+                        writeDate(Dates.of(Objects.toString(value), yyyy_MM_dd).timestamp());
                     else writeText(v);
                     break;
                 case BLANK:
