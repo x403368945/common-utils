@@ -3,6 +3,7 @@ package com.utils.util.excel;
 import com.utils.common.entity.excel.Header;
 import com.utils.common.entity.excel.Position;
 import com.utils.enums.DataType;
+import com.utils.exception.NotFoundException;
 import com.utils.util.FPath;
 import com.utils.util.FWrite;
 import com.utils.util.Util;
@@ -32,7 +33,7 @@ public class ExcelReader implements ISheetReader<ExcelReader>, ICellReader {
     }
 
     public static ExcelReader of(final String path, String... names) {
-        return of(FPath.of(path, names).file());
+        return of(FPath.of(path, names).file(), true);
     }
 
     public static ExcelReader of(@NonNull final File file) {
@@ -41,11 +42,11 @@ public class ExcelReader implements ISheetReader<ExcelReader>, ICellReader {
 
     @SneakyThrows
     public static ExcelReader of(@NonNull final File file, final boolean readOnly) {
-        if (!file.exists()) throw new NullPointerException("文件不存在：" + file.getAbsolutePath());
+        if (!file.exists()) throw new NotFoundException("文件不存在：".concat(file.getAbsolutePath()));
         if (file.getName().endsWith(".xls")) {
             return new ExcelReader(new HSSFWorkbook(new NPOIFSFileSystem(file, readOnly)));
         } else if (file.getName().endsWith(".xlsx")) {
-            @Cleanup OPCPackage pkg = OPCPackage.open(file, readOnly ? PackageAccess.READ : PackageAccess.READ_WRITE);
+            @Cleanup final OPCPackage pkg = OPCPackage.open(file, readOnly ? PackageAccess.READ : PackageAccess.READ_WRITE);
             return new ExcelReader(new XSSFWorkbook(pkg));
         } else {
             throw new IllegalArgumentException("未知的文件后缀");
@@ -53,7 +54,7 @@ public class ExcelReader implements ISheetReader<ExcelReader>, ICellReader {
     }
 
     public static ExcelReader of(@NonNull final Sheet sheet) {
-        ExcelReader reader = new ExcelReader(sheet.getWorkbook());
+        final ExcelReader reader = new ExcelReader(sheet.getWorkbook());
         reader.sheet = sheet;
         return reader;
     }
@@ -163,7 +164,7 @@ public class ExcelReader implements ISheetReader<ExcelReader>, ICellReader {
      * 获取头部列名加索引
      * 警告：重复的列名将会被覆盖；若不能保证列名不重复，请使用 {@link ExcelReader#headers()}
      *
-     * @return Map<String   ,       Integer>
+     * @return Map<String               ,                               Integer>
      */
     public LinkedHashMap<String, Integer> mapHeaders() {
         final LinkedHashMap<String, Integer> map = new LinkedHashMap<>();
@@ -177,7 +178,7 @@ public class ExcelReader implements ISheetReader<ExcelReader>, ICellReader {
     /**
      * 获取当前行，整行数据
      *
-     * @return LinkedHashMap<Integer   ,       Object>
+     * @return LinkedHashMap<Integer               ,                               Object>
      */
     public LinkedHashMap<Integer, Object> rowObject() {
         final LinkedHashMap<Integer, Object> map = new LinkedHashMap<>();
@@ -191,7 +192,7 @@ public class ExcelReader implements ISheetReader<ExcelReader>, ICellReader {
      * 获取当前行指定列数据
      *
      * @param headers List<Header> 来自 {@link ExcelReader#headers()}
-     * @return LinkedHashMap<String                               ,                                                               Object>
+     * @return LinkedHashMap<String                                                                                                                               ,                                                                                                                                                                                                                                                               Object>
      */
     public LinkedHashMap<String, Object> rowObject(final List<Header> headers) {
         final LinkedHashMap<String, Object> map = new LinkedHashMap<>();
@@ -203,7 +204,7 @@ public class ExcelReader implements ISheetReader<ExcelReader>, ICellReader {
      * 获取当前行指定列数据
      *
      * @param mapHeaders Map<String, Integer> 来自 {@link ExcelReader#mapHeaders()}
-     * @return LinkedHashMap<String                               ,                                                               Object>
+     * @return LinkedHashMap<String                                                                                                                               ,                                                                                                                                                                                                                                                               Object>
      */
     public LinkedHashMap<String, Object> rowObject(final Map<String, Integer> mapHeaders) {
         final LinkedHashMap<String, Object> map = new LinkedHashMap<>();

@@ -56,6 +56,7 @@ public class ExcelRewriter implements ISheetWriter<ExcelRewriter>, ISheetReader<
     private final Options ops;
     @Getter
     private final Workbook workbook;
+    @Getter
     private Sheet sheet;
     /**
      * 当前操作行索引
@@ -65,6 +66,7 @@ public class ExcelRewriter implements ISheetWriter<ExcelRewriter>, ISheetReader<
     /**
      * 当前操作行
      */
+    @Getter
     private Row row;
     /**
      * 当前操作单元格
@@ -100,21 +102,6 @@ public class ExcelRewriter implements ISheetWriter<ExcelRewriter>, ISheetReader<
         row = null;
         rowIndex = 0;
         return this;
-    }
-
-    @Override
-    public Workbook getWorkbook() {
-        return this.workbook;
-    }
-
-    @Override
-    public Sheet getSheet() {
-        return this.sheet;
-    }
-
-    @Override
-    public Row getRow() {
-        return this.row;
     }
 
     @Override

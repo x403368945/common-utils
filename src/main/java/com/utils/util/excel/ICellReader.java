@@ -3,10 +3,12 @@ package com.utils.util.excel;
 import com.utils.enums.DataType;
 import com.utils.util.Dates;
 import com.utils.util.Num;
+import org.apache.poi.ss.formula.functions.T;
 import org.apache.poi.ss.usermodel.*;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -134,10 +136,31 @@ public interface ICellReader {
      * @return String
      */
     default String stringValue() {
-        return value().map(v -> {
-            if (v instanceof Double) return Num.of(v).toBigDecimal().toPlainString(); // 解决科学计数法 toString()问题
-            else return v.toString();
-        }).orElse(null);
+        if (cellIsBlank()) return null;
+        switch (getCell().getCellTypeEnum()) {
+            case STRING:
+                return getCell().getStringCellValue();
+            case NUMERIC:
+                return (DateUtil.isCellDateFormatted(getCell()))
+                        ? Dates.of(getCell().getDateCellValue().getTime()).format(Dates.Pattern.yyyy_MM_dd_HH_mm_ss)
+                        : Num.of(getCell().getNumericCellValue()).toBigDecimal().toPlainString(); // 解决科学计数法 toString()问题
+            case BOOLEAN:
+                return Objects.toString(getCell().getBooleanCellValue());
+            case FORMULA:
+                // Cell.getCachedFormulaResultTypeEnum() 可以判断公式计算结果得出的数据类型；前置条件必须是 Cell.getCellTypeEnum() = CellType.FORMULA
+                switch (getCell().getCachedFormulaResultTypeEnum()) {
+                    case NUMERIC:
+                        return Objects.toString(getCell().getNumericCellValue());
+                    case _NONE:
+                    case STRING:
+                    case FORMULA:
+                    case BLANK:
+                    case BOOLEAN:
+                    case ERROR:
+                }
+        }
+        getCell().setCellType(CellType.STRING);
+        return getCell().getStringCellValue();
     }
 
     /**
@@ -155,7 +178,31 @@ public interface ICellReader {
      * @return {@link Num}
      */
     default Num numberValue() {
-        return value().map(Num::of).orElse(null);
+        if (cellIsBlank()) return null;
+        switch (getCell().getCellTypeEnum()) {
+            case STRING:
+                return Num.of(getCell().getStringCellValue());
+            case NUMERIC:
+                return Num.of(DateUtil.isCellDateFormatted(getCell())
+                        ? getCell().getDateCellValue().getTime()
+                        : getCell().getNumericCellValue()); // 解决科学计数法 toString()问题
+            case BOOLEAN:
+                return Num.of(getCell().getBooleanCellValue() ? 1 : 0);
+            case FORMULA:
+                // Cell.getCachedFormulaResultTypeEnum() 可以判断公式计算结果得出的数据类型；前置条件必须是 Cell.getCellTypeEnum() = CellType.FORMULA
+                switch (getCell().getCachedFormulaResultTypeEnum()) {
+                    case NUMERIC:
+                        return Num.of(getCell().getNumericCellValue());
+                    case _NONE:
+                    case STRING:
+                    case FORMULA:
+                    case BLANK:
+                    case BOOLEAN:
+                    case ERROR:
+                }
+        }
+        getCell().setCellType(CellType.NUMERIC);
+        return Num.of(getCell().getNumericCellValue());
     }
 
     /**
@@ -164,7 +211,7 @@ public interface ICellReader {
      * @return {@link Num}
      */
     default Num numberOfZore() {
-        return value().map(v -> Num.of(v.toString(), 0)).orElse(Num.of(0));
+        return Optional.ofNullable(numberValue()).orElse(Num.of(0));
     }
 
     /**
@@ -173,7 +220,10 @@ public interface ICellReader {
      * @return {@link Dates}
      */
     default Dates dateValue() {
-        return value().map(v -> Num.of(v.toString()).toDate()).orElse(null);
+//        return value().map(v -> Num.of(v.toString()).toDate()).orElse(null);
+        return (cellNotBlank() && DateUtil.isCellDateFormatted(getCell()))
+                ? Dates.of(getCell().getDateCellValue().getTime())
+                : null;
     }
 
     /**

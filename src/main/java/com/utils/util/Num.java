@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Objects;
@@ -15,6 +16,7 @@ import static com.utils.util.Num.Pattern.*;
 /**
  * 数字转换类；使用此类初始化时，会尽可能的处理 null 值，避免因为 null 值抛出异常；但部分无法适配的操作依然会抛异常
  * 请谨慎使用此类，因为可以用 null 值初始化，在计算时因为数据转换产生的 null 值会产生警告，造成计算结果有差异
+ *
  * @author Jason Xie on 2017/10/26.
  */
 @Slf4j
@@ -39,23 +41,26 @@ public class Num {
         // 带千位符，保留2位小数
         SDOUBLE("#,##0.00"),
         // 带千位符，保留 fixed 位小数；调用value(fixed)方法指定fixed
-        SAUTO("#,##0"),
-        ;
+        SAUTO("#,##0"),;
         /**
          * 格式
          */
         final String pattern;
+
         Pattern(String pattern) {
             this.pattern = pattern;
         }
+
         public String value() {
             return pattern;
         }
+
         public String value(int fixed) {
             if (fixed <= 0) return pattern;
             return pattern + '.' + String.format("%0{fixed}d".replace("{fixed}", fixed + ""), 0);
         }
     }
+
     @NoArgsConstructor
     @AllArgsConstructor
     @Data
@@ -63,11 +68,14 @@ public class Num {
         public static Range of(final Number min, final Number max) {
             return new Range(min, max);
         }
+
         private Number min;
         private Number max;
+
         public boolean in(Number value) {
             return min.doubleValue() <= value.doubleValue() && value.doubleValue() <= max.doubleValue();
         }
+
         public boolean round(Number value) {
             return min.doubleValue() < value.doubleValue() && value.doubleValue() < max.doubleValue();
         }
@@ -75,6 +83,7 @@ public class Num {
 
     /**
      * 构造数字处理对象， 可以为null；但是有值，数据类型转换失败，则抛出异常
+     *
      * @param value Object
      * @return Num
      */
@@ -82,8 +91,28 @@ public class Num {
         if (Objects.isNull(value)) return new Num();
         return of(Objects.toString(value));
     }
+
+    /**
+     * 构造数字处理对象， 可以为null；但是有值，数据类型转换失败，则抛出异常
+     *
+     * @param value Object
+     * @return Num
+     */
+    public static Num of(Object value, Number defaultValue) {
+        if (Objects.isNull(value)) return new Num(defaultValue);
+        if (value instanceof Integer) of((Integer) value);
+        else if (value instanceof Long) of((Long) value);
+        else if (value instanceof Double) of((Double) value);
+        else if (value instanceof Short) of((Short) value);
+        else if (value instanceof Float) of((Float) value);
+        else if (value instanceof BigInteger) of((BigInteger) value);
+        else if (value instanceof BigDecimal) of((BigDecimal) value);
+        return of(Objects.toString(value), defaultValue);
+    }
+
     /**
      * 构造数字处理对象， 不能为null，转换失败则抛出异常
+     *
      * @param value Number
      * @return Num
      */
@@ -93,22 +122,24 @@ public class Num {
 
     /**
      * 构造数字处理对象， 不能为null，转换失败则抛出异常
+     *
      * @param value String
      * @return Num
      */
     public static Num of(String value) {
-        return new Num(Double.valueOf(value.trim().replace(",","")));
+        return new Num(Double.valueOf(value.trim().replace(",", "")));
     }
 
     /**
      * 构造指定默认值的数字处理对象，且不抛异常；当数据转换失败时，有默认值则设置默认值，未设置则默认值为null；
-     * @param value String 数字字符串
+     *
+     * @param value        String 数字字符串
      * @param defaultValue 为空时的默认值
      * @return Num
      */
     public static Num of(String value, Number defaultValue) {
         try {
-            return Objects.isNull(value) ? new Num() : new Num(Double.valueOf(value.trim().replace(",","")));
+            return Objects.isNull(value) ? new Num() : new Num(Double.valueOf(value.trim().replace(",", "")));
         } catch (NumberFormatException e) {
             log.debug("value=" + value);
             return Objects.isNull(defaultValue) ? new Num() : new Num(defaultValue.doubleValue());
@@ -117,22 +148,27 @@ public class Num {
 
     /**
      * 构造允许空值的数字处理对象，且不抛异常；当数据转换失败时，默认值为null
+     *
      * @param value String
      * @return Num
      */
     public static Num ofNull(String value) {
         return of(value, null);
     }
+
     /**
      * 构造允许空值的数字处理对象，且不抛异常；当数据转换失败时，默认值为 0
+     *
      * @param value String
      * @return Num
      */
     public static Num ofZore(String value) {
         return of(value, 0);
     }
+
     /**
      * 构造允许空值的数字处理对象，且不抛异常；默认值为 0
+     *
      * @param value Number
      * @return Num
      */
@@ -152,6 +188,7 @@ public class Num {
         }
         log.warn("警告：使用null值初始化Num数字操作对象，计算时结果可能与实际结果有差异；建议使用: Num.of(\"1000\", 0) ,尽可能控制所有未知的情况，避免计算出错" + sb.toString());
     }
+
     private Num(Number value) {
         set(value);
     }
@@ -165,16 +202,18 @@ public class Num {
     public boolean isNull() {
         return Objects.isNull(value);
     }
+
     public boolean isNotNull() {
         return !isNull();
     }
 
     public Num set(String value) {
-        return new Num(Double.valueOf(value.trim().replace(",","")));
+        return new Num(Double.valueOf(value.trim().replace(",", "")));
     }
+
     public Num set(String value, Number defaultValue) {
         try {
-            return new Num(Double.valueOf(value.trim().replace(",","")));
+            return new Num(Double.valueOf(value.trim().replace(",", "")));
         } catch (NumberFormatException e) {
             return new Num(defaultValue.doubleValue());
         }
@@ -187,8 +226,10 @@ public class Num {
         this.value = value.doubleValue();
         return this;
     }
+
     /**
      * 数值增加，求和时使用
+     *
      * @param v Num
      * @return Num
      */
@@ -196,8 +237,10 @@ public class Num {
         if (Objects.nonNull(v)) value = this.doubleValue() + v.doubleValue();
         return this;
     }
+
     /**
      * 数值增加，求和时使用
+     *
      * @param v Number
      * @return Num
      */
@@ -205,13 +248,16 @@ public class Num {
         if (Objects.nonNull(v)) value = this.doubleValue() + v.doubleValue();
         return this;
     }
+
     /**
      * 数值增加，求和时使用
+     *
      * @param values Number
      * @return Num
      */
     public Num add(Number... values) {
-        if (Util.isNotEmpty(values)) value = this.doubleValue() + Arrays.stream(values).filter(Objects::nonNull).mapToDouble(Number::doubleValue).sum();
+        if (Util.isNotEmpty(values))
+            value = this.doubleValue() + Arrays.stream(values).filter(Objects::nonNull).mapToDouble(Number::doubleValue).sum();
         return this;
     }
 
@@ -325,6 +371,7 @@ public class Num {
 
     /**
      * 将 long 数字转换为日期操作对象
+     *
      * @return Dates
      */
     public Dates toDate() {
@@ -333,6 +380,7 @@ public class Num {
 
     /**
      * 将 value 按格式取对应的值；不建议使用此方法，因为得到的Number对象还得继续取值；但在某些情况，数字类型不明确时可以使用
+     *
      * @param pattern Pattern
      * @return Number
      */
@@ -359,6 +407,7 @@ public class Num {
     public String format() {
         return format(defaultPattern);
     }
+
     /**
      * 格式化数字，默认格式：0000.00保留两位小数,不含千位符
      *
@@ -370,6 +419,7 @@ public class Num {
         if (Objects.isNull(pattern)) pattern = Pattern.DOUBLE.value();
         return new DecimalFormat(pattern).format(value);
     }
+
     /**
      * 格式化数字，默认格式：0000.00保留两位小数,不含千位符
      *
@@ -429,9 +479,9 @@ public class Num {
         log.debug(Num.of("1000.01").formatAmount());
         log.debug("{}", Num.of("100,100.00").add(1.01).toInteger());
         log.debug("{}", Num.of("100,100.00").add(1.01).doubleValue());
-        log.debug("{}", Num.of("100,100.00").add(1.01,1.01, null,1.01).doubleValue());
-        log.debug(Num.of("100,100.00").add(1.01,1.01, null,1.01).toString());
-        log.debug(Num.of("100,100.00").add(1.01,1.01, null,1.01).format(Pattern.SDOUBLE));
+        log.debug("{}", Num.of("100,100.00").add(1.01, 1.01, null, 1.01).doubleValue());
+        log.debug(Num.of("100,100.00").add(1.01, 1.01, null, 1.01).toString());
+        log.debug(Num.of("100,100.00").add(1.01, 1.01, null, 1.01).format(Pattern.SDOUBLE));
 
         log.debug(">>>>>>>");
         log.debug(Num.of(1000000).format(LONG));
