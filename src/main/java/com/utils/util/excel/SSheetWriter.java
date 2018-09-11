@@ -5,6 +5,7 @@ import com.utils.enums.Colors;
 import com.utils.enums.DataType;
 import com.utils.util.Asserts;
 import com.utils.util.Dates;
+import com.utils.util.FPath;
 import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
@@ -16,8 +17,6 @@ import org.apache.poi.xssf.streaming.SXSSFRow;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
-import java.io.FileOutputStream;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -162,26 +161,26 @@ public class SSheetWriter implements ISheetWriter<SSheetWriter>, ISheetWriter.IC
         { // 普通写入
             Supplier supplier = () -> {
                 try {
-                    Rownum rownum = Rownum.of(1); // 从第几行开始写
-                    @Cleanup SXSSFWorkbook workbook = new SXSSFWorkbook();
+                    final Rownum rownum = Rownum.of(1); // 从第几行开始写
+                    @Cleanup final SXSSFWorkbook workbook = new SXSSFWorkbook();
                     workbook.createSheet("Sheet1");
                     workbook.getSheetAt(0).setDefaultColumnWidth(15);
                     // 日期格式样式
-                    CellStyle dateStyle = CellStyles.builder().dataFormat(workbook.createDataFormat().getFormat(Dates.Pattern.yyyy_MM_dd.value())).build().createCellStyle(workbook);
+                    final CellStyle dateStyle = CellStyles.builder().dataFormat(workbook.createDataFormat().getFormat(Dates.Pattern.yyyy_MM_dd.value())).build().createCellStyle(workbook);
                     // 蓝色单元格样式
-                    CellStyle blueStyle = CellStyles.builder().fillPattern(FillPatternType.SOLID_FOREGROUND).fillForegroundColor(Colors.SkyBlue.color).build().createCellStyle(workbook);
+                    final CellStyle blueStyle = CellStyles.builder().fillPattern(FillPatternType.SOLID_FOREGROUND).fillForegroundColor(Colors.SkyBlue.color).build().createCellStyle(workbook);
                     // 绿色单元格样式
-                    CellStyle greenStyle = CellStyles.builder().fillPattern(FillPatternType.SOLID_FOREGROUND).fillForegroundColor(Colors.BrightGreen.color).build().createCellStyle(workbook);
+                    final CellStyle greenStyle = CellStyles.builder().fillPattern(FillPatternType.SOLID_FOREGROUND).fillForegroundColor(Colors.BrightGreen.color).build().createCellStyle(workbook);
                     // 红色单元格样式
-                    CellStyle redStyle = CellStyles.builder().fillPattern(FillPatternType.SOLID_FOREGROUND).fillForegroundColor(Colors.Red.color).build().createCellStyle(workbook);
+                    final CellStyle redStyle = CellStyles.builder().fillPattern(FillPatternType.SOLID_FOREGROUND).fillForegroundColor(Colors.Red.color).build().createCellStyle(workbook);
                     // 文本居中样式，可追加的样式对象
-                    CellStyles centerStyle = CellStyles.builder().alignment(HorizontalAlignment.CENTER).build();
+                    final CellStyles centerStyle = CellStyles.builder().alignment(HorizontalAlignment.CENTER).build();
                     { // 后面 >>>>>> 测试样式库引用 <<<<<< 会使用到
                         cellDatas.add(Cell.builder().sindex((int) greenStyle.getIndex()).text("绿色单元格").type(DataType.TEXT).build());
                         cellDatas.add(Cell.builder().sindex((int) blueStyle.getIndex()).text("蓝色单元格").type(DataType.TEXT).build());
                         cellDatas.add(Cell.builder().sindex((int) redStyle.getIndex()).text("红色单元格").type(DataType.TEXT).build());
                     }
-                    SSheetWriter sheetWriter = SSheetWriter.of(workbook.getSheetAt(0))
+                    final SSheetWriter sheetWriter = SSheetWriter.of(workbook.getSheetAt(0))
                             .row(rownum)
                             .cell(0).writeNumber(100)
                             .cell(1).writeFormula("100*A1")
@@ -198,7 +197,7 @@ public class SSheetWriter implements ISheetWriter<SSheetWriter>, ISheetWriter.IC
                             .cell(4).writeText("绿色单元格").writeStyle(greenStyle)
                             .cell(5).writeText("红色单元格").writeStyle(redStyle);
                     { // 测试 FillPatternType
-                        FillPatternType[] types = FillPatternType.values();
+                        final FillPatternType[] types = FillPatternType.values();
                         sheetWriter.row(rownum.next());
                         for (int i = 0; i < types.length; i++) {
                             sheetWriter.cell(i)
@@ -222,10 +221,9 @@ public class SSheetWriter implements ISheetWriter<SSheetWriter>, ISheetWriter.IC
                                     );
                         }
                     }
-                    Path path = Paths.get("logs", "普通写入.xlsx").toAbsolutePath();
-                    @Cleanup FileOutputStream fileOutputStream = new FileOutputStream(path.toFile());
-                    workbook.write(fileOutputStream);
-                    log.debug("写入路径：" + path.toAbsolutePath());
+                    log.debug(String.format("写入路径：%s",
+                            sheetWriter.saveWorkBook(FPath.of("logs", "1.普通写入.xlsx")).absolute()
+                    ));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -236,21 +234,21 @@ public class SSheetWriter implements ISheetWriter<SSheetWriter>, ISheetWriter.IC
         { // 复制
             Supplier supplier = () -> {
                 try {
-                    Rownum rownum = Rownum.of(1); // 从第几行开始写
-                    @Cleanup SXSSFWorkbook workbook = new SXSSFWorkbook();
+                    final Rownum rownum = Rownum.of(1); // 从第几行开始写
+                    @Cleanup final SXSSFWorkbook workbook = new SXSSFWorkbook();
                     workbook.createSheet("Sheet1");
                     workbook.getSheetAt(0).setDefaultColumnWidth(15);
                     // 日期格式样式
-                    CellStyle dateStyle = CellStyles.builder().dataFormat(workbook.createDataFormat().getFormat(Dates.Pattern.yyyy_MM_dd.value())).build().createCellStyle(workbook);
+                    final CellStyle dateStyle = CellStyles.builder().dataFormat(workbook.createDataFormat().getFormat(Dates.Pattern.yyyy_MM_dd.value())).build().createCellStyle(workbook);
                     // 蓝色单元格样式
-                    CellStyle blueStyle = CellStyles.builder().fillPattern(FillPatternType.SOLID_FOREGROUND).fillForegroundColor(Colors.SkyBlue.color).build().createCellStyle(workbook);
+                    final CellStyle blueStyle = CellStyles.builder().fillPattern(FillPatternType.SOLID_FOREGROUND).fillForegroundColor(Colors.SkyBlue.color).build().createCellStyle(workbook);
                     // 绿色单元格样式
-                    CellStyle greenStyle = CellStyles.builder().fillPattern(FillPatternType.SOLID_FOREGROUND).fillForegroundColor(Colors.BrightGreen.color).build().createCellStyle(workbook);
+                    final CellStyle greenStyle = CellStyles.builder().fillPattern(FillPatternType.SOLID_FOREGROUND).fillForegroundColor(Colors.BrightGreen.color).build().createCellStyle(workbook);
                     // 红色单元格样式
-                    CellStyle redStyle = CellStyles.builder().fillPattern(FillPatternType.SOLID_FOREGROUND).fillForegroundColor(Colors.Red.color).build().createCellStyle(workbook);
+                    final CellStyle redStyle = CellStyles.builder().fillPattern(FillPatternType.SOLID_FOREGROUND).fillForegroundColor(Colors.Red.color).build().createCellStyle(workbook);
                     // 文本居中样式，可追加的样式对象
-                    CellStyles centerStyle = CellStyles.builder().alignment(HorizontalAlignment.CENTER).build();
-                    SSheetWriter sheetWriter = SSheetWriter.of(workbook.getSheetAt(0))
+                    final CellStyles centerStyle = CellStyles.builder().alignment(HorizontalAlignment.CENTER).build();
+                    final SSheetWriter sheetWriter = SSheetWriter.of(workbook.getSheetAt(0))
                             .row(rownum)
                             .cell(0).writeText("第1行")
                             .cell(1).writeNumber(100)
@@ -308,10 +306,9 @@ public class SSheetWriter implements ISheetWriter<SSheetWriter>, ISheetWriter.IC
 
                             .row(rownum.next())
                             .cell(0).writeText("第11行");
-                    Path path = Paths.get("logs", "复制.xlsx").toAbsolutePath();
-                    @Cleanup FileOutputStream fileOutputStream = new FileOutputStream(path.toFile());
-                    workbook.write(fileOutputStream);
-                    log.debug("写入路径：" + path.toAbsolutePath());
+                    log.debug(String.format("写入路径：%s",
+                            sheetWriter.saveWorkBook(FPath.of("logs", "2.复制.xlsx")).absolute()
+                    ));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -322,23 +319,21 @@ public class SSheetWriter implements ISheetWriter<SSheetWriter>, ISheetWriter.IC
         { // 公式重构
             Supplier supplier = () -> {
                 try {
-                    Rownum rownum = Rownum.of(1); // 从第几行开始写
-                    @Cleanup SXSSFWorkbook workbook = new SXSSFWorkbook();
+                    final Rownum rownum = Rownum.of(1); // 从第几行开始写
+                    @Cleanup final SXSSFWorkbook workbook = new SXSSFWorkbook();
                     workbook.createSheet("Sheet1");
                     workbook.getSheetAt(0).setDefaultColumnWidth(15);
                     SSheetWriter.of(workbook.getSheetAt(0)).row(rownum);
-                    SSheetWriter.of(workbook.getSheetAt(0),
+                    final SSheetWriter writer = SSheetWriter.of(workbook.getSheetAt(0),
                             Options.builder().rebuildFormula(true).build() // 开启公式重构
                     )
                             .row(rownum)
                             .cell(0).writeNumber(100)
                             .cell(1).writeNumber(2)
-                            .cell(2).writeFormula("A9*B9") // 将公式以当前实际行号重构，这里写入的公式实际会变成 A1*B1
-                    ;
-                    Path path = Paths.get("logs", "公式重构.xlsx").toAbsolutePath();
-                    @Cleanup FileOutputStream fileOutputStream = new FileOutputStream(path.toFile());
-                    workbook.write(fileOutputStream);
-                    log.debug("写入路径：" + path.toAbsolutePath());
+                            .cell(2).writeFormula("A9*B9");
+                    log.debug(String.format("写入路径：%s",
+                            writer.saveWorkBook(FPath.of("logs", "3.公式重构.xlsx")).absolute()
+                    ));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -349,21 +344,20 @@ public class SSheetWriter implements ISheetWriter<SSheetWriter>, ISheetWriter.IC
         { // 指定样式来源，测试样式库引用
             Supplier supplier = () -> {
                 try {
-                    Rownum rownum = Rownum.of(1); // 从第几行开始写
-                    @Cleanup SXSSFWorkbook workbook = new SXSSFWorkbook();
+                    final Rownum rownum = Rownum.of(1); // 从第几行开始写
+                    @Cleanup final SXSSFWorkbook workbook = new SXSSFWorkbook();
                     workbook.createSheet("Sheet1");
                     workbook.getSheetAt(0).setDefaultColumnWidth(15);
-                    SSheetWriter.of(workbook.getSheetAt(0))
-                            .setCloneStyles(Paths.get("logs", "普通写入.xlsx").toAbsolutePath().toString()) // 指定引用样式库文件路径
+                    final SSheetWriter writer = SSheetWriter.of(workbook.getSheetAt(0))
+                            .setCloneStyles(Paths.get("logs", "1.普通写入.xlsx").toAbsolutePath().toString()) // 指定引用样式库文件路径
                             .row(rownum)
                             .cell(0).write(cellDatas.get(0))
                             .cell(1).write(cellDatas.get(1))
-                            .cell(2).write(cellDatas.get(2))
-                    ;
-                    Path path = Paths.get("logs", "样式库引用【普通写入】.xlsx").toAbsolutePath();
-                    @Cleanup FileOutputStream fileOutputStream = new FileOutputStream(path.toFile());
-                    workbook.write(fileOutputStream);
-                    log.debug("写入路径：" + path.toAbsolutePath());
+                            .cell(2).write(cellDatas.get(2));
+
+                    log.debug(String.format("写入路径：%s",
+                            writer.saveWorkBook(FPath.of("logs", "4.样式库引用【普通写入】.xlsx")).absolute()
+                    ));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

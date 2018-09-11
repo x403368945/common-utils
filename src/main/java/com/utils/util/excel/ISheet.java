@@ -1,11 +1,12 @@
 package com.utils.util.excel;
 
+import com.utils.util.FPath;
+import lombok.Cleanup;
 import lombok.NonNull;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
+import lombok.SneakyThrows;
+import org.apache.poi.ss.usermodel.*;
 
+import java.io.FileOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -16,6 +17,13 @@ import java.util.Objects;
  * @author Jason Xie on 2018-8-8.
  */
 public interface ISheet<T> {
+    /**
+     * 获取当前操作Workbook
+     *
+     * @return {@link Workbook}
+     */
+    Workbook getWorkbook();
+
     /**
      * 获取当前操作Sheet
      *
@@ -106,13 +114,20 @@ public interface ISheet<T> {
     /**
      * 获取当前操作行所有列的数据类型，便于后面写入时确定数据类型
      *
-     * @return Map<Integer   [   columnIndex   ]   ,       CellType>
+     * @return Map<Integer                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               [                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               columnIndex                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               ]                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               ,                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               CellType>
      */
     default Map<Integer, CellType> cellTypes() {
         final Map<Integer, CellType> cellTypes = new HashMap<>();
-        getRow().forEach(cell ->
-                cellTypes.put(cell.getColumnIndex(), cell.getCellTypeEnum())
-        );
+        getRow().forEach(cell -> cellTypes.put(cell.getColumnIndex(), cell.getCellTypeEnum()));
         return cellTypes;
+    }
+
+    @SneakyThrows
+    default FPath saveWorkBook(final FPath path) {
+        @Cleanup final FileOutputStream fileOutputStream = new FileOutputStream(path.file());
+        getWorkbook().write(fileOutputStream);
+        path.chmod(644); // 设置文件权限
+//        System.out.println(String.format("写入路径：%s", path.absolute()));
+        return path;
     }
 }
