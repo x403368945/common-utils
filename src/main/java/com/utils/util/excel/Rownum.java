@@ -64,7 +64,7 @@ public class Rownum {
     }
 
     public static void main(String[] args) {
-        Rownum rownum = Rownum.of(0);
+        final Rownum rownum = Rownum.of(0);
         for (int i = 0; i < 10; i++) {
             System.out.println(Arrays.asList(rownum.next().get(), rownum.rowIndex()));
         }

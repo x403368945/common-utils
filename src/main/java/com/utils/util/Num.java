@@ -88,7 +88,7 @@ public class Num {
      * @return Num
      */
     public static Num of(Object value) {
-        if (Objects.isNull(value)) return new Num();
+        if (Objects.isNull(value) || Objects.equals(value, "")) return new Num();
         return of(Objects.toString(value));
     }
 

@@ -13,10 +13,10 @@ import org.apache.poi.xssf.model.StylesTable;
 import org.apache.poi.xssf.streaming.SXSSFCell;
 import org.apache.poi.xssf.streaming.SXSSFRow;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
 import org.apache.poi.xssf.usermodel.XSSFHyperlink;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -127,6 +127,17 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
     }
 
     /**
+     * 新建操作行
+     *
+     * @param rowIndex int 行索引
+     * @return <T extends ISheetWriter>
+     */
+    default T rowNew(final int rowIndex) {
+        return row(getSheet().createRow(rowIndex));
+    }
+
+
+    /**
      * 清除当前行所有单元格内容，单元格样式保留
      *
      * @return <T extends ISheetWriter>
@@ -166,6 +177,17 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
                 .ofNullable(getRow().getCell(columnIndex))
                 .orElseGet(() -> getRow().createCell(columnIndex, CellType.BLANK))
         );
+        return (T) this;
+    }
+
+    /**
+     * 新建操作单元格
+     *
+     * @param columnIndex int 列索引
+     * @return <T extends ISheetWriter>
+     */
+    default T cellNew(final int columnIndex) {
+        cell(getRow().createCell(columnIndex, CellType.BLANK));
         return (T) this;
     }
 
@@ -302,6 +324,28 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
 //        return (T) this;
 //    }
 
+    /**
+     * 自动调整列宽
+     *
+     * @return <T extends ISheetWriter>
+     */
+    default T autoColumnWidth() {
+        final Sheet sheet = getSheet();
+        for (Cell cell : sheet.getRow(0)) {
+            sheet.autoSizeColumn(cell.getColumnIndex());
+        }
+        return (T) this;
+    }
+
+    /**
+     * 刷新公式单元格
+     *
+     * @return <T extends ISheetWriter>
+     */
+    default T evaluateAllFormulaCells() {
+        XSSFFormulaEvaluator.evaluateAllFormulaCells(getWorkbook());
+        return (T) this;
+    }
 
     /**
      * 不同版本的 excel 执行复制操作相关的方法封装

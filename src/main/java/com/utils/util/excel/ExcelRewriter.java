@@ -2,19 +2,16 @@ package com.utils.util.excel;
 
 import com.utils.util.FCopy;
 import com.utils.util.FPath;
-import lombok.*;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.openxml4j.opc.PackageAccess;
 import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
-import org.apache.poi.ss.formula.functions.T;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 import java.util.Objects;
@@ -111,7 +108,7 @@ public class ExcelRewriter implements ISheetWriter<ExcelRewriter>, ISheetReader<
     }
 
     public ExcelRewriter row(final Row row) {
-        if(Objects.nonNull(row)) rowIndex = row.getRowNum();
+        if (Objects.nonNull(row)) rowIndex = row.getRowNum();
         this.row = row;
         this.cell = null; // 切换行，需要将 cell 置空
         return this;
@@ -133,7 +130,7 @@ public class ExcelRewriter implements ISheetWriter<ExcelRewriter>, ISheetReader<
      * 获取头部列名加索引
      * 警告：重复的列名将会被覆盖；若不能保证列名不重复，请使用 {@link ExcelReader#headers()}
      *
-     * @return Map<String, Integer>
+     * @return Map<String       ,               Integer>
      */
     public LinkedHashMap<String, Integer> mapHeaders() {
         final LinkedHashMap<String, Integer> map = new LinkedHashMap<>();
@@ -172,11 +169,7 @@ public class ExcelRewriter implements ISheetWriter<ExcelRewriter>, ISheetReader<
                     .cell(0).writeNumber(3)
                     .cell(2).writeByCellType("187-0000-0002")
             ;
-
-            Path path = Paths.get("logs", "重写.xlsx").toAbsolutePath();
-            @Cleanup FileOutputStream fileOutputStream = new FileOutputStream(path.toFile());
-            rwriter.getWorkbook().write(fileOutputStream);
-            log.debug("写入路径：" + path.toAbsolutePath());
+            log.debug(String.format("写入路径：%s", rwriter.saveWorkBook(FPath.of("logs", "重写.xlsx")).absolute()));
         }
         {
             ExcelRewriter rwriter = ExcelRewriter
@@ -203,11 +196,7 @@ public class ExcelRewriter implements ISheetWriter<ExcelRewriter>, ISheetReader<
                     .cell(0).writeNumber(3)
                     .cell(2).writeByCellType("187-0000-0002")
             ;
-
-            Path path = Paths.get("logs", "重写.xls").toAbsolutePath();
-            @Cleanup FileOutputStream fileOutputStream = new FileOutputStream(path.toFile());
-            rwriter.getWorkbook().write(fileOutputStream);
-            log.debug("写入路径：" + path.toAbsolutePath());
+            log.debug(String.format("写入路径：%s", rwriter.saveWorkBook(FPath.of("logs", "重写.xls")).absolute()));
         }
     }
 }

@@ -59,6 +59,7 @@ public class ExcelReader implements ISheetReader<ExcelReader>, ICellReader {
         return reader;
     }
 
+    @Getter
     final private Workbook workbook;
     /**
      * 当前操作sheet
