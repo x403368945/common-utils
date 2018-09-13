@@ -5,18 +5,16 @@ import lombok.Cleanup;
 import lombok.NonNull;
 import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackageAccess;
+import org.apache.poi.ss.formula.BaseFormulaEvaluator;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.eventusermodel.XSSFReader;
 import org.apache.poi.xssf.model.StylesTable;
-import org.apache.poi.xssf.streaming.SXSSFCell;
-import org.apache.poi.xssf.streaming.SXSSFRow;
-import org.apache.poi.xssf.streaming.SXSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
-import org.apache.poi.xssf.usermodel.XSSFHyperlink;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.streaming.*;
+import org.apache.poi.xssf.usermodel.*;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -343,8 +341,34 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
      *
      * @return <T extends ISheetWriter>
      */
-    default T evaluateAllFormulaCells() {
-        XSSFFormulaEvaluator.evaluateAllFormulaCells(getWorkbook());
+    default T evaluateAllFormulaCells_XSSF() {
+//        if (getWorkbook() instanceof XSSFWorkbook) XSSFFormulaEvaluator.evaluateAllFormulaCells((XSSFWorkbook) getWorkbook());
+//        else BaseFormulaEvaluator.evaluateAllFormulaCells(getWorkbook());
+        BaseFormulaEvaluator.evaluateAllFormulaCells(getWorkbook());
+        return (T) this;
+    }
+
+    /**
+     * 刷新公式单元格
+     *
+     * @return <T extends ISheetWriter>
+     */
+    default T evaluateAllFormulaCells_SXSSF() {
+        if (getWorkbook() instanceof SXSSFWorkbook)
+            SXSSFFormulaEvaluator.evaluateAllFormulaCells((SXSSFWorkbook) getWorkbook(), false);
+        else BaseFormulaEvaluator.evaluateAllFormulaCells(getWorkbook());
+        return (T) this;
+    }
+
+    /**
+     * 刷新公式单元格
+     *
+     * @return <T extends ISheetWriter>
+     */
+    default T evaluateAllFormulaCells_HSSF() {
+        if (getWorkbook() instanceof HSSFWorkbook)
+            HSSFFormulaEvaluator.evaluateAllFormulaCells((HSSFWorkbook) getWorkbook());
+        else BaseFormulaEvaluator.evaluateAllFormulaCells(getWorkbook());
         return (T) this;
     }
 
