@@ -150,7 +150,7 @@ public class FCopy {
     /**
      * 直接从 from 复制到 to ；即 from 和 to 都是文件绝对路径
      *
-     * @return FCopy
+     * @return {@link FCopy}
      */
     @SneakyThrows
     public FCopy copyTo() {
@@ -160,8 +160,8 @@ public class FCopy {
 
     @SneakyThrows
     public FCopy copy() {
-        Asserts.notNull(from, "请指定源文件或目录");
-        Asserts.notNull(to, "请指定目标文件或目录");
+        Objects.requireNonNull(from, "请指定源文件或目录");
+        Objects.requireNonNull(to, "请指定目标文件或目录");
         if (!from.exists()) {
             if (ops.ignore) return this;
             throw new FileNotFoundException("源文件不存在:".concat(from.getAbsolutePath()));
@@ -171,7 +171,7 @@ public class FCopy {
             copy(from, to.toPath().resolve(ops.isRename ? FileName.of(from.getName()).getUuidFileName() : from.getName()).toFile());
         } else if (from.isDirectory()) {
             // from 为目录，则遍历 names 文件名集合
-            Asserts.notEmpty(ops.names, "请指定需要复制的源文件名");
+            Objects.requireNonNull(ops.names, "请指定需要复制的源文件名");
             for (String name : ops.names) {
                 copy(
                         from.toPath().resolve(name).toFile(),
@@ -189,17 +189,17 @@ public class FCopy {
      * {src}/* > {dist}/ <br>
      * dir/[1.txt,2.txt,3.txt] > newDir/[1.txt,2.txt,3.txt]
      *
-     * @return FCopy
+     * @return {@link FCopy}
      */
     @SneakyThrows
     public FCopy copyDir() {
-        Asserts.notNull(from, "请指定源文件或目录");
-        Asserts.notNull(to, "请指定目标文件或目录");
+        Objects.requireNonNull(from, "请指定源文件或目录");
+        Objects.requireNonNull(to, "请指定目标文件或目录");
         if (!from.exists()) {
             if (ops.ignore) return this;
             throw new FileNotFoundException("源目录不存在:".concat(from.getAbsolutePath()));
         }
-        Asserts.isTrue(from.isDirectory(), "复制源不是目录");
+        Objects.requireNonNull(from.isDirectory() ? true : null, "复制源不是目录");
 //        Files.copy(from.toPath(), to.toPath(), StandardCopyOption.REPLACE_EXISTING);
         for (Path path : Files.newDirectoryStream(from.toPath())) {
             if (path.toFile().isDirectory())
@@ -231,10 +231,10 @@ public class FCopy {
             FPath.of(to.getParentFile()).chmod(755);
         }
         if (ops.ignore && !from.exists()) {
-            log.debug("忽略不存在的源文件：{}", from.getAbsolutePath());
+            log.info("忽略不存在的源文件：{}", from.getAbsolutePath());
             return;
         }
-        log.debug("{} > {}", from.getAbsolutePath(), to.getAbsolutePath());
+        log.info("{} > {}", from.getAbsolutePath(), to.getAbsolutePath());
 //        Files.copy(from.toPath(), to.toPath(), StandardCopyOption.REPLACE_EXISTING);
         @Cleanup final FileChannel fromFileChannel = FileChannel.open(from.toPath(), EnumSet.of(StandardOpenOption.READ));
         @Cleanup final FileChannel toFileChannel = FileChannel.open(to.toPath(), EnumSet.of(StandardOpenOption.CREATE, StandardOpenOption.WRITE));
@@ -250,33 +250,33 @@ public class FCopy {
                     .from("src/test/files/temp", "json.zip")
                     .to("src/test/files/temp", FileName.of("json.zip").getUuidFileName())
                     .copyTo();
-            log.debug("==================copyTo");
-            log.debug(copy.getNewFileName().orElse(null));
-            log.debug(copy.getNewFilePath().orElse(null));
-            log.debug("{}", copy.getNewFile().orElse(null));
-            log.debug(JSON.toJSONString(copy.getNewFiles()));
+            log.info("==================copyTo");
+            log.info(copy.getNewFileName().orElse(null));
+            log.info(copy.getNewFilePath().orElse(null));
+            log.info("{}", copy.getNewFile().orElse(null));
+            log.info(JSON.toJSONString(copy.getNewFiles()));
         }
         {
             FCopy copy = FCopy.ofDefault()
                     .from("src/test/files/temp", "json.zip")
                     .to("src/test/files/temp", "json-bak.zip")
                     .copyTo();
-            log.debug("==================copyTo");
-            log.debug(copy.getNewFileName().orElse(null));
-            log.debug(copy.getNewFilePath().orElse(null));
-            log.debug("{}", copy.getNewFile().orElse(null));
-            log.debug(JSON.toJSONString(copy.getNewFiles()));
+            log.info("==================copyTo");
+            log.info(copy.getNewFileName().orElse(null));
+            log.info(copy.getNewFilePath().orElse(null));
+            log.info("{}", copy.getNewFile().orElse(null));
+            log.info(JSON.toJSONString(copy.getNewFiles()));
         }
         {
             FCopy copy = FCopy.ofDefault()
                     .from("src/test/files/libs", "README.md")
                     .to("src/test/files/temp")
                     .copy();
-            log.debug("==================copy");
-            log.debug(copy.getNewFileName().orElse(null));
-            log.debug(copy.getNewFilePath().orElse(null));
-            log.debug("{}", copy.getNewFile().orElse(null));
-            log.debug(JSON.toJSONString(copy.getNewFiles()));
+            log.info("==================copy");
+            log.info(copy.getNewFileName().orElse(null));
+            log.info(copy.getNewFilePath().orElse(null));
+            log.info("{}", copy.getNewFile().orElse(null));
+            log.info(JSON.toJSONString(copy.getNewFiles()));
         }
 
         {
@@ -285,11 +285,11 @@ public class FCopy {
                     .rename()
                     .to("src/test/files/temp")
                     .copy();
-            log.debug("==================copy rename");
-            log.debug(copy.getNewFileName().orElse(null));
-            log.debug(copy.getNewFilePath().orElse(null));
-            log.debug("{}", copy.getNewFile().orElse(null));
-            log.debug(JSON.toJSONString(copy.getNewFiles()));
+            log.info("==================copy rename");
+            log.info(copy.getNewFileName().orElse(null));
+            log.info(copy.getNewFilePath().orElse(null));
+            log.info("{}", copy.getNewFile().orElse(null));
+            log.info(JSON.toJSONString(copy.getNewFiles()));
         }
 
         {
@@ -299,22 +299,22 @@ public class FCopy {
                     .rename()
                     .to("src/test/files/temp")
                     .copy();
-            log.debug("==================copy Multi rename");
-            log.debug(copy.getNewFileName().orElse(null));
-            log.debug(copy.getNewFilePath().orElse(null));
-            log.debug("{}", copy.getNewFile().orElse(null));
-            log.debug(JSON.toJSONString(copy.getNewFiles()));
+            log.info("==================copy Multi rename");
+            log.info(copy.getNewFileName().orElse(null));
+            log.info(copy.getNewFilePath().orElse(null));
+            log.info("{}", copy.getNewFile().orElse(null));
+            log.info(JSON.toJSONString(copy.getNewFiles()));
         }
         {
             FCopy copy = FCopy.ofDefault()
                     .from("src/test/files/temp/libs")
                     .to("src/test/files/temp/test")
                     .copyDir();
-            log.debug("==================copy dir");
-            log.debug(copy.getNewFileName().orElse(null));
-            log.debug(copy.getNewFilePath().orElse(null));
-            log.debug("{}", copy.getNewFile().orElse(null));
-            log.debug(JSON.toJSONString(copy.getNewFiles()));
+            log.info("==================copy dir");
+            log.info(copy.getNewFileName().orElse(null));
+            log.info(copy.getNewFilePath().orElse(null));
+            log.info("{}", copy.getNewFile().orElse(null));
+            log.info(JSON.toJSONString(copy.getNewFiles()));
         }
         System.out.println(dates.getTimeConsuming());
     }

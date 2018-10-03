@@ -1,8 +1,8 @@
 package com.utils.util;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
@@ -10,6 +10,9 @@ import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 import static com.utils.util.Num.Pattern.*;
 
@@ -61,23 +64,57 @@ public class Num {
         }
     }
 
-    @NoArgsConstructor
-    @AllArgsConstructor
     @Data
+    @RequiredArgsConstructor(staticName = "of")
     public static class Range {
-        public static Range of(final Number min, final Number max) {
-            return new Range(min, max);
-        }
-
+        @NonNull
         private Number min;
+        @NonNull
         private Number max;
 
-        public boolean in(Number value) {
+        /**
+         * 检查 value 是否在 min,max 区间内；包含 min,max
+         *
+         * @param value {@link Number} 被检查的值
+         * @return boolean true：是，false：否
+         */
+        public boolean in(final Number value) {
             return min.doubleValue() <= value.doubleValue() && value.doubleValue() <= max.doubleValue();
         }
 
-        public boolean round(Number value) {
+        /**
+         * 检查 value 是否在 min,max 区间内；不包含 min,max
+         *
+         * @param value {@link Number} 被检查的值
+         * @return boolean true：是，false：否
+         */
+        public boolean round(final Number value) {
             return min.doubleValue() < value.doubleValue() && value.doubleValue() < max.doubleValue();
+        }
+
+        /**
+         * 遍历区间，包含 min 和 max 值
+         *
+         * @param action {@link Consumer<Integer:value>}
+         */
+        public void forEach(Consumer<Integer> action) {
+            Objects.requireNonNull(action, "参数【action】是必须的");
+            for (int i = min.intValue(); i <= max.longValue(); i++) {
+                action.accept(i);
+            }
+        }
+
+        /**
+         * 转换区间，包含 min 和 max 值
+         *
+         * @param mapper {@link Function<Integer:value, R:返回数据类型>}
+         * @param <R>    返回数据类型
+         * @return {@link Stream<R>}
+         */
+        public <R> Stream<R> map(Function<Integer, ? extends R> mapper) {
+            return Stream.iterate(min.intValue(), n -> n + 1)
+                    .limit(max.intValue() - min.intValue() + 1)
+                    .map(mapper);
         }
     }
 
@@ -85,7 +122,7 @@ public class Num {
      * 构造数字处理对象， 可以为null；但是有值，数据类型转换失败，则抛出异常
      *
      * @param value Object
-     * @return Num
+     * @return {@link Num}
      */
     public static Num of(Object value) {
         if (Objects.isNull(value) || Objects.equals(value, "")) return new Num();
@@ -96,7 +133,7 @@ public class Num {
      * 构造数字处理对象， 可以为null；但是有值，数据类型转换失败，则抛出异常
      *
      * @param value Object
-     * @return Num
+     * @return {@link Num}
      */
     public static Num of(Object value, Number defaultValue) {
         if (Objects.isNull(value)) return new Num(defaultValue);
@@ -114,7 +151,7 @@ public class Num {
      * 构造数字处理对象， 不能为null，转换失败则抛出异常
      *
      * @param value Number
-     * @return Num
+     * @return {@link Num}
      */
     public static Num of(Number value) {
         return new Num(value);
@@ -124,7 +161,7 @@ public class Num {
      * 构造数字处理对象， 不能为null，转换失败则抛出异常
      *
      * @param value String
-     * @return Num
+     * @return {@link Num}
      */
     public static Num of(String value) {
         return new Num(Double.valueOf(value.trim().replace(",", "")));
@@ -135,13 +172,13 @@ public class Num {
      *
      * @param value        String 数字字符串
      * @param defaultValue 为空时的默认值
-     * @return Num
+     * @return {@link Num}
      */
     public static Num of(String value, Number defaultValue) {
         try {
             return Objects.isNull(value) ? new Num() : new Num(Double.valueOf(value.trim().replace(",", "")));
         } catch (NumberFormatException e) {
-            log.debug("value=" + value);
+            log.info("value=" + value);
             return Objects.isNull(defaultValue) ? new Num() : new Num(defaultValue.doubleValue());
         }
     }
@@ -150,7 +187,7 @@ public class Num {
      * 构造允许空值的数字处理对象，且不抛异常；当数据转换失败时，默认值为null
      *
      * @param value String
-     * @return Num
+     * @return {@link Num}
      */
     public static Num ofNull(String value) {
         return of(value, null);
@@ -160,7 +197,7 @@ public class Num {
      * 构造允许空值的数字处理对象，且不抛异常；当数据转换失败时，默认值为 0
      *
      * @param value String
-     * @return Num
+     * @return {@link Num}
      */
     public static Num ofZore(String value) {
         return of(value, 0);
@@ -170,7 +207,7 @@ public class Num {
      * 构造允许空值的数字处理对象，且不抛异常；默认值为 0
      *
      * @param value Number
-     * @return Num
+     * @return {@link Num}
      */
     public static Num ofZore(Number value) {
         if (Objects.isNull(value)) return new Num(0);
@@ -231,7 +268,7 @@ public class Num {
      * 数值增加，求和时使用
      *
      * @param v Num
-     * @return Num
+     * @return {@link Num}
      */
     public Num add(Num v) {
         if (Objects.nonNull(v)) value = this.doubleValue() + v.doubleValue();
@@ -242,7 +279,7 @@ public class Num {
      * 数值增加，求和时使用
      *
      * @param v Number
-     * @return Num
+     * @return {@link Num}
      */
     public Num add(Number v) {
         if (Objects.nonNull(v)) value = this.doubleValue() + v.doubleValue();
@@ -253,7 +290,7 @@ public class Num {
      * 数值增加，求和时使用
      *
      * @param values Number
-     * @return Num
+     * @return {@link Num}
      */
     public Num add(Number... values) {
         if (Util.isNotEmpty(values))
@@ -372,7 +409,7 @@ public class Num {
     /**
      * 将 long 数字转换为日期操作对象
      *
-     * @return Dates
+     * @return {@link Dates}
      */
     public Dates toDate() {
         return longValue() > 0 ? Dates.of(longValue()) : null;
@@ -448,72 +485,73 @@ public class Num {
     }
 
     public static void main(String[] args) {
-        log.debug("{}", Num.ofNull(" ").toInteger());
-        log.debug("{}", Num.ofNull(" ").intValue());
-        log.debug("{}", Num.ofNull(null).toDouble());
-        log.debug("{}", Num.ofNull(null).doubleValue());
-        log.debug("{}", Num.ofNull(" ").toBigDecimal());
-        log.debug("{}", Num.ofNull(" ").bigDecimalValue());
-        log.debug("{}", Num.of(null, null));
-        log.debug("{}", Num.of("", null));
-        log.debug("---------");
-        log.debug("{}", Num.of(1000.01).toInteger());
-        log.debug("{}", Num.of(1000.01).intValue());
-        log.debug("{}", Num.of(1000.01).toDouble());
-        log.debug("{}", Num.of(1000.01).doubleValue());
-        log.debug("{}", Num.of(1000.01).toBigDecimal());
-        log.debug("{}", Num.of(1000.01).bigDecimalValue());
+        log.info("{}", Range.of(0, 10).toString());
+        log.info("{}", Num.ofNull(" ").toInteger());
+        log.info("{}", Num.ofNull(" ").intValue());
+        log.info("{}", Num.ofNull(null).toDouble());
+        log.info("{}", Num.ofNull(null).doubleValue());
+        log.info("{}", Num.ofNull(" ").toBigDecimal());
+        log.info("{}", Num.ofNull(" ").bigDecimalValue());
+        log.info("{}", Num.of(null, null));
+        log.info("{}", Num.of("", null));
+        log.info("---------");
+        log.info("{}", Num.of(1000.01).toInteger());
+        log.info("{}", Num.of(1000.01).intValue());
+        log.info("{}", Num.of(1000.01).toDouble());
+        log.info("{}", Num.of(1000.01).doubleValue());
+        log.info("{}", Num.of(1000.01).toBigDecimal());
+        log.info("{}", Num.of(1000.01).bigDecimalValue());
 
-        log.debug(">>>>>>>");
-        log.debug(Num.of(Integer.MAX_VALUE).formatAmount());
-        log.debug(Num.of(Integer.MIN_VALUE).formatAmount());
-        log.debug(Num.of(Short.MAX_VALUE).formatAmount());
-        log.debug(Num.of(Short.MIN_VALUE).formatAmount());
-        log.debug(Num.of(Float.MAX_VALUE).formatAmount());
-        log.debug(Num.of(Float.MIN_VALUE).formatAmount());
-        log.debug(Num.of(Double.MAX_VALUE).formatAmount());
-        log.debug(Num.of(Double.MIN_VALUE).formatAmount());
-        log.debug(Num.of(BigDecimal.ZERO).formatAmount());
-        log.debug(Num.of(BigDecimal.ONE).formatAmount());
-        log.debug(Num.of("1000", 0).formatAmount());
-        log.debug(Num.of("1000.01").formatAmount());
-        log.debug("{}", Num.of("100,100.00").add(1.01).toInteger());
-        log.debug("{}", Num.of("100,100.00").add(1.01).doubleValue());
-        log.debug("{}", Num.of("100,100.00").add(1.01, 1.01, null, 1.01).doubleValue());
-        log.debug(Num.of("100,100.00").add(1.01, 1.01, null, 1.01).toString());
-        log.debug(Num.of("100,100.00").add(1.01, 1.01, null, 1.01).format(Pattern.SDOUBLE));
+        log.info(">>>>>>>");
+        log.info(Num.of(Integer.MAX_VALUE).formatAmount());
+        log.info(Num.of(Integer.MIN_VALUE).formatAmount());
+        log.info(Num.of(Short.MAX_VALUE).formatAmount());
+        log.info(Num.of(Short.MIN_VALUE).formatAmount());
+        log.info(Num.of(Float.MAX_VALUE).formatAmount());
+        log.info(Num.of(Float.MIN_VALUE).formatAmount());
+        log.info(Num.of(Double.MAX_VALUE).formatAmount());
+        log.info(Num.of(Double.MIN_VALUE).formatAmount());
+        log.info(Num.of(BigDecimal.ZERO).formatAmount());
+        log.info(Num.of(BigDecimal.ONE).formatAmount());
+        log.info(Num.of("1000", 0).formatAmount());
+        log.info(Num.of("1000.01").formatAmount());
+        log.info("{}", Num.of("100,100.00").add(1.01).toInteger());
+        log.info("{}", Num.of("100,100.00").add(1.01).doubleValue());
+        log.info("{}", Num.of("100,100.00").add(1.01, 1.01, null, 1.01).doubleValue());
+        log.info(Num.of("100,100.00").add(1.01, 1.01, null, 1.01).toString());
+        log.info(Num.of("100,100.00").add(1.01, 1.01, null, 1.01).format(Pattern.SDOUBLE));
 
-        log.debug(">>>>>>>");
-        log.debug(Num.of(1000000).format(LONG));
-        log.debug(Num.of("-1000000").format(LONG));
-        log.debug(Num.of(1000000).format(FLOAT));
-        log.debug(Num.of("-1000000").format(FLOAT));
-        log.debug(Num.of(1000000).format(DOUBLE));
-        log.debug(Num.of("-1000000").format(DOUBLE));
-        log.debug(Num.of(1000000).format(AUTO.value(4)));
-        log.debug(Num.of("-1000000").format(AUTO.value(4)));
-        log.debug(Num.of(1000000).format(SLONG));
-        log.debug(Num.of("-1000000").format(SLONG));
-        log.debug(Num.of(1000000).format(SFLOAT));
-        log.debug(Num.of("-1000000").format(SFLOAT));
-        log.debug(Num.of(1000000).format(SDOUBLE));
-        log.debug(Num.of("-1000000").format(SDOUBLE));
-        log.debug(Num.of(1000000).format(SAUTO.value(4)));
-        log.debug(Num.of("-1000000").format(SAUTO.value(4)));
+        log.info(">>>>>>>");
+        log.info(Num.of(1000000).format(LONG));
+        log.info(Num.of("-1000000").format(LONG));
+        log.info(Num.of(1000000).format(FLOAT));
+        log.info(Num.of("-1000000").format(FLOAT));
+        log.info(Num.of(1000000).format(DOUBLE));
+        log.info(Num.of("-1000000").format(DOUBLE));
+        log.info(Num.of(1000000).format(AUTO.value(4)));
+        log.info(Num.of("-1000000").format(AUTO.value(4)));
+        log.info(Num.of(1000000).format(SLONG));
+        log.info(Num.of("-1000000").format(SLONG));
+        log.info(Num.of(1000000).format(SFLOAT));
+        log.info(Num.of("-1000000").format(SFLOAT));
+        log.info(Num.of(1000000).format(SDOUBLE));
+        log.info(Num.of("-1000000").format(SDOUBLE));
+        log.info(Num.of(1000000).format(SAUTO.value(4)));
+        log.info(Num.of("-1000000").format(SAUTO.value(4)));
 
-        log.debug(">>>>>>>");
-        log.debug("0 in 1-10 : {}", Range.of(1, 10).in(0));
-        log.debug("1 in 1-10 : {}", Range.of(1, 10).in(1));
-        log.debug("2 in 1-10 : {}", Range.of(1, 10).in(2));
-        log.debug("9 in 1-10 : {}", Range.of(1, 10).in(9));
-        log.debug("10 in 1-10 : {}", Range.of(1, 10).in(10));
-        log.debug("11 in 1-10 : {}", Range.of(1, 10).in(11));
-        log.debug("0 round 1-10 : {}", Range.of(1, 10).round(0));
-        log.debug("1 round 1-10 : {}", Range.of(1, 10).round(1));
-        log.debug("2 round 1-10 : {}", Range.of(1, 10).round(2));
-        log.debug("9 round 1-10 : {}", Range.of(1, 10).round(9));
-        log.debug("10 round 1-10 : {}", Range.of(1, 10).round(10));
-        log.debug("11 round 1-10 : {}", Range.of(1, 10).round(11));
+        log.info(">>>>>>>");
+        log.info("0 in 1-10 : {}", Range.of(1, 10).in(0));
+        log.info("1 in 1-10 : {}", Range.of(1, 10).in(1));
+        log.info("2 in 1-10 : {}", Range.of(1, 10).in(2));
+        log.info("9 in 1-10 : {}", Range.of(1, 10).in(9));
+        log.info("10 in 1-10 : {}", Range.of(1, 10).in(10));
+        log.info("11 in 1-10 : {}", Range.of(1, 10).in(11));
+        log.info("0 round 1-10 : {}", Range.of(1, 10).round(0));
+        log.info("1 round 1-10 : {}", Range.of(1, 10).round(1));
+        log.info("2 round 1-10 : {}", Range.of(1, 10).round(2));
+        log.info("9 round 1-10 : {}", Range.of(1, 10).round(9));
+        log.info("10 round 1-10 : {}", Range.of(1, 10).round(10));
+        log.info("11 round 1-10 : {}", Range.of(1, 10).round(11));
 
     }
 }

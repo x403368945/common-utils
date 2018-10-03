@@ -66,7 +66,8 @@ public class JSEngine {
      * @return String
      * @throws ScriptException 执行异常
      */
-    public String eval(@NonNull String script, Object... values) throws ScriptException {
+    public String eval(String script, Object... values) throws ScriptException {
+        Objects.requireNonNull(script, "参数【script】是必须的");
         if (Objects.nonNull(values)) {
             for (Object value : values) {
                 script = script.replaceFirst("<%[\\da-zA-Z]*%>", value.toString());
@@ -77,12 +78,13 @@ public class JSEngine {
     /**
      * 执行 JS - eval()函数，执行异常将会抛出 ScriptException
      * 例：1<2?'正确':'不正确'
-     * @param script String js代码字符串
-     * @param map  Map<String, Object>  script 中可以用 <%key%> 进行占位，map中的元素将会替换占位符，替换规则为 <%entry.getKey()%> = entry.getValue()
+     * @param script String js代码字符串，script 中可以用 <%key%>
+     * @param map  Map<String, Object> map中的元素将会替换占位符，替换规则为 <%entry.getKey()%> = entry.getValue()
      * @return String
      * @throws ScriptException 执行异常
      */
-    public String eval(@NonNull String script, Map<String, Object> map) throws ScriptException {
+    public String eval(String script, Map<String, Object> map) throws ScriptException {
+        Objects.requireNonNull(script, "参数【script】是必须的");
         if (Objects.nonNull(map)) {
             for (Map.Entry<String, Object> entry : map.entrySet()) {
                 script = script.replaceFirst(MessageFormat.format("<%{0}%>", entry.getKey()), entry.getValue().toString());

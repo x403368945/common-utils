@@ -65,10 +65,11 @@ public class CodeImage {
     /**
      * 生成图片
      *
-     * @param consumer Consumer<String> 处理验证码；生成的验证码会当做参数传入 consumer
-     * @return CodeImage
+     * @param consumer {@link Consumer<String:code:生成的验证码>} 处理验证码
+     * @return {@link CodeImage}
      */
-    public CodeImage generate(@NonNull final Consumer<String> consumer) {
+    public CodeImage generate(final Consumer<String> consumer) {
+        Objects.requireNonNull(consumer, "参数【consumer】是必须的");
         image = new BufferedImage(ops.width, ops.height, BufferedImage.TYPE_INT_RGB);
         // 获取图形上下文
         final Graphics g = image.getGraphics();
@@ -124,8 +125,9 @@ public class CodeImage {
     }
 
     @SneakyThrows
-    public File write(@NonNull final File file) {
-        Asserts.notEmpty(image, "请先生成图片:generate(System.out::println)");
+    public File write(final File file) {
+        Objects.requireNonNull(file, "参数【consumer】是必须的");
+        Objects.requireNonNull(image, "请先生成图片:generate(System.out::println)");
         if (!ImageIO.write(image, ops.type.name(), file)) {
             throw new IOException(String.format("Could not write an image of format %s to %s", ops.type.name(), file.getAbsolutePath()));
         }
@@ -133,15 +135,16 @@ public class CodeImage {
     }
 
     @SneakyThrows
-    public void write(@NonNull final OutputStream outputStream) {
-        Asserts.notEmpty(image, "请先生成图片:generate(System.out::println)");
+    public void write(final OutputStream outputStream) {
+        Objects.requireNonNull(outputStream, "参数【outputStream】是必须的");
+        Objects.requireNonNull(image, "请先生成图片:generate(System.out::println)");
         if (!ImageIO.write(image, ops.type.name(), outputStream))
             throw new IOException("Could not write an image of format ".concat(ops.type.name()));
     }
 
     @SneakyThrows
     public String base64() {
-        Asserts.notEmpty(image, "请先生成图片:generate(System.out::println)");
+        Objects.requireNonNull(image, "请先生成图片:generate(System.out::println)");
         @Cleanup final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         if (!ImageIO.write(image, ops.type.name(), byteArrayOutputStream)) {
             throw new IOException("Could not write an image of format ".concat(ops.type.name()));

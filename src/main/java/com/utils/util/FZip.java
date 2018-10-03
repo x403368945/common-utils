@@ -22,6 +22,7 @@ import java.util.zip.ZipOutputStream;
  * 可以不指定 to ，会默认在 from 同级的目录下产生一个同名的压缩包； <br>
  * 例1：当 from = D:\files\dir ；则默认 to = D:\files\dir.zip <br>
  * 例2：当 from = D:\files\content.txt ；则默认 to = D:\files\content.zip <br>
+ *
  * @author Jason Xie on 2017/10/30.
  */
 @AllArgsConstructor
@@ -45,12 +46,15 @@ public class FZip {
          */
         private Predicate<String> exclude;
     }
+
     public static FZip ofDefault() {
         return of(Options.builder().build());
     }
+
     public static FZip of(final Options ops) {
-        return new FZip(ops, null,null);
+        return new FZip(ops, null, null);
     }
+
     final Options ops;
     /**
      * 源文件或目录：绝对路径
@@ -68,6 +72,7 @@ public class FZip {
         this.from = from;
         return this;
     }
+
     public FZip from(String from, String... names) {
         return from(FPath.of(from, names).file());
     }
@@ -76,6 +81,7 @@ public class FZip {
         this.to = to;
         return this;
     }
+
     public FZip to(String to, String... names) {
         return to(FPath.of(to, names).file());
     }
@@ -90,12 +96,13 @@ public class FZip {
 
     /**
      * 执行压缩操作
-     * @return Zip
+     *
+     * @return {@link FZip}
      */
-    public FZip zip() throws Exception{
+    public FZip zip() throws Exception {
         { // 检查参数是否正确
-            Asserts.notNull(from, "文件或目录不存在:".concat(from.getAbsolutePath()));
-            Asserts.isTrue(from.exists(), "文件或目录不存在:".concat(from.getAbsolutePath()));
+            Objects.requireNonNull(from, "文件或目录不存在:".concat(from.getAbsolutePath()));
+            Objects.requireNonNull(from.exists() ? true : null, "文件或目录不存在:".concat(from.getAbsolutePath()));
             if (Util.isEmpty(to)) {
                 to = from.getParentFile()
                         .toPath()
@@ -104,22 +111,22 @@ public class FZip {
                         )
                         .toFile();
             } else {
-                Asserts.isTrue(to.getName().endsWith(".zip"), "目标后缀必须是 .zip 的文件，不能是目录或其他后缀:".concat(to.getAbsolutePath()));
+                Objects.requireNonNull(to.getName().endsWith(".zip") ? true : null, "目标后缀必须是 .zip 的文件，不能是目录或其他后缀:".concat(to.getAbsolutePath()));
             }
         }
 //        Dates dates = Dates.now();
         final File[] files = from.isDirectory()
                 ? from.listFiles((dir, name) -> Objects.isNull(ops.exclude) || !ops.exclude.test(name))
                 : new File[]{from};
-        Asserts.notNull(files, "压缩目录文件列表为空");
+        Objects.requireNonNull(files, "压缩目录文件列表为空");
         @Cleanup final BufferedOutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(to.toPath()));
         @Cleanup final ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream);
         int p = 0; // 进度
         for (int i = 0; i < files.length; i++) {
             write(files[i], zipOutputStream, Paths.get(""));
             if (Objects.nonNull(ops.progress)) {
-                if((int)((i + 1.0) / files.length * 100) > p) {
-                    p = (int)((i + 1.0) / files.length * 100);
+                if ((int) ((i + 1.0) / files.length * 100) > p) {
+                    p = (int) ((i + 1.0) / files.length * 100);
                     ops.progress.accept(p);
                 }
             }
@@ -131,6 +138,7 @@ public class FZip {
         FPath.of(to).chmod(644);
         return this;
     }
+
     private void write(final File source, final ZipOutputStream output, final Path parent) throws Exception {
         if (source.isDirectory()) {
             if (ops.isRecursion)
@@ -157,7 +165,7 @@ public class FZip {
                     .from("src/test/files/json")
                     .to("src/test/files/temp/json.zip")
                     .zip();
-            log.debug(zip.getTo().getAbsolutePath());
+            log.info(zip.getTo().getAbsolutePath());
         } catch (Exception e) {
             e.printStackTrace();
         }

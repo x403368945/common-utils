@@ -62,8 +62,8 @@ public class FWrite {
 
     @SneakyThrows
     private void check() {
-        log.debug("write file : {}", file.getAbsolutePath());
-        Asserts.notEmpty(file, "请指定写入路径");
+        log.info("write file : {}", file.getAbsolutePath());
+        Objects.requireNonNull(file, "请指定写入路径");
         if (!file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
             FPath.of(file.getParentFile()).chmod(755);
@@ -122,16 +122,16 @@ public class FWrite {
 
     public static void main(String[] args) {
         try {
-            log.debug("{}", FWrite.of("logs", "test.txt")
+            log.info("{}", FWrite.of("logs", "test.txt")
                     .write("aaa")
                     .getAbsolute()
                     .get());
-            log.debug("{}", FWrite.of("logs", "test.txt")
+            log.info("{}", FWrite.of("logs", "test.txt")
                     .append()
                     .write("bbb")
                     .getAbsolute()
                     .get());
-            log.debug("{}", FWrite.of("logs", "test.txt")
+            log.info("{}", FWrite.of("logs", "test.txt")
                     .append()
                     .write("ccc".getBytes(Charsets.UTF_8))
                     .getAbsolute()

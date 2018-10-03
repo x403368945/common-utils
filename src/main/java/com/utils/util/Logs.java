@@ -47,7 +47,7 @@ public final class Logs {
                 clazz.getSimpleName(),
                 new SimpleDateFormat("yyyyMMddHHmmssSSS").format(System.currentTimeMillis()) + uid + ".log"
         ).toAbsolutePath().toString();
-        File file = new File(filePath);
+        final File file = new File(filePath);
         file.getParentFile().mkdirs();
         writer = new FileWriter(file, true);
     }
@@ -66,7 +66,7 @@ public final class Logs {
     /**
      * 获取日志文件路径
      *
-     * @return
+     * @return String
      */
     public String getLogPath() {
         return filePath;
@@ -90,7 +90,7 @@ public final class Logs {
 
     private void write(StackTraceElement element, Event event, String message, Exception e) {
         if (Objects.isNull(message)) message = "";
-//		log.debug(message, e);
+//		log.info(message, e);
         String exception = "";
         if (Objects.nonNull(e)) {
             StringWriter sw = new StringWriter();

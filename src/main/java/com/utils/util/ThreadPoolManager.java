@@ -76,7 +76,7 @@ public final class ThreadPoolManager {
      * 执行任务，等待返回结果
      *
      * @param callable {@link Callable}
-     * @return Future
+     * @return {@link Future}
      */
     public <T> Future<T> submit(final Callable<T> callable) {
         return executorService.submit(callable);

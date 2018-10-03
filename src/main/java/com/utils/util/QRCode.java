@@ -15,9 +15,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Paths;
 import java.util.Hashtable;
+import java.util.Objects;
 
 /**
- * 二维码生成
+ * 二维码生成；依赖 google.zxing 库
  *
  * @author Jason Xie on 2018/1/29.
  */
@@ -68,7 +69,8 @@ public class QRCode {
     }
 
     @SneakyThrows
-    public File write(@NonNull final File file) {
+    public File write(final File file) {
+        Objects.requireNonNull(file, "参数【file】是必须的");
         if (!ImageIO.write(generate(), type.name(), file)) {
             throw new IOException(String.format("Could not write an image of format %s to %s", type.name(), file.getAbsolutePath()));
         }
@@ -76,7 +78,8 @@ public class QRCode {
     }
 
     @SneakyThrows
-    public void write(@NonNull final OutputStream stream) {
+    public void write(final OutputStream stream) {
+        Objects.requireNonNull(stream, "参数【stream】是必须的");
         if (!ImageIO.write(generate(), type.name(), stream)) {
             throw new IOException("Could not write an image of format ".concat(type.name()));
         }

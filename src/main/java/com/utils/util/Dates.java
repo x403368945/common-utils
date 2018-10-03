@@ -3,7 +3,7 @@ package com.utils.util;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
-import com.utils.enums.Week;
+import com.utils.excel.enums.Week;
 import lombok.*;
 import lombok.Builder;
 import lombok.experimental.Accessors;
@@ -13,6 +13,7 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -20,6 +21,7 @@ import static java.util.Calendar.*;
 
 /**
  * 日期处理类
+ *
  * @author Jason Xie on 2017/10/28.
  */
 @Slf4j
@@ -68,7 +70,7 @@ public class Dates {
     }
 
     /**
-     * @deprecated 未完善,暂时不可用
+     * @deprecated 未完善, 暂时不可用
      */
     @AllArgsConstructor
     @Builder
@@ -76,7 +78,7 @@ public class Dates {
     @Deprecated
     public static class DateObject {
         private static DateObject parse(String jsonText) { // "{'y':0,'m':0,'d':0,'h':0,'mm':0,'s':0,'ms':0}"
-            JSONObject obj = JSON.parseObject(jsonText.replace("'","\""));
+            JSONObject obj = JSON.parseObject(jsonText.replace("'", "\""));
             int y = obj.getIntValue("y");
             int m = obj.getIntValue("m");
             int d = obj.getIntValue("d");
@@ -91,10 +93,12 @@ public class Dates {
             }
             return dateObject;
         }
+
         /**
          * 识别日期格式
+         *
          * @param value String
-         * @return DateObject
+         * @return {@link DateObject}
          */
         public static DateObject of(String value) {
             if (Objects.isNull(value) || "".equals(value.trim())) {
@@ -103,7 +107,7 @@ public class Dates {
             try {
                 value = value.trim();
 //                "{'y':0,'m':0,'d':0,'h':0,'mm':0,'s':0,'ms':0}"
-                if(value.replace(" ", "").matches("^\\d+$")) { // 纯数字
+                if (value.replace(" ", "").matches("^\\d+$")) { // 纯数字
                     switch (value.length()) {
                         case 6: // 6 位数字，时分秒 > HHmmss
                             return parse(value.replaceAll("^(\\d{2})(\\d{2})(\\d{2})$", "{'y':0,'m':0,'d':0,'h':$1,'mm':$2,'s':$3,'ms':0}"));
@@ -119,16 +123,16 @@ public class Dates {
                             throw new IllegalArgumentException("未识别的日期格式");
                     }
                 }
-                if(value.matches("^\\d{4}.\\d{1,2}.\\d{1,2} \\d{1,2}.\\d{1,2}.\\d{1,2}$")) { // yyyyMMddHHmmss
+                if (value.matches("^\\d{4}.\\d{1,2}.\\d{1,2} \\d{1,2}.\\d{1,2}.\\d{1,2}$")) { // yyyyMMddHHmmss
                     return parse(value.replace("^(\\d{4}).(\\d{1,2}).(\\d{1,2}) (\\d{1,2}).(\\d{1,2}).(\\d{1,2})$", "{'y':$1,'m':$2,'d':$3,'h':$4,'mm':$5,'s':$6,'ms':0}"));
                 }
-                if(value.matches("^\\d{4}.\\d{1,2}.\\d{1,2}[T ]\\d{1,2}.\\d{1,2}.\\d{1,2}.\\d{1,3}(Z)?$")) { // yyyyMMddHHmmssSSS
+                if (value.matches("^\\d{4}.\\d{1,2}.\\d{1,2}[T ]\\d{1,2}.\\d{1,2}.\\d{1,2}.\\d{1,3}(Z)?$")) { // yyyyMMddHHmmssSSS
                     return parse(value.replace("^(\\d{4}).(\\d{1,2}).(\\d{1,2})[T ](\\d{1,2}).(\\d{1,2}).(\\d{1,2}).(\\d{1,3})(Z)?$", "{'y':$1,'m':$2,'d':$3,'h':$4,'mm':$5,'s':$6,'ms':$7}"));
                 }
-                if(value.matches("^\\d{4}.\\d{1,2}.\\d{1,2}$")) { // yyyyMMdd
+                if (value.matches("^\\d{4}.\\d{1,2}.\\d{1,2}$")) { // yyyyMMdd
                     return parse(value.replaceAll("^(\\d{4})(\\d{1,2})(\\d{1,2})$", "{'y':$1,'m':$2,'d':$3,'h':0,'mm':0,'s':0,'ms':0}"));
                 }
-                if(value.matches("^\\d{1,2}.\\d{1,2}.\\d{1,2}$")) { // hhmmss
+                if (value.matches("^\\d{1,2}.\\d{1,2}.\\d{1,2}$")) { // hhmmss
                     return parse(value.replaceAll("^(\\d{2})(\\d{1,2})(\\d{1,2})$", "{'y':0,'m':0,'d':0,'h':$1,'mm':$2,'s':$3,'ms':0}"));
                 }
                 throw new IllegalArgumentException("未识别的日期格式");
@@ -136,6 +140,7 @@ public class Dates {
                 throw new IllegalArgumentException("日期转换失败，value:".concat(value));
             }
         }
+
         private int y;
         private int m;
         private int d;
@@ -143,12 +148,15 @@ public class Dates {
         private int mm;
         private int s;
         private int ms;
+
         public Dates toDates() {
             return new Dates().year(y).month(m).day(d).h(h).m(mm).s(s).ms(ms);
         }
+
         public Date toDate() {
             return toDates().date();
         }
+
         public Date toTimestamp() {
             return toDates().timestamp();
         }
@@ -174,13 +182,44 @@ public class Dates {
         private Timestamp end;
 
         /**
+         * 遍历选定区间：按天
+         *
+         * @param action {@link BiConsumer<Timestamp:start, Timestamp:end> } <br>start=2018-01-01 00:00:00.000 <br>end=2018-01-01 23:59:59.999
+         */
+        public void forEach(BiConsumer<Timestamp, Timestamp> action) {
+            Objects.requireNonNull(action, "参数【action】是必须的");
+            final Dates beginDate = Dates.of(begin);
+            final Dates endDate = Dates.of(end).endTimeOfDay();
+            do {
+                action.accept(beginDate.beginTimeOfDay().timestamp(), beginDate.endTimeOfDay().timestamp());
+                beginDate.addDay(1);
+            } while (beginDate.le(endDate));
+        }
+
+        /**
+         * 遍历选定区间：按月
+         *
+         * @param action {@link BiConsumer<Timestamp:start, Timestamp:end> } <br>start=2018-01-01 00:00:00.000 <br>end=2018-01-31 23:59:59.999
+         */
+        public void forEachMonth(BiConsumer<Timestamp, Timestamp> action) {
+            Objects.requireNonNull(action, "参数【action】是必须的");
+            final Dates beginDate = Dates.of(begin);
+            final Dates endDate = Dates.of(end).lastDayOfMonth();
+            do {
+                action.accept(beginDate.firstDayOfMonth().timestamp(), beginDate.lastDayOfMonth().timestamp());
+                beginDate.addMonth(1);
+            } while (beginDate.le(endDate));
+        }
+
+        /**
          * 保留年月日，将开始时间设置为 00:00:00
          * 保留年月日，将结束时间设置为 23:59:59
-         * @return Range
+         *
+         * @return {@link Range}
          */
         public Range rebuild() {
-            if(Objects.nonNull(begin)) begin = Dates.of(begin).beginTimeOfDay().timestamp();
-            if(Objects.nonNull(end)) end = Dates.of(end).endTimeOfDay().timestamp();
+            if (Objects.nonNull(begin)) begin = Dates.of(begin).beginTimeOfDay().timestamp();
+            if (Objects.nonNull(end)) end = Dates.of(end).endTimeOfDay().timestamp();
             return this;
         }
 
@@ -193,46 +232,54 @@ public class Dates {
     /**
      * 以当前时间 构造时间处理对象
      *
-     * @return Dates
+     * @return {@link Dates}
      */
     public static Dates now() {
         return new Dates();
     }
+
     /**
      * 构造时间处理对象：指定时间
      *
      * @param value Timestamp
-     * @return Dates
+     * @return {@link Dates}
      */
-    public static Dates of(@NonNull final Timestamp value) {
+    public static Dates of(final Timestamp value) {
+        Objects.requireNonNull(value, "参数【value】是必须的");
         return new Dates(value.getTime());
     }
+
     /**
      * 构造时间处理对象：指定时间
      *
      * @param value Date
-     * @return Dates
+     * @return {@link Dates}
      */
-    public static Dates of(@NonNull final Date value) {
+    public static Dates of(final Date value) {
+        Objects.requireNonNull(value, "参数【value】是必须的");
         return new Dates(value.getTime());
     }
+
     /**
      * 构造时间处理对象：指定时间
      *
      * @param value Timestamp
-     * @return Dates
+     * @return {@link Dates}
      */
     public static Dates of(final long value) {
         return new Dates(value);
     }
+
     /**
      * 构造时间处理对象：指定时间
      *
      * @param value   String 日期字符串
-     * @param pattern Pattern 日期格式
-     * @return Dates
+     * @param pattern {@link Pattern} 日期格式
+     * @return {@link Dates}
      */
-    public static Dates of(@NonNull final String value, @NonNull final Pattern pattern) {
+    public static Dates of(final String value, final Pattern pattern) {
+        Objects.requireNonNull(value, "参数【value】是必须的");
+        Objects.requireNonNull(pattern, "参数【pattern】是必须的");
         try {
             return new Dates(new SimpleDateFormat(pattern.value()).parse(value).getTime());
         } catch (ParseException e) {
@@ -242,6 +289,7 @@ public class Dates {
 
     private Dates() {
     }
+
     private Dates(long value) {
         this.calendar.setTimeInMillis(value);
     }
@@ -269,7 +317,7 @@ public class Dates {
     /**
      * 转换为 Date
      *
-     * @return Date
+     * @return {@link Date}
      */
     public Date date() {
         return calendar.getTime();
@@ -281,7 +329,8 @@ public class Dates {
      * @param pattern Pattern
      * @return String
      */
-    public String format(@NonNull final Pattern pattern) {
+    public String format(final Pattern pattern) {
+        Objects.requireNonNull(pattern, "参数【pattern】是必须的");
         return format(pattern.value());
     }
 
@@ -291,7 +340,8 @@ public class Dates {
      * @param pattern Pattern
      * @return String
      */
-    public String format(@NonNull final String pattern) {
+    public String format(final String pattern) {
+        Objects.requireNonNull(pattern, "参数【pattern】是必须的");
         return new SimpleDateFormat(pattern).format(calendar.getTime());
     }
 
@@ -352,7 +402,7 @@ public class Dates {
     /**
      * 获取：星期
      *
-     * @return Week
+     * @return {@link Week}
      */
     public Week week() {
         return Week.values()[calendar.get(DAY_OF_WEEK) - 1];
@@ -398,7 +448,7 @@ public class Dates {
      * 指定：年
      *
      * @param value int
-     * @return Dates
+     * @return {@link Dates}
      */
     public Dates year(int value) {
         calendar.set(YEAR, value);
@@ -409,7 +459,7 @@ public class Dates {
      * 指定：月
      *
      * @param value int
-     * @return Dates
+     * @return {@link Dates}
      */
     public Dates month(int value) {
         calendar.set(MONTH, Math.min(12, value) - 1);
@@ -420,7 +470,7 @@ public class Dates {
      * 指定：日
      *
      * @param value int
-     * @return Dates
+     * @return {@link Dates}
      */
     public Dates day(int value) {
         calendar.set(DAY_OF_MONTH, Math.min(calendar.getActualMaximum(DAY_OF_MONTH), value));
@@ -431,7 +481,7 @@ public class Dates {
      * 指定：时
      *
      * @param value int
-     * @return Dates
+     * @return {@link Dates}
      */
     public Dates h(int value) {
         calendar.set(HOUR_OF_DAY, Math.min(23, value));
@@ -442,7 +492,7 @@ public class Dates {
      * 指定：分
      *
      * @param value int
-     * @return Dates
+     * @return {@link Dates}
      */
     public Dates m(int value) {
         calendar.set(MINUTE, Math.min(59, value));
@@ -453,17 +503,18 @@ public class Dates {
      * 指定：秒
      *
      * @param value int
-     * @return Dates
+     * @return {@link Dates}
      */
     public Dates s(int value) {
         calendar.set(SECOND, Math.min(59, value));
         return this;
     }
+
     /**
      * 指定：秒
      *
      * @param value int
-     * @return Dates
+     * @return {@link Dates}
      */
     public Dates ms(int value) {
         calendar.set(MILLISECOND, Math.min(999, value));
@@ -474,7 +525,7 @@ public class Dates {
      * 年【增加|减少】
      *
      * @param value int 正数为增加，负数表示减少
-     * @return Datas
+     * @return {@link Dates}
      */
     public Dates addYear(int value) {
         calendar.add(YEAR, value);
@@ -485,7 +536,7 @@ public class Dates {
      * 月【增加|减少】
      *
      * @param value int 正数为增加，负数表示减少
-     * @return Datas
+     * @return {@link Dates}
      */
     public Dates addMonth(int value) {
         calendar.add(MONTH, value);
@@ -496,7 +547,7 @@ public class Dates {
      * 日【增加|减少】
      *
      * @param value int 正数为增加，负数表示减少
-     * @return Datas
+     * @return {@link Dates}
      */
     public Dates addDay(int value) {
         calendar.add(DAY_OF_MONTH, value);
@@ -507,7 +558,7 @@ public class Dates {
      * 星期【增加|减少】
      *
      * @param value int 正数为增加，负数表示减少
-     * @return Datas
+     * @return {@link Dates}
      */
     public Dates addWeek(int value) {
         calendar.add(WEEK_OF_YEAR, value);
@@ -518,7 +569,7 @@ public class Dates {
      * 时【增加|减少】
      *
      * @param value int 正数为增加，负数表示减少
-     * @return Datas
+     * @return {@link Dates}
      */
     public Dates addHour(int value) {
         calendar.add(HOUR, value);
@@ -529,17 +580,18 @@ public class Dates {
      * 分【增加|减少】
      *
      * @param value int 正数为增加，负数表示减少
-     * @return Datas
+     * @return {@link Dates}
      */
     public Dates addMinute(int value) {
         calendar.add(MINUTE, value);
         return this;
     }
+
     /**
      * 秒【增加|减少】
      *
      * @param value int 正数为增加，负数表示减少
-     * @return Datas
+     * @return {@link Dates}
      */
     public Dates addSecond(int value) {
         calendar.add(SECOND, value);
@@ -549,7 +601,7 @@ public class Dates {
     /**
      * 计算并设置为上周一的日期
      *
-     * @return Dates
+     * @return {@link Dates}
      */
     public Dates prevMonday() {
         // addWeek(-1) ；即上周
@@ -558,10 +610,11 @@ public class Dates {
         calendar.set(DAY_OF_WEEK, Week.Mon.ordinal() + 1);
         return this;
     }
+
     /**
      * 计算并设置为下周一的日期
      *
-     * @return Dates
+     * @return {@link Dates}
      */
     public Dates nextMonday() {
         // addWeek(1) ；即下周
@@ -575,7 +628,7 @@ public class Dates {
      * 当天的开始时间
      * 设置为当天 0 时 0 分 0 秒
      *
-     * @return Dates
+     * @return {@link Dates}
      */
     public Dates beginTimeOfDay() {
         h(0).m(0).s(0).ms(0);
@@ -586,7 +639,7 @@ public class Dates {
      * 当天的结束时间
      * 设置为当天 23 时 59 分 59 秒
      *
-     * @return Dates
+     * @return {@link Dates}
      */
     public Dates endTimeOfDay() {
         h(23).m(59).s(59).ms(999);
@@ -596,7 +649,7 @@ public class Dates {
     /**
      * 设置为当月第一天
      *
-     * @return Dates
+     * @return {@link Dates}
      */
     public Dates firstDayOfMonth() {
         day(1);
@@ -606,7 +659,7 @@ public class Dates {
     /**
      * 设置为当月最后一天
      *
-     * @return Dates
+     * @return {@link Dates}
      */
     public Dates lastDayOfMonth() {
         day(calendar.getActualMaximum(DAY_OF_MONTH));
@@ -628,40 +681,50 @@ public class Dates {
         if (src == dest) return 0;
         return (src < dest) ? -1 : 1;
     }
+
     /**
      * 比对两个日期，左边 > 右边
+     *
      * @param destDate Dates
      * @return boolean
      */
     public boolean gt(Dates destDate) {
         return 1 == compare(destDate);
     }
+
     /**
      * 比对两个日期，左边 < 右边
+     *
      * @param destDate Dates
      * @return boolean
      */
     public boolean lt(Dates destDate) {
         return -1 == compare(destDate);
     }
+
     /**
      * 比对两个日期，左边 >= 右边
+     *
      * @param destDate Dates
      * @return boolean
      */
     public boolean ge(Dates destDate) {
         return -1 != compare(destDate);
     }
+
     /**
      * 比对两个日期，左边 <= 右边
+     *
      * @param destDate Dates
      * @return boolean
      */
     public boolean le(Dates destDate) {
         return 1 != compare(destDate);
     }
+
     /**
      * 比对两个日期，左边 == 右边
+     *
      * @param destDate Dates
      * @return boolean
      */
@@ -707,6 +770,7 @@ public class Dates {
     /**
      * 获取本年按季度划分的时间区间集合
      * 数据示例：[{"begin":"2017-01-01 00:00:00","end":"2017-03-31 23:59:59"}, {"begin":"2017-04-01 00:00:00","end":"2017-06-30 23:59:59"}, {"begin":"2017-07-01 00:00:00","end":"2017-09-30 23:59:59"}, {"begin":"2017-10-01 00:00:00","end":"2017-12-31 23:59:59"}]
+     *
      * @return List<Range>
      */
     public List<Range> getRangeOfQuarter() {
@@ -715,7 +779,7 @@ public class Dates {
                 new int[]{4, 6},
                 new int[]{7, 9},
                 new int[]{10, 12}
-                )
+        )
                 .map(arr -> Range.builder()
                         .begin(month(arr[0]).firstDayOfMonth().beginTimeOfDay().timestamp())
                         .end(month(arr[1]).lastDayOfMonth().endTimeOfDay().timestamp())
@@ -723,10 +787,12 @@ public class Dates {
                 )
                 .collect(Collectors.toList());
     }
+
     /**
      * 获取当月时间区间
      * 数据示例：{"begin":"2017-01-01 00:00:00","end":"2017-1-31 23:59:59"}
-     * @return Range
+     *
+     * @return {@link Range}
      */
     public Range getRangeOfMonth() {
         return Range.builder()
@@ -734,10 +800,12 @@ public class Dates {
                 .end(lastDayOfMonth().endTimeOfDay().timestamp())
                 .build();
     }
+
     /**
      * 获取当年时间区间
      * 数据示例：{"begin":"2017-01-01 00:00:00","end":"2017-12-31 23:59:59"}
-     * @return Range
+     *
+     * @return {@link Range}
      */
     public Range getRangeOfYear() {
         return Range.builder()
@@ -752,39 +820,39 @@ public class Dates {
     }
 
     public static void main(String[] args) {
-        log.debug(Dates.now().format(Pattern.yyyy_MM));
-        log.debug(Dates.now().formatDateTime());
-        log.debug(Dates.now().formatDate());
-        log.debug(Dates.now().formatTime());
-        log.debug(Dates.of(new Date()).addYear(1).format("yyyy-MM-dd"));
-        log.debug(Dates.of(new Timestamp(new Date().getTime())).formatDateTime());
-        log.debug("{}", Dates.now().getRangeOfMonth());
-        log.debug("{}", Dates.now().getRangeOfYear());
-        log.debug("{}", Dates.now().getRangeOfQuarter());
-        log.debug("{}", JSON.parseObject("{\"begin\":\"2017-11-01\",\"end\":\"2017-11-30\"}", Range.class).rebuild());
+        log.info(Dates.now().format(Pattern.yyyy_MM));
+        log.info(Dates.now().formatDateTime());
+        log.info(Dates.now().formatDate());
+        log.info(Dates.now().formatTime());
+        log.info(Dates.of(new Date()).addYear(1).format("yyyy-MM-dd"));
+        log.info(Dates.of(new Timestamp(new Date().getTime())).formatDateTime());
+        log.info("{}", Dates.now().getRangeOfMonth());
+        log.info("{}", Dates.now().getRangeOfYear());
+        log.info("{}", Dates.now().getRangeOfQuarter());
+        log.info("{}", JSON.parseObject("{\"begin\":\"2017-11-01\",\"end\":\"2017-11-30\"}", Range.class).rebuild());
         Dates dates = Dates.now();
-        log.debug(dates.formatDateTime());
-        log.debug("{}", dates.get());
-        log.debug("{}", Dates.of(dates.formatDateTime(), Pattern.yyyy_MM_dd_HH_mm_ss).get());
-        log.debug(Dates.of("2017-01-17 08:56:03 +0000", Pattern.yyyy_MM_dd).formatDate());
+        log.info(dates.formatDateTime());
+        log.info("{}", dates.get());
+        log.info("{}", Dates.of(dates.formatDateTime(), Pattern.yyyy_MM_dd_HH_mm_ss).get());
+        log.info(Dates.of("2017-01-17 08:56:03 +0000", Pattern.yyyy_MM_dd).formatDate());
 
-        log.debug("左 > 右 true：{}",Dates.now().addDay(1).gt(Dates.now()));
-        log.debug("左 > 右 false：{}",Dates.now().gt(Dates.now().addDay(1)));
-        log.debug("左 < 右 true：{}",Dates.now().lt(Dates.now().addDay(1)));
-        log.debug("左 < 右 false：{}",Dates.now().addDay(1).lt(Dates.now()));
-        log.debug("左 = 右 true：{}",Dates.now().beginTimeOfDay().eq(Dates.now().beginTimeOfDay()));
-        log.debug("左 = 右 false：{}",Dates.now().addDay(1).beginTimeOfDay().eq(Dates.now().beginTimeOfDay()));
-        log.debug("左 >= 右 true：{}",Dates.now().beginTimeOfDay().ge(Dates.now().beginTimeOfDay()));
-        log.debug("左 >= 右 true：{}",Dates.now().addDay(1).beginTimeOfDay().ge(Dates.now().beginTimeOfDay()));
-        log.debug("左 >= 右 false：{}",Dates.now().beginTimeOfDay().ge(Dates.now().addDay(1).beginTimeOfDay()));
-        log.debug("左 <= 右 true：{}",Dates.now().beginTimeOfDay().le(Dates.now().beginTimeOfDay()));
-        log.debug("左 <= 右 true：{}",Dates.now().beginTimeOfDay().le(Dates.now().addDay(1).beginTimeOfDay()));
-        log.debug("左 <= 右 false：{}",Dates.now().addDay(1).beginTimeOfDay().le(Dates.now().beginTimeOfDay()));
-        try{ // UTC 日期
+        log.info("左 > 右 true：{}", Dates.now().addDay(1).gt(Dates.now()));
+        log.info("左 > 右 false：{}", Dates.now().gt(Dates.now().addDay(1)));
+        log.info("左 < 右 true：{}", Dates.now().lt(Dates.now().addDay(1)));
+        log.info("左 < 右 false：{}", Dates.now().addDay(1).lt(Dates.now()));
+        log.info("左 = 右 true：{}", Dates.now().beginTimeOfDay().eq(Dates.now().beginTimeOfDay()));
+        log.info("左 = 右 false：{}", Dates.now().addDay(1).beginTimeOfDay().eq(Dates.now().beginTimeOfDay()));
+        log.info("左 >= 右 true：{}", Dates.now().beginTimeOfDay().ge(Dates.now().beginTimeOfDay()));
+        log.info("左 >= 右 true：{}", Dates.now().addDay(1).beginTimeOfDay().ge(Dates.now().beginTimeOfDay()));
+        log.info("左 >= 右 false：{}", Dates.now().beginTimeOfDay().ge(Dates.now().addDay(1).beginTimeOfDay()));
+        log.info("左 <= 右 true：{}", Dates.now().beginTimeOfDay().le(Dates.now().beginTimeOfDay()));
+        log.info("左 <= 右 true：{}", Dates.now().beginTimeOfDay().le(Dates.now().addDay(1).beginTimeOfDay()));
+        log.info("左 <= 右 false：{}", Dates.now().addDay(1).beginTimeOfDay().le(Dates.now().beginTimeOfDay()));
+        try { // UTC 日期
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
             simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-            log.debug("2018-02-01T01:25:04.226Z > {}", simpleDateFormat.parse("2018-02-01T01:25:04.226Z").getTime());
-            log.debug("2018-02-01T01:25:04.226Z > {}", Dates.of(simpleDateFormat.parse("2018-02-01T01:25:04.226Z").getTime()).formatDateTime());
+            log.info("2018-02-01T01:25:04.226Z > {}", simpleDateFormat.parse("2018-02-01T01:25:04.226Z").getTime());
+            log.info("2018-02-01T01:25:04.226Z > {}", Dates.of(simpleDateFormat.parse("2018-02-01T01:25:04.226Z").getTime()).formatDateTime());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
