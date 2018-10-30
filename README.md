@@ -5,11 +5,13 @@ JAVA 开发常用的工具类封装，并不是每一处都合理，欢迎大家
 底部会对封装的类进行索引说明；
 请尊重开源，转载请注明来源：  
 https://gitee.com/xcc/common-utils  
+https://github.com/x403368945/common-utils  
 
 ## 安装步骤
 下载源码
 ```
 git clone https://gitee.com/xcc/common-utils.git
+https://github.com/x403368945/common-utils.git
 ```
 编译安装 jar 包到本地仓库
 ```
