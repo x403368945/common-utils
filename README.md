@@ -11,7 +11,7 @@ https://github.com/x403368945/common-utils
 下载源码
 ```
 git clone https://gitee.com/xcc/common-utils.git
-https://github.com/x403368945/common-utils.git
+git clone https://github.com/x403368945/common-utils.git
 ```
 编译安装 jar 包到本地仓库
 ```
