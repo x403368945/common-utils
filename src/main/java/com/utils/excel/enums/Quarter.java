@@ -11,6 +11,7 @@ import java.util.Objects;
  * @author Jason Xie on 2017/10/15.
  */
 public enum Quarter {
+    // 第一季度
     One("第一季度"),
     Two("第二季度"),
     Three("第三季度"),
@@ -28,7 +29,9 @@ public enum Quarter {
      * @return List<Header>
      */
     public static List<Header> buildHeaders(List<Header> headers) {
-        if (Objects.isNull(headers)) headers = new ArrayList<>();
+        if (Objects.isNull(headers)) {
+            headers = new ArrayList<>();
+        }
         return buildHeaders(headers, headers.size());
     }
     /**
@@ -38,7 +41,9 @@ public enum Quarter {
      * @return List<Header>
      */
     public static List<Header> buildHeaders(List<Header> headers, int startIndex) {
-        if (Objects.isNull(headers)) headers = new ArrayList<>();
+        if (Objects.isNull(headers)) {
+            headers = new ArrayList<>();
+        }
         Header.HeaderBuilder builder = Header.builder().type(DataType.NUMBER);
         {
             builder.group(One.comment);

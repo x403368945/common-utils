@@ -109,10 +109,6 @@ public class FCopy {
         return this;
     }
 
-    //		public FCopy setCheck(boolean check) {
-//			isCheck = check;
-//			return this;
-//		}
     public FCopy names(List<String> names) {
         ops.names = names;
         return this;
@@ -163,7 +159,9 @@ public class FCopy {
         Objects.requireNonNull(from, "请指定源文件或目录");
         Objects.requireNonNull(to, "请指定目标文件或目录");
         if (!from.exists()) {
-            if (ops.ignore) return this;
+            if (ops.ignore) {
+                return this;
+            }
             throw new FileNotFoundException("源文件不存在:".concat(from.getAbsolutePath()));
         }
         if (from.isFile()) {
@@ -196,16 +194,19 @@ public class FCopy {
         Objects.requireNonNull(from, "请指定源文件或目录");
         Objects.requireNonNull(to, "请指定目标文件或目录");
         if (!from.exists()) {
-            if (ops.ignore) return this;
+            if (ops.ignore) {
+                return this;
+            }
             throw new FileNotFoundException("源目录不存在:".concat(from.getAbsolutePath()));
         }
         Objects.requireNonNull(from.isDirectory() ? true : null, "复制源不是目录");
 //        Files.copy(from.toPath(), to.toPath(), StandardCopyOption.REPLACE_EXISTING);
         for (Path path : Files.newDirectoryStream(from.toPath())) {
-            if (path.toFile().isDirectory())
+            if (path.toFile().isDirectory()) {
                 copyDir(path.toFile(), to.toPath().toFile());
-            else
+            } else {
                 copy(path.toFile(), to.toPath().resolve(path.getFileName()).toFile());
+            }
         }
         return this;
     }
@@ -215,10 +216,11 @@ public class FCopy {
         if (src.isDirectory()) {
             FPath.of(dist.toPath().resolve(src.getName())).mkdirs();
             for (Path path : Files.newDirectoryStream(src.toPath())) {
-                if (path.toFile().isDirectory())
+                if (path.toFile().isDirectory()) {
                     copyDir(path.toFile(), dist.toPath().resolve(src.getName()).toFile());
-                else
+                } else {
                     copy(path.toFile(), dist.toPath().resolve(src.getName()).resolve(path.getFileName()).toFile());
+                }
             }
         } else {
             copy(src, dist);

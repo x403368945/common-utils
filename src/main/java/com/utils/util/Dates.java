@@ -26,12 +26,13 @@ import static java.util.Calendar.*;
  */
 @Slf4j
 public class Dates {
-    private static final TimeZone timeZone = TimeZone.getTimeZone("GMT+8");
+    private static final TimeZone TIME_ZONE = TimeZone.getTimeZone("GMT+8");
 
     /**
      * 枚举：定义日期格式
      */
     public enum Pattern {
+        // 年度
         yyyy("yyyy"),
         MM("MM"),
         dd("dd"),
@@ -169,6 +170,7 @@ public class Dates {
     @AllArgsConstructor
     @Builder
     @Data
+    @Accessors(chain = true)
     public static class Range {
         /**
          * 开始
@@ -180,6 +182,32 @@ public class Dates {
          */
         @JSONField(format = "yyyy-MM-dd HH:mm:ss")
         private Timestamp end;
+
+        /**
+         * 以当天时间初始化区间 yyyy-MM-dd 00:00:00.00 - yyyy-MM-dd 23:59:59.999
+         *
+         * @return {@link Range}
+         */
+        public static Range today() {
+            final Dates now = Dates.now();
+            return Range.builder()
+                    .begin(now.beginTimeOfDay().timestamp())
+                    .end(now.endTimeOfDay().timestamp())
+                    .build();
+        }
+
+        /**
+         * 以当月时间初始化区间 yyyy-MM-01 00:00:00.00 - yyyy-MM-(28|30|31) 23:59:59.999
+         *
+         * @return {@link Range}
+         */
+        public static Range month() {
+            final Dates now = Dates.now();
+            return Range.builder()
+                    .begin(now.firstDayOfMonth().beginTimeOfDay().timestamp())
+                    .end(now.lastDayOfMonth().endTimeOfDay().timestamp())
+                    .build();
+        }
 
         /**
          * 遍历选定区间：按天
@@ -212,14 +240,18 @@ public class Dates {
         }
 
         /**
-         * 保留年月日，将开始时间设置为 00:00:00
-         * 保留年月日，将结束时间设置为 23:59:59
+         * 保留年月日，将开始时间设置为 00:00:00.000
+         * 保留年月日，将结束时间设置为 23:59:59.999
          *
          * @return {@link Range}
          */
         public Range rebuild() {
-            if (Objects.nonNull(begin)) begin = Dates.of(begin).beginTimeOfDay().timestamp();
-            if (Objects.nonNull(end)) end = Dates.of(end).endTimeOfDay().timestamp();
+            if (Objects.nonNull(begin)) {
+                begin = Dates.of(begin).beginTimeOfDay().timestamp();
+            }
+            if (Objects.nonNull(end)) {
+                end = Dates.of(end).endTimeOfDay().timestamp();
+            }
             return this;
         }
 
@@ -294,7 +326,7 @@ public class Dates {
         this.calendar.setTimeInMillis(value);
     }
 
-    private final Calendar calendar = Calendar.getInstance(timeZone);
+    private final Calendar calendar = Calendar.getInstance(TIME_ZONE);
 
     /**
      * 转换为long
@@ -626,7 +658,7 @@ public class Dates {
 
     /**
      * 当天的开始时间
-     * 设置为当天 0 时 0 分 0 秒
+     * 设置为当天 0 时 0 分 0 秒 0 毫秒
      *
      * @return {@link Dates}
      */
@@ -637,7 +669,7 @@ public class Dates {
 
     /**
      * 当天的结束时间
-     * 设置为当天 23 时 59 分 59 秒
+     * 设置为当天 23 时 59 分 59 秒 999 毫秒
      *
      * @return {@link Dates}
      */
@@ -678,7 +710,9 @@ public class Dates {
     public int compare(Dates destDate) {
         long src = this.get();
         long dest = destDate.get();
-        if (src == dest) return 0;
+        if (src == dest) {
+            return 0;
+        }
         return (src < dest) ? -1 : 1;
     }
 
@@ -751,8 +785,12 @@ public class Dates {
         int minute = Math.abs(second / 60);
         second = Math.abs(second % 60);
         StringBuilder sb = new StringBuilder();
-        if (Math.abs(minute) > 0) sb.append(minute).append("分");
-        if (second > 0) sb.append(second).append("秒");
+        if (Math.abs(minute) > 0) {
+            sb.append(minute).append("分");
+        }
+        if (second > 0) {
+            sb.append(second).append("秒");
+        }
         return sb.toString();
     }
 
@@ -825,7 +863,7 @@ public class Dates {
         log.info(Dates.now().formatDate());
         log.info(Dates.now().formatTime());
         log.info(Dates.of(new Date()).addYear(1).format("yyyy-MM-dd"));
-        log.info(Dates.of(new Timestamp(new Date().getTime())).formatDateTime());
+        log.info(Dates.of(new Timestamp(System.currentTimeMillis())).formatDateTime());
         log.info("{}", Dates.now().getRangeOfMonth());
         log.info("{}", Dates.now().getRangeOfYear());
         log.info("{}", Dates.now().getRangeOfQuarter());

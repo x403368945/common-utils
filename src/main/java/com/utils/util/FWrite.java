@@ -1,20 +1,17 @@
 package com.utils.util;
 
 import com.alibaba.fastjson.JSON;
-import lombok.Cleanup;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Objects;
 import java.util.Optional;
 
+import static com.utils.enums.Charsets.UTF_8;
 import static java.nio.file.StandardOpenOption.APPEND;
 
 /**
@@ -68,7 +65,9 @@ public class FWrite {
             file.getParentFile().mkdirs();
             FPath.of(file.getParentFile()).chmod(755);
         }
-        if (!file.exists()) file.createNewFile();
+        if (!file.exists()) {
+            file.createNewFile();
+        }
     }
 
     @SneakyThrows
@@ -83,12 +82,12 @@ public class FWrite {
 //        }
 //        outputStreamWriter.flush();
 //        FPath.of(file).chmod(644);
-        write(content.getBytes(Charsets.UTF_8));
+        write(content.getBytes(UTF_8.charset));
         return this;
     }
 
     public FWrite writeJson(Object obj) {
-        write(JSON.toJSONString(obj).getBytes(Charsets.UTF_8));
+        write(JSON.toJSONString(obj).getBytes(UTF_8.charset));
         return this;
     }
 
@@ -104,7 +103,7 @@ public class FWrite {
 //        }
 //        bos.flush();
 //        StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.APPEND
-        if (isAppend)
+        if (isAppend) {
             Files.write(
                     file.toPath(),
                     content,
@@ -112,8 +111,9 @@ public class FWrite {
                             ? new StandardOpenOption[]{APPEND}
                             : new StandardOpenOption[]{StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING}
             );
-        else
+        } else {
             Files.write(file.toPath(), content);
+        }
 
         FPath.of(file.getParentFile()).chmod(755);
         FPath.of(file).chmod(644);
@@ -133,7 +133,7 @@ public class FWrite {
                     .get());
             log.info("{}", FWrite.of("logs", "test.txt")
                     .append()
-                    .write("ccc".getBytes(Charsets.UTF_8))
+                    .write("ccc".getBytes(UTF_8.charset))
                     .getAbsolute()
                     .get());
         } catch (Exception e) {

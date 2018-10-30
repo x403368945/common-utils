@@ -1,11 +1,11 @@
 package com.utils.excel;
 
 import com.utils.excel.entity.Header;
-import com.utils.excel.entity.Position;
 import com.utils.excel.enums.DataType;
 import com.utils.util.Util;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * Sheet 读操作相关的方法封装
@@ -33,18 +33,6 @@ public interface ISheetReader<T extends ISheetReader> extends ISheet<T>, ICellRe
     }
 
     /**
-     * 指定当前操作单元格
-     *
-     * @param position Position 单元格坐标
-     * @return <T extends ISheetReader>
-     */
-    default T cell(final Position position) {
-        Objects.requireNonNull(position, "参数【position】是必须的");
-        row(position.rowIndex()).cell(position.columnIndex());
-        return (T) this;
-    }
-
-    /**
      * 换行操作<br>
      * 警告：当调用 next() 方法之后，先执行 setRowIndex() ，判断 hasEnd() 之后会跳出，但当前操作的 Row 对象还在上一行；
      * 下次操作时需要重新指定操作行，否则将会操作 hasEnd() 之前的那一行数据
@@ -53,13 +41,40 @@ public interface ISheetReader<T extends ISheetReader> extends ISheet<T>, ICellRe
      */
     default T next() {
         setRowIndex(getRowIndex() + 1); // 设置下一行 rowIndex ，判断是否已读完
-        if (hasEnd()) return null;
+        if (hasEnd()) {
+            return null;
+        }
         row(getRowIndex());
-        if (Objects.isNull(getRow()))
+        if (Objects.isNull(getRow())) {
             return next();
+        }
         return (T) this;
     }
 
+    /**
+     * 判断是否已经读完
+     *
+     * @return boolean true：已经读完了
+     */
+    default boolean hasNext() {
+        return Objects.nonNull(next());
+    }
+
+    /**
+     * 判断是否已经读完
+     *
+     * @param ending {@link Consumer<Integer:rowIndex>} 最后一行读完之后触发该操作，参数为最后一行索引
+     * @return boolean false：已经读完了
+     */
+    default boolean hasNext(final Consumer<Integer> ending) {
+        if (Objects.isNull(next())) {
+            if (Objects.nonNull(ending)) {
+                ending.accept(getRowIndex() - 1);
+            }
+            return false;
+        }
+        return true;
+    }
 
     /**
      * 获取头部列名加索引
@@ -71,8 +86,9 @@ public interface ISheetReader<T extends ISheetReader> extends ISheet<T>, ICellRe
         String label;
         for (int i = 0; i < getRow().getLastCellNum(); i++) {
             cell(i);
-            if (Util.isNotEmpty(label = stringValue()))
+            if (Util.isNotEmpty(label = stringValue())) {
                 headers.add(Header.builder().index(i).label(label.trim()).type(DataType.TEXT).sindex(sindex()).build());
+            }
         }
         return headers;
     }

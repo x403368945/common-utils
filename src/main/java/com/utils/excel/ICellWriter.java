@@ -52,8 +52,9 @@ interface ICellWriter<T extends ICellWriter> {
      * @return <T extends ICellWriter>
      */
     default T setCellBlankIgnoreFormula() {
-        if (!(CellType.FORMULA == getCell().getCellType() || CellType.FORMULA == getCell().getCachedFormulaResultType()))
+        if (!(CellType.FORMULA == getCell().getCellType() || CellType.FORMULA == getCell().getCachedFormulaResultType())) {
             getCell().setCellType(CellType.BLANK);
+        }
         return (T) this;
     }
 
@@ -73,14 +74,20 @@ interface ICellWriter<T extends ICellWriter> {
             writeFormula(data.getFormula());
             return (T) this; // 如果单元格有公式，则写完公式就跳出，所以需要提前return (T) this;
         }
-        if (Objects.isNull(data.getType())) data.setType(DataType.TEXT);
+        if (Objects.isNull(data.getType())) {
+            data.setType(DataType.TEXT);
+        }
         switch (data.getType()) {
             case DATE:
-                if (Objects.nonNull(data.getValue())) writeDate(data.getDate().date());
+                if (Objects.nonNull(data.getValue())) {
+                    writeDate(data.getDate().date());
+                }
                 break;
             case NUMBER:
             case PERCENT:
-                if (Objects.nonNull(data.getValue())) writeNumber(data.getNumber().doubleValue());
+                if (Objects.nonNull(data.getValue())) {
+                    writeNumber(data.getNumber().doubleValue());
+                }
                 break;
             default:
                 writeText(data.getText());
@@ -96,7 +103,9 @@ interface ICellWriter<T extends ICellWriter> {
      * @return <T extends ICellWriter>
      */
     default T writeByCellType(final Object value) {
-        if (Objects.isNull(value)) return setCellBlank();
+        if (Objects.isNull(value)) {
+            return setCellBlank();
+        }
 //        if (Objects.isNull(getCell().getCellTypeEnum())) return writeText(Objects.toString(value));
         return write(getCell().getCellType(), value);
     }
@@ -120,21 +129,28 @@ interface ICellWriter<T extends ICellWriter> {
      * @return <T extends ICellWriter>
      */
     default T write(final CellType type, final Object value) {
-        if (Objects.isNull(value)) setCellBlank();
-        else if (value instanceof Timestamp) writeDate((Timestamp) value);
-        else if (value instanceof Date) writeDate((Date) value);
-        else {
+        if (Objects.isNull(value)) {
+            setCellBlank();
+        } else if (value instanceof Timestamp) {
+            writeDate((Timestamp) value);
+        } else if (value instanceof Date) {
+            writeDate((Date) value);
+        } else {
             switch (type) {
                 case FORMULA:
                     writeFormula(Objects.toString(value));
                     break;
                 case NUMERIC:
                     final String v = Objects.toString(value).trim();
-                    if (v.matches("^[+-]?\\d+$")) writeNumber(Num.of(value).longValue());
-                    else if (v.matches("^[+-]?\\d+\\.\\d+$")) writeNumber(Num.of(value).doubleValue());
-                    else if (v.matches("^[+-]?\\d{4}-\\d{1,2}-\\d{1,2}$"))
+                    if (v.matches("^[+-]?\\d+$")) {
+                        writeNumber(Num.of(value).longValue());
+                    } else if (v.matches("^[+-]?\\d+\\.\\d+$")) {
+                        writeNumber(Num.of(value).doubleValue());
+                    } else if (v.matches("^[+-]?\\d{4}-\\d{1,2}-\\d{1,2}$")) {
                         writeDate(Dates.of(Objects.toString(value), yyyy_MM_dd).timestamp());
-                    else writeText(v);
+                    } else {
+                        writeText(v);
+                    }
                     break;
                 case BLANK:
                 case STRING:
@@ -155,8 +171,9 @@ interface ICellWriter<T extends ICellWriter> {
      * @return <T extends ICellWriter>
      */
     default T writeText(final String value) {
-        if (Objects.isNull(value)) setCellBlank();
-        else {
+        if (Objects.isNull(value)) {
+            setCellBlank();
+        } else {
             getCell().setCellType(CellType.STRING);
             getCell().setCellValue(value);
         }
@@ -170,8 +187,9 @@ interface ICellWriter<T extends ICellWriter> {
      * @return <T extends ICellWriter>
      */
     default T writeNumber(final Number value) {
-        if (Objects.isNull(value)) setCellBlank(); // 设置为 BLANK 可以清空单元格内容，保留样式
-        else {
+        if (Objects.isNull(value)) {
+            setCellBlank(); // 设置为 BLANK 可以清空单元格内容，保留样式
+        } else {
             getCell().setCellType(CellType.NUMERIC);
             getCell().setCellValue(value.doubleValue());
         }
@@ -185,8 +203,11 @@ interface ICellWriter<T extends ICellWriter> {
      * @return <T extends ICellWriter>
      */
     default T writeDate(final Date value) {
-        if (Objects.isNull(value)) setCellBlank(); // 设置为 BLANK 可以清空单元格内容，保留样式
-        else getCell().setCellValue(value);
+        if (Objects.isNull(value)) {
+            setCellBlank(); // 设置为 BLANK 可以清空单元格内容，保留样式
+        } else {
+            getCell().setCellValue(value);
+        }
         return (T) this;
     }
 
@@ -197,8 +218,11 @@ interface ICellWriter<T extends ICellWriter> {
      * @return <T extends ICellWriter>
      */
     default T writeDate(final Timestamp value) {
-        if (Objects.isNull(value)) setCellBlank(); // 设置为 BLANK 可以清空单元格内容，保留样式
-        else getCell().setCellValue(value);
+        if (Objects.isNull(value)) {
+            setCellBlank(); // 设置为 BLANK 可以清空单元格内容，保留样式
+        } else {
+            getCell().setCellValue(value);
+        }
         return (T) this;
     }
 
@@ -209,8 +233,11 @@ interface ICellWriter<T extends ICellWriter> {
      * @return <T extends ICellWriter>
      */
     default T writeDate(final String value) {
-        if (Objects.isNull(value)) setCellBlank(); // 设置为 BLANK 可以清空单元格内容，保留样式
-        else getCell().setCellValue(value);
+        if (Objects.isNull(value)) {
+            setCellBlank(); // 设置为 BLANK 可以清空单元格内容，保留样式
+        } else {
+            getCell().setCellValue(value);
+        }
         return (T) this;
     }
 
@@ -221,8 +248,11 @@ interface ICellWriter<T extends ICellWriter> {
      * @return <T extends ICellWriter>
      */
     default T writeFormula(final String formula) {
-        if (Util.isEmpty(formula)) setCellBlank();
-        else getCell().setCellFormula(formula);
+        if (Util.isEmpty(formula)) {
+            setCellBlank();
+        } else {
+            getCell().setCellFormula(formula);
+        }
         return (T) this;
     }
 
@@ -249,8 +279,11 @@ interface ICellWriter<T extends ICellWriter> {
 //            }
 //            return formula;
 //        };
-        if (Util.isEmpty(formula)) setCellBlank();
-        else getCell().setCellFormula(formula.get());
+        if (Util.isEmpty(formula)) {
+            setCellBlank();
+        } else {
+            getCell().setCellFormula(formula.get());
+        }
         return (T) this;
     }
 
@@ -262,8 +295,9 @@ interface ICellWriter<T extends ICellWriter> {
      * @return <T extends ICellWriter>
      */
     default T writeComment(final String content) {
-        if (Objects.isNull(content)) getCell().removeCellComment();
-        else {
+        if (Objects.isNull(content)) {
+            getCell().removeCellComment();
+        } else {
             final Sheet sheet = getCell().getSheet();
             final CreationHelper factory = sheet.getWorkbook().getCreationHelper();
             final ClientAnchor anchor = factory.createClientAnchor();
@@ -295,7 +329,9 @@ interface ICellWriter<T extends ICellWriter> {
      * @return <T extends ICellWriter>
      */
     default T writeStyle(final CellStyle cellStyle) {
-        if (Objects.nonNull(cellStyle)) getCell().setCellStyle(cellStyle);
+        if (Objects.nonNull(cellStyle)) {
+            getCell().setCellStyle(cellStyle);
+        }
         return (T) this;
     }
 

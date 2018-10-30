@@ -2,9 +2,9 @@ package com.utils.excel;
 
 import com.utils.excel.entity.Position;
 import com.utils.excel.entity.Range;
-import lombok.Builder;
-import lombok.Cleanup;
-import lombok.SneakyThrows;
+import com.utils.excel.enums.Column;
+import com.utils.util.Num;
+import lombok.*;
 import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -22,10 +22,13 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import static com.utils.enums.Patterns.A_Z_FIND;
+import static com.utils.enums.Patterns.d_FIND;
 
 /**
  * Sheet 写操作相关的方法封装
@@ -50,11 +53,10 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
 
     /**
      * POI Excel 复制行规则，默认设置，会复制单元格值
+     *
+     * @return {@link Options}
      */
     Options getOps();
-
-    Workbook getWorkbook();
-
 
     /**
      * 指定样式库
@@ -90,6 +92,7 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
      *
      * @return {@link CloneStyles}
      */
+    @Override
     default CloneStyles getCloneStyles() {
         return getOps().cloneStyles;
     }
@@ -134,7 +137,7 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
      * @return <T extends ISheetWriter>
      */
     default T rowOfNew(final Rownum rownum) {
-        return rowOfNew(rownum.rowIndex());
+        return rowOfNew(rownum.index());
     }
 
     /**
@@ -154,7 +157,7 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
      * @return <T extends ISheetWriter>
      */
     default T rowNew(final Rownum rownum) {
-        return rowNew(rownum.rowIndex());
+        return rowNew(rownum.index());
     }
 
     /**
@@ -176,7 +179,6 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
     default T nextRowNew() {
         return row(getSheet().createRow(getRowIndex() + 1));
     }
-
 
     /**
      * 清除当前行所有单元格内容，单元格样式保留
@@ -371,12 +373,12 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
      */
     default T freeze(final String address) {
         final Supplier<Integer> row = () -> {
-            final Matcher m = Pattern.compile("(\\d+)").matcher(address);
+            final Matcher m = d_FIND.matcher(address);
             // 冻结行列都是从 1 开始，所以这里需要 +1
             return m.find() ? Integer.parseInt(m.group()) + 1 : 0;
         };
         final Supplier<Integer> column = () -> {
-            final Matcher m = Pattern.compile("([A-Z]+)").matcher(address);
+            final Matcher m = A_Z_FIND.matcher(address);
             // 冻结行列都是从 1 开始，所以这里需要 +1
             return m.find() ? Position.ofColumn(m.group()).columnIndex() + 1 : 0;
         };
@@ -430,7 +432,9 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
      */
     @SneakyThrows
     default T writeDropdownList(final String[] items, final Range range) {
-        if (items.length > 128) throw new Exception("下拉选项最大数量为128");
+        if (items.length > 128) {
+            throw new Exception("下拉选项最大数量为128");
+        }
         final DataValidationHelper helper = getSheet().getDataValidationHelper();
         final DataValidation validation = helper.createValidation(
 //                 DVConstraint.createExplicitListConstraint(items),
@@ -486,7 +490,9 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
             final CellRangeAddress rangeAddress = range.getCellRangeAddress();
             sheet.getCellComments().forEach((address, comment) -> {
                 if (rangeAddress.isInRange(address.getRow(), address.getColumn())) // 批注在选定区间，则删除
+                {
                     sheet.getRow(address.getRow()).getCell(address.getColumn()).removeCellComment();
+                }
             });
         } else {
             final CreationHelper factory = sheet.getWorkbook().getCreationHelper();
@@ -525,7 +531,7 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
 //        final DataValidation validation = helper.createValidation(
 ////                        DVConstraint.createCustomFormulaConstraint("BB1");
 //                helper.createCustomConstraint("A2"),
-//                new CellRangeAddressList(start.rowIndex(), end.rowIndex(), start.columnIndex(), end.columnIndex())
+//                new CellRangeAddressList(start.index(), end.index(), start.columnIndex(), end.columnIndex())
 //        );
 //        validation.createPromptBox(title, content);
 //        getSheet().addValidationData(validation);
@@ -555,6 +561,53 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
 //        }
 //        return (T) this;
 //    }
+
+    /**
+     * 设置行分组
+     *
+     * @param fromRowIndex int 起始行索引，包含
+     * @param toRowIndex   int 结束行索引，包含
+     * @return <T extends ISheetWriter>
+     */
+    default T groupRow(final int fromRowIndex, final int toRowIndex) {
+        getSheet().groupRow(fromRowIndex, toRowIndex);
+        return (T) this;
+    }
+
+    /**
+     * 设置行分组
+     *
+     * @param range {@link com.utils.util.Num.RangeInt} 分组行索引区间
+     * @return <T extends ISheetWriter>
+     */
+    default T groupRow(final Num.RangeInt range) {
+        groupRow(range.getMin(), range.getMax());
+        return (T) this;
+    }
+
+    /**
+     * 设置列分组
+     *
+     * @param fromColumnIndex int 起始列索引，包含
+     * @param toColumnIndex   int 结束列索引，包含
+     * @return <T extends ISheetWriter>
+     */
+    default T groupColumn(final int fromColumnIndex, final int toColumnIndex) {
+        getSheet().groupColumn(fromColumnIndex, toColumnIndex);
+        return (T) this;
+    }
+
+    /**
+     * 设置列分组
+     *
+     * @param range {@link com.utils.util.Num.RangeInt} 分组列索引区间
+     * @return <T extends ISheetWriter>
+     */
+    default T groupColumn(final Num.RangeInt range) {
+        groupColumn(range.getMin(), range.getMax());
+        return (T) this;
+    }
+
 
     /**
      * 隐藏行
@@ -599,12 +652,14 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
      * @return <T extends ISheetWriter>
      */
     default T evaluateAllFormulaCells() {
-        if (getWorkbook() instanceof HSSFWorkbook)
+        if (getWorkbook() instanceof HSSFWorkbook) {
             HSSFFormulaEvaluator.evaluateAllFormulaCells((HSSFWorkbook) getWorkbook());
-        else if (getWorkbook() instanceof SXSSFWorkbook)
+        } else if (getWorkbook() instanceof SXSSFWorkbook) {
             SXSSFFormulaEvaluator.evaluateAllFormulaCells((SXSSFWorkbook) getWorkbook(), false);
-        else //if (getWorkbook() instanceof XSSFWorkbook)
+        } else //if (getWorkbook() instanceof XSSFWorkbook)
+        {
             BaseFormulaEvaluator.evaluateAllFormulaCells(getWorkbook());
+        }
         return (T) this;
     }
 
@@ -705,19 +760,30 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
      * 关闭 Workbook 对象
      */
     @SneakyThrows
+    @Override
     default void close() {
         getWorkbook().close();
     }
 
     /**
-     * 不同版本的 excel 执行复制操作相关的方法封装
+     * 不同版本的 excel 执行复制操作相关的方法封装IS
      *
      * @param <T>
      */
     interface ICopyRows<T> {
-        CellCopyPolicy defaultCellCopyPolicy = new CellCopyPolicy().createBuilder().build();
+        CellCopyPolicy DEFAULT_CELL_COPY_POLICY = new CellCopyPolicy().createBuilder().build();
 
         interface ICopy {
+            /**
+             * 复制行参数
+             *
+             * @param sheet             {@link Sheet}
+             * @param fromStratRowIndex int 起始区间，行索引
+             * @param fromEndRowIndex   int 起始区间，行索引
+             * @param toRowIndex        int 目标行索引
+             * @param repeatCount       int 重复次数
+             * @param cellCopyPolicy    {@link CellCopyPolicy} 行复制规则
+             */
             void copy(final Sheet sheet,
                       final int fromStratRowIndex,
                       final int fromEndRowIndex,
@@ -727,24 +793,32 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
         }
 
         enum SheetTypes {
+            /**
+             * .xlsx 写入
+             */
             XSSFSHEET(".xlsx",
                     (sheet) -> sheet instanceof XSSFSheet,
                     (sheet, fromStratRowIndex, fromEndRowIndex, toRowIndex, repeatCount, cellCopyPolicy) -> {
                         // 实现 .xlsx 行复制功能
                         // Sheet sheet, int fromStratRowIndex, int fromEndRowIndex, int toRowIndex, int repeatCount, CellCopyPolicy cellCopyPolicy
-                        if (Objects.isNull(cellCopyPolicy)) cellCopyPolicy = defaultCellCopyPolicy;
+                        if (Objects.isNull(cellCopyPolicy)) {
+                            cellCopyPolicy = DEFAULT_CELL_COPY_POLICY;
+                        }
                         final XSSFSheet xsheet = (XSSFSheet) sheet;
                         for (int i = 0; i < repeatCount; i++) {
                             xsheet.copyRows(fromStratRowIndex, fromEndRowIndex, toRowIndex + i + (i * (fromEndRowIndex - fromStratRowIndex)), cellCopyPolicy);
                         }
                     }),
+            /**
+             * .xlsx限制最大缓存写入
+             */
             SXSSFSHEET(".xlsx限制最大缓存写入",
                     (sheet) -> sheet instanceof SXSSFSheet,
                     (sheet, fromStratRowIndex, fromEndRowIndex, toRowIndex, repeatCount, cellCopyPolicy) -> {
                         // 实现 .xlsx 带最大缓存航的 行复制功能
                         // 本身并不支持复制操作，尝试实现复制操作
 //                        Stream.iterate(0, v -> v + 1).limit(repeatCount).forEach(i -> { });
-                        final CellCopyPolicy policy = Objects.isNull(cellCopyPolicy) ? defaultCellCopyPolicy : cellCopyPolicy;
+                        final CellCopyPolicy policy = Objects.isNull(cellCopyPolicy) ? DEFAULT_CELL_COPY_POLICY : cellCopyPolicy;
                         for (int i = 0; i < repeatCount; i++) {
                             for (int j = fromStratRowIndex; j <= fromEndRowIndex; j++) {
                                 // 参考:org.apache.poi.xssf.usermodel.XSSFRow#copyRowFrom
@@ -757,14 +831,17 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
                                     { // 参考: org.apache.poi.xssf.usermodel.XSSFCell > copyCellFrom
                                         if (policy.isCopyCellValue()) {
                                             CellType copyCellType = srcCell.getCellType();
-                                            if (copyCellType == CellType.FORMULA && !policy.isCopyCellFormula())
+                                            if (copyCellType == CellType.FORMULA && !policy.isCopyCellFormula()) {
                                                 copyCellType = srcCell.getCachedFormulaResultType();
+                                            }
 
                                             switch (copyCellType) {
                                                 case NUMERIC:
-                                                    if (DateUtil.isCellDateFormatted(srcCell))
+                                                    if (DateUtil.isCellDateFormatted(srcCell)) {
                                                         destCell.setCellValue(srcCell.getDateCellValue());
-                                                    else destCell.setCellValue(srcCell.getNumericCellValue());
+                                                    } else {
+                                                        destCell.setCellValue(srcCell.getNumericCellValue());
+                                                    }
                                                     break;
                                                 case STRING:
                                                     destCell.setCellValue(srcCell.getStringCellValue());
@@ -804,11 +881,13 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
                                         }
                                         Hyperlink srcHyperlink = srcCell.getHyperlink();
                                         if (policy.isMergeHyperlink()) {
-                                            if (Objects.nonNull(srcHyperlink))
+                                            if (Objects.nonNull(srcHyperlink)) {
                                                 destCell.setHyperlink(new XSSFHyperlink(srcHyperlink));
+                                            }
                                         } else if (policy.isCopyHyperlink()) {
-                                            if (Objects.nonNull(srcHyperlink))
+                                            if (Objects.nonNull(srcHyperlink)) {
                                                 destCell.setHyperlink(new XSSFHyperlink(srcHyperlink));
+                                            }
                                         }
                                     }
                                 });
@@ -833,12 +912,16 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
                             });
                         }
                     }),
+            /**
+             * .xls 写入
+             */
             HSSFSHEET(".xls",
                     (sheet) -> sheet instanceof HSSFSheet,
                     (sheet, fromStratRowIndex, fromEndRowIndex, toRowIndex, repeatCount, cellCopyPolicy) -> {
                         // 实现 .xls 行复制功能
 
-                    }),;
+                    }),
+            ;
             final String comment;
             final Predicate<Sheet> match;
             final ICopy instance;
@@ -923,6 +1006,92 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
                     .copy(getSheet(), row.getRowNum(), row.getRowNum(), toRowIndex, 1, null);
             return (T) this;
         }
+    }
+
+    /**
+     * 获得行保持状态
+     *
+     * @return {@link HoldRow}
+     */
+    default HoldRow holdRow() {
+        return HoldRow.of(getRow());
+    }
+
+    /**
+     * 行状态保持对象，小计行部分操作需要在子节点写入完成之后，所以需要保持行
+     */
+    @RequiredArgsConstructor(staticName = "of")
+    class HoldRow implements ICellWriter<HoldRow> {
+
+        @NonNull
+        private final Row row;
+        private Cell cell;
+
+        @Override
+        public Cell getCell() {
+            return cell;
+        }
+
+        @Override
+        public CloneStyles getCloneStyles() {
+            return null;
+        }
+
+        /**
+         * 选择操作单元格
+         *
+         * @param columnIndex int 列索引
+         * @return HoldRow
+         */
+        public HoldRow cell(final int columnIndex) {
+            cell = Objects.isNull(row) ? null : row.getCell(columnIndex);
+            return this;
+        }
+
+        /**
+         * 选择操作单元格
+         *
+         * @param column {@link Column} 列名枚举定义
+         * @return HoldRow
+         */
+        public HoldRow cell(final Column column) {
+            cell(column.ordinal());
+            return this;
+        }
+
+        /**
+         * 选择操作单元格，当单元格不存在时创建单元格，并设置单元格类型为 CellType.BLANK
+         *
+         * @param columnIndex int 列索引
+         * @return HoldRow
+         */
+        public HoldRow cellOfNew(final int columnIndex) {
+            cell = Optional
+                    .ofNullable(row.getCell(columnIndex))
+                    .orElseGet(() -> row.createCell(columnIndex, CellType.BLANK));
+            return this;
+        }
+
+        /**
+         * 新建操作单元格
+         *
+         * @param columnIndex int 列索引
+         * @return HoldRow
+         */
+        public HoldRow cellNew(final int columnIndex) {
+            cell = row.createCell(columnIndex, CellType.BLANK);
+            return this;
+        }
+
+        /**
+         * 当前操作对象作为参数
+         *
+         * @param consumer Consumer<HoldRow>
+         */
+        public void end(final Consumer<HoldRow> consumer) {
+            consumer.accept(this);
+        }
+
     }
 
 //    interface ICopy {

@@ -141,9 +141,11 @@ public class FZip {
 
     private void write(final File source, final ZipOutputStream output, final Path parent) throws Exception {
         if (source.isDirectory()) {
-            if (ops.isRecursion)
-                for (Path path : Files.newDirectoryStream(source.toPath()))
+            if (ops.isRecursion) {
+                for (Path path : Files.newDirectoryStream(source.toPath())) {
                     write(path.toFile(), output, parent.resolve(source.getName()));
+                }
+            }
         } else {
             @Cleanup final FileChannel channel = FileChannel.open(source.toPath(), StandardOpenOption.READ);
             final ByteBuffer buffer = ByteBuffer.allocate(2048);

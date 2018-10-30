@@ -8,6 +8,7 @@ import java.awt.*;
  * @author Jason Xie on 2017/11/18.
  */
 public enum Colors {
+    // 黑色
     Black(new Color(0, 0, 0, 255)),
     Brown(new Color(153, 51, 0, 255)),
     OliveGreen(new Color(51, 51, 0, 255)),

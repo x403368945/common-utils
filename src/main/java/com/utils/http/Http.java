@@ -1,20 +1,15 @@
 package com.utils.http;
 
 import com.alibaba.fastjson.JSON;
-import com.utils.util.Charsets;
 import com.utils.util.FWrite;
 import com.utils.util.Maps;
-import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 
-import java.beans.BeanInfo;
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -22,6 +17,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.utils.enums.Charsets.UTF_8;
 import static okhttp3.internal.Util.EMPTY_REQUEST;
 import static okhttp3.internal.Util.EMPTY_RESPONSE;
 
@@ -92,7 +88,9 @@ public class Http {
     public Http url(String url, Object... args) {
         if (Objects.nonNull(args)) {
             for (Object value : args) // 替换 url 参数占位符
+            {
                 url = url.replaceFirst("\\{([a-zA-Z0-9]+)?}", value.toString());
+            }
         }
         this.url = url;
         return this;
@@ -109,8 +107,9 @@ public class Http {
      */
     public Http url(String url, Map<String, Object> args) {
         if (Objects.nonNull(args)) {
-            for (Map.Entry<String, Object> entry : args.entrySet())
+            for (Map.Entry<String, Object> entry : args.entrySet()) {
                 url = url.replace(String.format("{%s}", entry.getKey()), entry.getValue().toString());
+            }
         }
         this.url = url;
         return this;
@@ -133,7 +132,9 @@ public class Http {
      * @return {@link RequestBody}
      */
     private RequestBody buildBody() {
-        if (Objects.isNull(params)) return EMPTY_REQUEST;
+        if (Objects.isNull(params)) {
+            return EMPTY_REQUEST;
+        }
         String content;
         switch (type) {
             case JSON:
@@ -161,20 +162,18 @@ public class Http {
         if (Objects.nonNull(params) && params.size() > 0) {
             {
                 String enParams = params.entrySet().stream()
-                        .map(entry -> {
-                            try {
-                                return Objects.isNull(entry.getValue()) ? null : entry.getKey() + "=" + URLEncoder.encode(entry.getValue().toString(), Charsets.UTF_8.name());
-                            } catch (UnsupportedEncodingException e) {
-                                log.error(e.getMessage(), e);
-                                return null;
-                            }
-                        })
+                        .map(entry -> Objects.isNull(entry.getValue())
+                                ? null
+                                : entry.getKey().concat("=").concat(UTF_8.encode(entry.getValue().toString()))
+                        )
                         .filter(Objects::nonNull)
                         .collect(Collectors.joining("&"));
-                URL = HttpUrl.parse(url + "?" + enParams);
+                URL = HttpUrl.parse(url.concat("?").concat(enParams));
             }
         }
-        log.info("\nmethod:get \nurl:" + URL.toString() + "\nparams:" + JSON.toJSONString(params));
+        if (log.isDebugEnabled()) {
+            log.debug("\nmethod:get \nurl:{} \nparams:{}", URL.toString(), JSON.toJSONString(params));
+        }
         return HttpClient.getInstance().send(client,
                 headers.apply(new Request.Builder().url(URL).get())
                         .build()
@@ -187,7 +186,9 @@ public class Http {
      * @return {@link Optional<ResponseBody>} 响应对象
      */
     public Optional<ResponseBody> post() {
-        log.info("\nmethod:post \nurl:" + url + "\nparams:" + JSON.toJSONString(params));
+        if (log.isDebugEnabled()) {
+            log.debug("\nmethod:post \nurl:{} \nparams:{}", url, JSON.toJSONString(params));
+        }
         return HttpClient.getInstance().send(client,
                 headers.apply(new Request.Builder().url(url).post(buildBody()))
                         .build()
@@ -200,7 +201,9 @@ public class Http {
      * @return {@link Optional<ResponseBody>} 响应对象
      */
     public Optional<ResponseBody> put() {
-        log.info("\nmethod:put \nurl:" + url + "\nparams:" + JSON.toJSONString(params));
+        if (log.isDebugEnabled()) {
+            log.debug("\nmethod:put \nurl:{} \nparams:{}", url, JSON.toJSONString(params));
+        }
         return HttpClient.getInstance().send(client,
                 headers.apply(new Request.Builder().url(url).put(buildBody()))
                         .build()
@@ -213,7 +216,9 @@ public class Http {
      * @return {@link Optional<ResponseBody>} 响应对象
      */
     public Optional<ResponseBody> patch() {
-        log.info("\nmethod:patch \nurl:" + url + "\nparams:" + JSON.toJSONString(params));
+        if (log.isDebugEnabled()) {
+            log.debug("\nmethod:patch \nurl:{} \nparams:{}", url, JSON.toJSONString(params));
+        }
         return HttpClient.getInstance().send(client,
                 headers.apply(new Request.Builder().url(url).patch(buildBody()))
                         .build()
@@ -226,7 +231,9 @@ public class Http {
      * @return {@link Optional<ResponseBody>} 响应对象
      */
     public Optional<ResponseBody> delete() {
-        log.info("\nmethod:delete \nurl:" + url + "\nparams:" + JSON.toJSONString(params));
+        if (log.isDebugEnabled()) {
+            log.debug("\nmethod:delete \nurl:{} \nparams:{}", url, JSON.toJSONString(params));
+        }
         return HttpClient.getInstance().send(client,
                 headers.apply(new Request.Builder().url(url).delete(buildBody()))
                         .build()
@@ -241,19 +248,35 @@ public class Http {
      */
     @Deprecated
     public Optional<ResponseBody> download() {
-//        okhttp3.Request request;
-//        if (Util.isNotEmpty(params)) {
-//            okhttp3.RequestBody body = okhttp3.RequestBody.create(CONTENT_TYPE_FORM, params);
-//            request = new okhttp3.Request.Builder().url(url).post(body).build();
-//        } else {
-//            request = new okhttp3.Request.Builder().url(url).get().build();
-//        }
+//        okhttp3.Request request = new okhttp3.Request.Builder().url(url).get().build();
 //        try {
 //            okhttp3.Response response = httpClient.newCall(request).execute();
 //
-//            if (!response.isSuccessful()) throw new RuntimeException("Unexpected code " + response);
+//            if (!response.isSuccessful()) {
+//                throw new RuntimeException("Unexpected code " + response);
+//            }
 //
-//            return response.body().byteStream();
+//            okhttp3.ResponseBody body = response.body();
+//            okhttp3.MediaType mediaType = body.contentType();
+//            MediaFile mediaFile = new MediaFile();
+//            if (Objects.equals(mediaType.type(), "text")) {
+//                mediaFile.setError(body.string());
+//            } else {
+//                BufferedInputStream bis = new BufferedInputStream(body.byteStream());
+//
+//                String ds = response.header("Content-disposition");
+//                String fullName = ds.substring(ds.indexOf("filename=\"") + 10, ds.length() - 1);
+//                String relName = fullName.substring(0, fullName.lastIndexOf("."));
+//                String suffix = fullName.substring(relName.length()+1);
+//
+//                mediaFile.setFullName(fullName);
+//                mediaFile.setFileName(relName);
+//                mediaFile.setSuffix(suffix);
+//                mediaFile.setContentLength(body.contentLength() + "");
+//                mediaFile.setContentType(body.contentType().toString());
+//                mediaFile.setFileStream(bis);
+//            }
+//            return mediaFile;
 //        } catch (IOException e) {
 //            throw new RuntimeException(e);
 //        }
@@ -277,7 +300,7 @@ public class Http {
 //                .setType(okhttp3.MultipartBody.FORM)
 //                .addFormDataPart("media", file.getName(), fileBody);
 //
-//        if (Util.isNotEmpty(params)) {
+//        if (StrKit.notBlank(params)) {
 //            builder.addFormDataPart("description", params);
 //        }
 //
@@ -286,6 +309,8 @@ public class Http {
 //                .url(url)
 //                .post(requestBody)
 //                .build();
+//
+//        return exec(request);
         return Optional.empty();
     }
 

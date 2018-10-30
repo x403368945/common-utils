@@ -51,10 +51,15 @@ public class JSEngine {
      * @throws ScriptException 执行异常
      */
     public Num compute(final String formula) throws ScriptException {
-        if (Util.isEmpty(formula) || formula.contains("n.a.")) throw new NaNException(formula + "=NaN");
+        if (Util.isEmpty(formula) || formula.contains("n.a.")) {
+            throw new NaNException(formula + "=NaN");
+        }
         final String value = eval(formula);
-        if (Objects.equals("NaN", value)) throw new NaNException(formula + "=" + value);
-        else if (Objects.equals("Infinity", value)) throw new InfinityException(formula + "=" + value);
+        if (Objects.equals("NaN", value)) {
+            throw new NaNException(formula + "=" + value);
+        } else if (Objects.equals("Infinity", value)) {
+            throw new InfinityException(formula + "=" + value);
+        }
         return Num.of(value);
     }
 

@@ -6,9 +6,12 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 
+import java.math.BigDecimal;
 import java.security.MessageDigest;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -20,12 +23,12 @@ import java.util.stream.Stream;
 @Slf4j
 public class Util {
     /**
-     * 获取UUID
+     * 获取UUID；中间的 - 剔除
      *
      * @return String
      */
     public static String uuid() {
-        return UUID.randomUUID().toString();
+        return UUID.randomUUID().toString().replace("-", "");
     }
 
     /**
@@ -80,7 +83,9 @@ public class Util {
      * @return String
      */
     public static String tostring(final Object obj) {
-        if (Objects.isNull(obj)) return null;
+        if (Objects.isNull(obj)) {
+            return null;
+        }
         return "".equals(obj.toString().trim()) ? null : obj.toString().trim();
     }
 
@@ -323,10 +328,15 @@ public class Util {
      * @return String[]
      */
     public static String[] sort(final boolean asc, String... args) {
-        if (isEmpty(args)) return null;
+        if (isEmpty(args)) {
+            return null;
+        }
         String[] arrays = args.clone();
-        if (asc) Arrays.sort(arrays);
-        else Arrays.sort(arrays, Collections.reverseOrder());
+        if (asc) {
+            Arrays.sort(arrays);
+        } else {
+            Arrays.sort(arrays, Collections.reverseOrder());
+        }
         return arrays;
     }
 
@@ -357,8 +367,9 @@ public class Util {
      * @param sources {@link Map<String, Object>}
      */
     public static void assign(final Map<String, Object> dest, Map<String, Object>... sources) {
-        for (Map<String, Object> map : sources)
+        for (Map<String, Object> map : sources) {
             dest.putAll(map);
+        }
     }
 
     /**
@@ -368,8 +379,9 @@ public class Util {
      * @param sources JSONObject[]
      */
     public static void assign(final JSONObject dest, JSONObject... sources) {
-        for (JSONObject obj : sources)
+        for (JSONObject obj : sources) {
             dest.putAll(obj);
+        }
     }
 
     /**
@@ -394,7 +406,7 @@ public class Util {
      * obj.toString之后打印日志，并返回原对象
      *
      * @param obj <T>
-     * @return obj
+     * @return T
      */
     public static <T> T peek(final T obj) {
         log.info(isEmpty(obj) ? "obj is null" : Objects.toString(obj));
@@ -406,12 +418,14 @@ public class Util {
      *
      * @param obj      <T>
      * @param consumer Consumer<T>
-     * @return obj
+     * @return T
      */
     public static <T> T peek(final T obj, final Consumer<T> consumer) {
-        if (Objects.isNull(consumer))
+        if (Objects.isNull(consumer)) {
             log.info(isEmpty(obj) ? "obj is null" : Objects.toString(obj));
-        else consumer.accept(obj);
+        } else {
+            consumer.accept(obj);
+        }
         return obj;
     }
 
@@ -419,7 +433,7 @@ public class Util {
      * 将对象格式化成json字符串打印日志，并返回原对象
      *
      * @param obj <T>
-     * @return obj
+     * @return T
      */
     public static <T> T peekJson(final T obj) {
         log.info(isEmpty(obj) ? "obj is null" : JSON.toJSONString(obj, SerializerFeature.PrettyFormat));
@@ -447,7 +461,7 @@ public class Util {
      *
      * @param list List 需要切割的集合
      * @param size int 每个集合的大小
-     * @return List<List       <       T>>
+     * @return {@link List<List<T>>}
      */
     public static <T> List<List<T>> partition(final List<T> list, final int size) {
         final int max = list.size();
@@ -456,6 +470,48 @@ public class Util {
                 .map(n -> list.subList(n * size, Math.min(max, (n + 1) * size)))
 //				.map(n -> list.stream().skip(n * size).limit(size).collect(Collectors.toList()))
                 .collect(Collectors.toList());
+    }
+
+    public static String format(String value, final Object... args) {
+        if (Objects.nonNull(args)) {
+            for (Object arg : args) {
+                if (Objects.isNull(arg)) {
+                    return value.replace("\\{(\\w+)?}", "null");
+                } else if (arg instanceof BigDecimal) {
+                    value = value.replaceFirst("\\{(\\w+)?}", ((BigDecimal) arg).toPlainString());
+                } else if (arg instanceof Double) {
+                    value = value.replaceFirst("\\{(\\w+)?}", BigDecimal.valueOf((Double) arg).toPlainString());
+                } else if (arg instanceof Float) {
+                    value = value.replaceFirst("\\{(\\w+)?}", BigDecimal.valueOf((Float) arg).toPlainString());
+                } else {
+                    value = value.replaceFirst("\\{(\\w+)?}", Objects.toString(arg));
+                }
+            }
+        }
+        return value;
+    }
+
+    private static final Pattern FORMAT_PATTERN = Pattern.compile("\\{\\w+?}");
+
+    public static String format(String value, final Map<String, Object> map) {
+        if (Objects.nonNull(map)) {
+            final Matcher m = FORMAT_PATTERN.matcher(value);
+            while (m.find()) {
+                final Object v = map.get(m.group().replaceAll("^\\{(.*)}$", "$1"));
+                if (Objects.isNull(v)) {
+                    return value.replace(m.group(), "null");
+                } else if (v instanceof BigDecimal) {
+                    value = value.replaceFirst("\\{(\\w+)?}", ((BigDecimal) v).toPlainString());
+                } else if (v instanceof Double) {
+                    value = value.replaceFirst(m.group(), BigDecimal.valueOf((Double) v).toPlainString());
+                } else if (v instanceof Float) {
+                    value = value.replaceFirst(m.group(), BigDecimal.valueOf((Float) v).toPlainString());
+                } else {
+                    value = value.replace(m.group(), Objects.toString(v));
+                }
+            }
+        }
+        return value;
     }
 
     public static void main(String[] args) {
@@ -500,6 +556,7 @@ public class Util {
                 )
         );
         log.info(uuid());
+        log.info(format("/page/{index}/{}/{size}", 1, null, "100"));
 //		log.info("{}", Code.SUCCESS);
 //		log.info("{}", in(Code.NO_PERMISSION, Code.SUCCESS, Code.FAILURE));
 //		log.info("{}", in(Code.SUCCESS, Code.SUCCESS, Code.FAILURE));

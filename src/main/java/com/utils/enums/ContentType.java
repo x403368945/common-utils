@@ -1,4 +1,4 @@
-package com.utils.util;
+package com.utils.enums;
 
 /**
  * HTTP Content-type
@@ -6,6 +6,7 @@ package com.utils.util;
  * @author Jason Xie on 2017/12/20.
  */
 public enum ContentType {
+    // 二进制流
     stream(".*（ 二进制流）", "application/octet-stream"),
     xlsx(".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
     html(".html", "text/html"),

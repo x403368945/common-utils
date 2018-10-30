@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class HttpClient {
     public enum ContentType {
+        // JSON
         JSON("application/json; charset=utf-8"),
         FORM_URLENCODED("application/x-www-form-urlencoded; charset=utf-8"),
         ;
@@ -64,7 +65,9 @@ public class HttpClient {
                 TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
                 trustManagerFactory.init(keyStore);
                 for (TrustManager manager : trustManagerFactory.getTrustManagers()) {
-                    if (manager instanceof X509TrustManager) x509TrustManager = (X509TrustManager) manager;
+                    if (manager instanceof X509TrustManager) {
+                        x509TrustManager = (X509TrustManager) manager;
+                    }
                 }
             }
             KeyManager[] keyManagers = null;
@@ -106,7 +109,9 @@ public class HttpClient {
                     .sslSocketFactory(sslContext.getSocketFactory(), x509TrustManager)
                     .build();
         }
-        else sslClient = null;
+        else {
+            sslClient = null;
+        }
     }
 
     public static HttpClient getInstance() {

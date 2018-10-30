@@ -3,12 +3,16 @@ package com.utils.util;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
 import com.itextpdf.tool.xml.XMLWorkerHelper;
-import com.utils.util.Num.Range;
+import com.utils.enums.Charsets;
+import com.utils.excel.entity.Range;
+import com.utils.util.Num.RangeInt;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
 import java.util.Objects;
+
+import static com.utils.enums.Charsets.UTF_8;
 
 /**
  * @author Jason Xie on 2017/12/11.
@@ -86,7 +90,7 @@ public class HtmlPdfWriter {
      * @return {@link File} 写入 PDF 文件路径
      */
     public final File write(final String html) {
-        return write(new ByteArrayInputStream(html.getBytes(Charsets.UTF_8)));
+        return write(new ByteArrayInputStream(html.getBytes(UTF_8.charset)));
     }
 
     /**
@@ -113,8 +117,8 @@ public class HtmlPdfWriter {
 
                     @Override
                     public void onEndPage(final PdfWriter writer, final Document document) {
-                        Range.of(0, 2).forEach(x ->
-                                Range.of(0, 2).forEach(y ->
+                        RangeInt.of(0, 2).forEach(x ->
+                                RangeInt.of(0, 2).forEach(y ->
                                         ColumnText.showTextAligned(writer.getDirectContentUnder(), Element.ALIGN_CENTER, phrase, (50.5f + x * 350), (50.0f + y * 300), 45)
                                 )
                         );
@@ -126,7 +130,7 @@ public class HtmlPdfWriter {
         XMLWorkerHelper.getInstance().parseXHtml(writer, document,
                 inputStream,
                 new FileInputStream(css),
-                Charsets.UTF_8);
+                UTF_8.charset);
 
         document.close();
         FPath.of(pdf).chmod(644);

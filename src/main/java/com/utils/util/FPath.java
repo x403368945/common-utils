@@ -1,5 +1,6 @@
 package com.utils.util;
 
+import com.utils.enums.Charsets;
 import lombok.Cleanup;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +14,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import static com.utils.util.Charsets.UTF_8;
 
 /**
  * 文件路径处理及文件对象操作
@@ -66,6 +66,16 @@ public class FPath {
     public static FPath of(final String absolute) {
         Objects.requireNonNull(absolute, "参数【absolute】是必须的");
         return new FPath(Paths.get(absolute));
+    }
+
+    /**
+     * 追加目录并返回新的 FPath 对象，原始对象不会发生变化
+     *
+     * @param name {@link String} 目录名
+     * @return {@link FPath} 新的 FPath 对象
+     */
+    public FPath append(final String name) {
+        return FPath.of(path.resolve(name));
     }
 
     /**
@@ -130,7 +140,9 @@ public class FPath {
     public FPath mkdirs() {
         File file = path.toFile();
         if (!file.exists()) {
-            if (!file.mkdirs()) throw new RuntimeException("文件目录创建失败:".concat(file.getAbsolutePath()));
+            if (!file.mkdirs()) {
+                throw new RuntimeException("文件目录创建失败:".concat(file.getAbsolutePath()));
+            }
         }
         chmod(755);
         return this;
@@ -151,11 +163,15 @@ public class FPath {
      * @param names String[] 文件名
      */
     public void delete(final List<String> names) {
-        if (Util.isEmpty(names)) return;
+        if (Util.isEmpty(names)) {
+            return;
+        }
         names.forEach(name -> {
             if (Util.isNotEmpty(name)) {
                 boolean delete = path.resolve(name).toFile().delete();
-                if (log.isDebugEnabled()) log.debug("删除文件【{}】{}", path.resolve(name).toString(), delete);
+                if (log.isDebugEnabled()) {
+                    log.debug("删除文件【{}】{}", path.resolve(name).toString(), delete);
+                }
             }
         });
     }
@@ -177,11 +193,16 @@ public class FPath {
         File[] files = path.toFile().listFiles();
         if (Util.isNotEmpty(files)) {
             for (File file : files) {
-                if (file.isDirectory()) FPath.of(file).deleteAll(true);
-                else file.delete();
+                if (file.isDirectory()) {
+                    FPath.of(file).deleteAll(true);
+                } else {
+                    file.delete();
+                }
             }
         }
-        if (self) path.toFile().delete(); // 删除自己
+        if (self) {
+            path.toFile().delete(); // 删除自己
+        }
     }
 
     /**
@@ -198,7 +219,7 @@ public class FPath {
                 return null;
             }
             final StringBuilder sb = new StringBuilder();
-            @Cleanup final BufferedReader reader = Files.newBufferedReader(path, UTF_8);
+            @Cleanup final BufferedReader reader = Files.newBufferedReader(path, Charsets.UTF_8.charset);
             // 一次读多个字符
             final char[] chars = new char[2048];
             int length;
@@ -251,8 +272,11 @@ public class FPath {
      */
     public FPath chmod() {
         try {
-            if (isDirectory()) Runtime.getRuntime().exec("chmod 755 ".concat(absolute()));
-            else Runtime.getRuntime().exec("chmod 644 ".concat(absolute()));
+            if (isDirectory()) {
+                Runtime.getRuntime().exec("chmod 755 ".concat(absolute()));
+            } else {
+                Runtime.getRuntime().exec("chmod 644 ".concat(absolute()));
+            }
         } catch (Exception e) {
         }
         return this;

@@ -73,7 +73,9 @@ interface ICellReader<T extends ICellReader> {
      * @return Optional<Object>
      */
     default Optional<Object> value(final boolean format) {
-        if (cellIsBlank()) return Optional.empty();
+        if (cellIsBlank()) {
+            return Optional.empty();
+        }
         switch (getCell().getCellType()) {
             case STRING:
                 return Optional.of(getCell().getStringCellValue());
@@ -114,7 +116,12 @@ interface ICellReader<T extends ICellReader> {
                         break;
                     case ERROR:
                         break;
+                    default:
+                        break;
                 }
+                break;
+            default:
+                break;
         }
         getCell().setCellType(CellType.STRING);
         return Optional.of(getCell().getStringCellValue());
@@ -146,7 +153,9 @@ interface ICellReader<T extends ICellReader> {
      * @return String
      */
     default String stringValue() {
-        if (cellIsBlank()) return null;
+        if (cellIsBlank()) {
+            return null;
+        }
         switch (getCell().getCellType()) {
             case STRING:
                 return getCell().getStringCellValue();
@@ -167,7 +176,12 @@ interface ICellReader<T extends ICellReader> {
                     case BLANK:
                     case BOOLEAN:
                     case ERROR:
+                    default:
+                        break;
                 }
+                break;
+            default:
+                break;
         }
         getCell().setCellType(CellType.STRING);
         return getCell().getStringCellValue();
@@ -199,7 +213,9 @@ interface ICellReader<T extends ICellReader> {
      * @return {@link Num}
      */
     default Num numberValue() {
-        if (cellIsBlank()) return null;
+        if (cellIsBlank()) {
+            return null;
+        }
         switch (getCell().getCellType()) {
             case STRING:
                 return Num.of(getCell().getStringCellValue());
@@ -220,7 +236,12 @@ interface ICellReader<T extends ICellReader> {
                     case BLANK:
                     case BOOLEAN:
                     case ERROR:
+                    default:
+                        break;
                 }
+                break;
+            default:
+                break;
         }
         getCell().setCellType(CellType.NUMERIC);
         return Num.of(getCell().getNumericCellValue());
@@ -412,11 +433,14 @@ interface ICellReader<T extends ICellReader> {
      * @return String
      */
     default String formula(final Supplier<Integer> rowIndex) {
-        if (cellIsBlank()) return null;
-        if (Objects.equals(CellType.FORMULA, getCell().getCellType()))
+        if (cellIsBlank()) {
+            return null;
+        }
+        if (Objects.equals(CellType.FORMULA, getCell().getCellType())) {
             return Objects.nonNull(rowIndex)
                     ? getCell().getCellFormula().replaceAll(String.format("(?<=[A-Z])%d", rowIndex.get() + 1), "{0}") // 获取到的公式将会使用正则替换为行占位符
                     : getCell().getCellFormula();
+        }
         return null;
     }
 
@@ -501,14 +525,25 @@ interface ICellReader<T extends ICellReader> {
      * @return {@link DataType}
      */
     default DataType dataType() {
-        if (cellIsNull()) return null;
+        if (cellIsNull()) {
+            return null;
+        }
         switch (getCell().getCellType()) {
             case NUMERIC:
-                if (DateUtil.isCellDateFormatted(getCell())) return DataType.DATE;
-                else if (Optional.ofNullable(dataFormat()).orElse("").endsWith("%")) return DataType.PERCENT;
-                else return DataType.NUMBER;
+                if (DateUtil.isCellDateFormatted(getCell())) {
+                    return DataType.DATE;
+                } else if (Optional.ofNullable(dataFormat()).orElse("").endsWith("%")) {
+                    return DataType.PERCENT;
+                } else {
+                    return DataType.NUMBER;
+                }
             case FORMULA:
-                if (CellType.NUMERIC == getCell().getCachedFormulaResultType()) return DataType.NUMBER;
+                if (CellType.NUMERIC == getCell().getCachedFormulaResultType()) {
+                    return DataType.NUMBER;
+                }
+                break;
+            default:
+                break;
         }
         return DataType.TEXT;
     }
@@ -530,7 +565,9 @@ interface ICellReader<T extends ICellReader> {
      * @return {@link CellType}
      */
     default CellType cellType() {
-        if (cellIsNull()) return null;
+        if (cellIsNull()) {
+            return null;
+        }
         return getCell().getCellType();
     }
 

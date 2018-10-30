@@ -2,6 +2,7 @@ package com.utils.excel.entity;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.annotation.JSONType;
+import com.utils.excel.enums.Formula;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -32,7 +33,9 @@ import java.util.stream.Stream;
 @Slf4j
 public class Range {
     public static Range of(final String range) {
-        if (!range.matches("^[A-Z]+\\d+:[A-Z]+\\d+$")) throw new IllegalArgumentException("区间值不正确");
+        if (!range.matches("^[A-Z]+\\d+:[A-Z]+\\d+$")) {
+            throw new IllegalArgumentException("区间值不正确");
+        }
         final String[] arrs = range.split(":");
         return new Range(Position.of(arrs[0]), Position.of(arrs[1]));
     }
@@ -50,6 +53,28 @@ public class Range {
      */
     private Position end;
 
+    /**
+     * sum(start:end)
+     * sum(A1:A10)
+     * sum(A1:D1)
+     *
+     * @return {@link String}
+     */
+    public String sum() {
+        return Formula.SUM.of(this);
+    }
+
+    /**
+     * avg(start:end)
+     * avg(A1:A10)
+     * avg(A1:D1)
+     *
+     * @return {@link String}
+     */
+    public String avg() {
+        return Formula.AVG.of(this);
+    }
+
     public CellRangeAddress getCellRangeAddress() {
         return new CellRangeAddress(
                 start.rowIndex(),
@@ -58,6 +83,7 @@ public class Range {
                 end.columnIndex()
         );
     }
+
     public CellRangeAddressList getCellRangeAddressList() {
         return new CellRangeAddressList(
                 start.rowIndex(),

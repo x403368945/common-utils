@@ -32,7 +32,9 @@ class CloneStyles {
     private final HashMap<Integer, CellStyle> CACHE = new HashMap<>();
 
     CellStyle clone(int styleIndex) {
-        if (Objects.isNull(fromStyleTable)) return null;
+        if (Objects.isNull(fromStyleTable)) {
+            return null;
+        }
         if (!CACHE.containsKey(styleIndex)) { // 克隆并缓存样式，下次直接使用引用，不会重新创建样式
             CellStyle style = toWorkbook.createCellStyle();
             style.cloneStyleFrom(fromStyleTable.getStyleAt(styleIndex));

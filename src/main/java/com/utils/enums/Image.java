@@ -8,6 +8,7 @@ import java.util.Objects;
  * @author Jason Xie on 2018/2/11.
  */
 public enum Image {
+    // JPEG
     JPEG, PNG;
 
     public String base64(final String base64) {

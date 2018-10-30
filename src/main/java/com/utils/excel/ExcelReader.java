@@ -3,7 +3,6 @@ package com.utils.excel;
 import com.utils.excel.entity.Header;
 import com.utils.excel.entity.Position;
 import com.utils.exception.NotFoundException;
-import com.utils.util.Dates;
 import com.utils.util.FPath;
 import com.utils.util.FWrite;
 import lombok.Cleanup;
@@ -46,7 +45,9 @@ public class ExcelReader implements ISheetReader<ExcelReader> {
     @SneakyThrows
     public static ExcelReader of(final File file, final boolean readOnly) {
         Objects.requireNonNull(file, "参数【file】是必须的");
-        if (!file.exists()) throw new NotFoundException("文件不存在：".concat(file.getAbsolutePath()));
+        if (!file.exists()) {
+            throw new NotFoundException("文件不存在：".concat(file.getAbsolutePath()));
+        }
         if (file.getName().endsWith(".xls")) {
             return new ExcelReader(new HSSFWorkbook(new POIFSFileSystem(file, readOnly)));
         } else if (file.getName().endsWith(".xlsx")) {
@@ -60,8 +61,12 @@ public class ExcelReader implements ISheetReader<ExcelReader> {
     @SneakyThrows
     public static ExcelReader of(final File file, final boolean readOnly, final String password) {
         Objects.requireNonNull(file, "参数【file】是必须的");
-        if (!file.exists()) throw new NotFoundException("文件不存在：".concat(file.getAbsolutePath()));
-        if (!file.getName().matches("[\\s\\S]*\\.xls(x)?$")) throw new IllegalArgumentException("未知的文件后缀");
+        if (!file.exists()) {
+            throw new NotFoundException("文件不存在：".concat(file.getAbsolutePath()));
+        }
+        if (!file.getName().matches("[\\s\\S]+\\.xls(x)?$")) {
+            throw new IllegalArgumentException("未知的文件后缀");
+        }
         return new ExcelReader(WorkbookFactory.create(file, password, readOnly));
     }
 
@@ -97,6 +102,7 @@ public class ExcelReader implements ISheetReader<ExcelReader> {
     private Cell cell;
     private DataFormatter dataFormatter;
 
+    @Override
     public DataFormatter getDataFormatter() {
         return dataFormatter;
     }
@@ -146,7 +152,9 @@ public class ExcelReader implements ISheetReader<ExcelReader> {
 
     @Override
     public ExcelReader row(final Row row) {
-        if (Objects.nonNull(row)) rowIndex = row.getRowNum();
+        if (Objects.nonNull(row)) {
+            rowIndex = row.getRowNum();
+        }
         this.row = row;
         this.cell = null;
         return this;
@@ -216,8 +224,9 @@ public class ExcelReader implements ISheetReader<ExcelReader> {
                         Position.ofColumn("F").columnIndex()
                 );
                 final StringBuffer sb = new StringBuffer();
-                @Cleanup final ExcelReader reader = ExcelReader.of(file).sheet(0).row(Rownum.of(2)); // 读取第 1 个 sheet ，从第 2 行开始
-                do {
+                @Cleanup final ExcelReader reader = ExcelReader.of(file).sheet(0) // 读取第 1 个 sheet
+                        .skip(1); // 跳过第 1 行从第 2 行开始
+                while (reader.hasNext()) {
                     sb.append("<tr>\n");
                     columnIndexs.forEach(index ->
                             sb.append("<td class=\"text-x-small p-3" + (index == 0 ? " text-left" : "") + "\">")
@@ -225,7 +234,7 @@ public class ExcelReader implements ISheetReader<ExcelReader> {
                                     .append("</td>\n")
                     );
                     sb.append("</tr>\n");
-                } while (Objects.nonNull(reader.next()));
+                }
                 System.out.println(FWrite.of(String.format("src/test/files/temp/%s.html", file.getName())).write(sb.toString()).getAbsolute().orElse(null));
             };
             read.accept(FPath.of("src/test/files/excel/test.xls").file());
@@ -236,16 +245,17 @@ public class ExcelReader implements ISheetReader<ExcelReader> {
                 final int A = Position.ofColumn("A").columnIndex();
                 final int B = Position.ofColumn("B").columnIndex();
                 final int C = Position.ofColumn("C").columnIndex();
-                @Cleanup final ExcelReader reader = ExcelReader.of(file).sheet(3).row(Rownum.of(2)); // 读取第 4 个 sheet ，从第 2 行开始
+                @Cleanup final ExcelReader reader = ExcelReader.of(file).sheet(3) // 读取第 4 个 sheet
+                        .skip(1); // 跳过第 1 行从第 2 行开始
                 final Map<String, TreeSet<String>> map = new LinkedHashMap<>();
-                do {
+                while (reader.hasNext()) {
                     map.put(reader.cell(A).stringOfEmpty(), new TreeSet<>());
-                } while (Objects.nonNull(reader.next()));
-                reader.row(Rownum.of(2));
+                }
+                reader.row(Rownum.of(2)); // 重新定位到第 2 行
                 do {
                     map.get(reader.cell(A).stringOfEmpty())
                             .add(Objects.isNull(reader.cell(B).stringValue()) ? reader.cell(C).stringValue() : reader.cell(B).stringValue());
-                } while (Objects.nonNull(reader.next()));
+                } while (reader.hasNext());
 
                 System.out.println(FWrite.of(String.format("src/test/files/temp/%s.json", file.getName())).writeJson(map).getAbsolute().orElse(null));
             };
@@ -258,7 +268,7 @@ public class ExcelReader implements ISheetReader<ExcelReader> {
 //                @Cleanup final ExcelReader reader = ExcelReader.of(file, true, "111111").sheet(0); // 读取第 1 个 sheet
                 final List<Header> header = reader.row(Rownum.of(1)).headers();
                 final List<com.utils.excel.entity.Row> body = new ArrayList<>();
-                while (Objects.nonNull(reader.next())) {
+                while (reader.hasNext()) {
                     body.add(reader.rowObject(header));
                 }
                 System.out.println(FWrite.of(String.format("src/test/files/temp/%s.json", file.getName()))

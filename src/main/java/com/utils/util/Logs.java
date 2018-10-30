@@ -19,6 +19,7 @@ import java.util.Random;
 public final class Logs {
 
     private enum Event {
+        // 调试日志
         DEBUG("调试日志"),
         INFO("基本信息日志"),
         ERROR("异常日志"),;
@@ -38,8 +39,12 @@ public final class Logs {
     @SneakyThrows
     private Logs(Class<?> clazz, String uid) {
         String home = System.getProperty("catalina.home");
-        if (Objects.isNull(home)) home = System.getProperty("user.dir");
-        if (Objects.isNull(home)) home = File.separator;
+        if (Objects.isNull(home)) {
+            home = System.getProperty("user.dir");
+        }
+        if (Objects.isNull(home)) {
+            home = File.separator;
+        }
         uid = '_' + ((Objects.nonNull(uid) && uid.length() > 0) ? uid : String.format("%06d", new Random().nextInt(999999)));
         this.filePath = Paths.get(
                 home,
@@ -89,7 +94,9 @@ public final class Logs {
 
 
     private void write(StackTraceElement element, Event event, String message, Exception e) {
-        if (Objects.isNull(message)) message = "";
+        if (Objects.isNull(message)) {
+            message = "";
+        }
 //		log.info(message, e);
         String exception = "";
         if (Objects.nonNull(e)) {

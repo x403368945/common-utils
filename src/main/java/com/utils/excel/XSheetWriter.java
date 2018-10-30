@@ -1,5 +1,6 @@
 package com.utils.excel;
 
+import com.alibaba.fastjson.JSON;
 import com.utils.enums.Colors;
 import com.utils.excel.entity.Cell;
 import com.utils.excel.entity.Position;
@@ -7,9 +8,12 @@ import com.utils.excel.entity.Range;
 import com.utils.excel.enums.DataType;
 import com.utils.util.Dates;
 import com.utils.util.FPath;
+import com.utils.util.Num;
+import com.utils.util.Util;
 import lombok.Cleanup;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.math3.analysis.function.Max;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -22,6 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * 【.xlsx】数据写入操作；写入完成之后需要调用 close 方法；否则可能造成内存泄露
@@ -73,7 +78,9 @@ public class XSheetWriter implements ISheetWriter<XSheetWriter>, ISheetWriter.IC
     private ExcelReader reader;
 
     public ExcelReader getReader() {
-        if (Objects.isNull(reader)) reader = ExcelReader.of(sheet);
+        if (Objects.isNull(reader)) {
+            reader = ExcelReader.of(sheet);
+        }
         return reader;
     }
 
@@ -233,7 +240,7 @@ public class XSheetWriter implements ISheetWriter<XSheetWriter>, ISheetWriter.IC
                             sheetWriter
 //                                    .autoColumnWidth()
                                     .evaluateAllFormulaCells()
-                                    .saveWorkBook(FPath.of("logs", "1.普通写入.xlsx")).absolute()
+                                    .saveWorkBook(FPath.of("logs/1.普通写入.xlsx")).absolute()
                     ));
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -284,13 +291,13 @@ public class XSheetWriter implements ISheetWriter<XSheetWriter>, ISheetWriter.IC
                             .merge(Range.of("H2", "I2"))
 
                             // 从第 2 行复制到第 3 行, 复制都是使用索引
-                            .copy(Rownum.of(2).rowIndex(), Rownum.of(3).rowIndex())
+                            .copy(Rownum.of(2).index(), Rownum.of(3).index())
                             .nextRowOfNew()
                             .cell(0).writeText("第3行：从第2行复制来的")
                             .cell(2).writeNumber(3)
                             .cell(3).writeFormula("100*B3")
                             // 将第 3 行复制，从第 6 行开始作为目标行，总共复制 5 行, 复制都是使用索引
-                            .copy(Rownum.of(3).rowIndex(), Rownum.of(6).rowIndex(), 5)
+                            .copy(Rownum.of(3).index(), Rownum.of(6).index(), 5)
                             // 切换到第5行
                             .row(Rownum.of(5))
                             .cell(0).writeText("这是第5行，第2列和第4行已隐藏").merge(Range.of("A5:E5"))
@@ -321,12 +328,12 @@ public class XSheetWriter implements ISheetWriter<XSheetWriter>, ISheetWriter.IC
                             .cell(0).writeText("第11行")
 
                             // 隐藏第 4 行，第 2 列
-                            .hideRow(Rownum.of(4).rowIndex()).hideColumn(Position.ofColumn("B").columnIndex())
+                            .hideRow(Rownum.of(4).index()).hideColumn(Position.ofColumn("B").columnIndex())
 
 //                            .autoColumnWidth()
                             .evaluateAllFormulaCells();
                     log.info(String.format("写入路径：%s",
-                            sheetWriter.saveWorkBook(FPath.of("logs", "2.复制.xlsx")).absolute()
+                            sheetWriter.saveWorkBook(FPath.of("logs/2.复制.xlsx")).absolute()
                     ));
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -352,7 +359,7 @@ public class XSheetWriter implements ISheetWriter<XSheetWriter>, ISheetWriter.IC
 //                            .autoColumnWidth()
                             .evaluateAllFormulaCells();
                     log.info(String.format("写入路径：%s",
-                            writer.saveWorkBook(FPath.of("logs", "3.公式重构.xlsx")).absolute()
+                            writer.saveWorkBook(FPath.of("logs/3.公式重构.xlsx")).absolute()
                     ));
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -368,7 +375,7 @@ public class XSheetWriter implements ISheetWriter<XSheetWriter>, ISheetWriter.IC
                     workbook.createSheet("Sheet1");
                     workbook.getSheet("Sheet1").setDefaultColumnWidth(15);
                     final XSheetWriter writer = XSheetWriter.of(workbook.getSheetAt(0))
-                            .setCloneStyles(Paths.get("logs", "1.普通写入.xlsx").toAbsolutePath().toString()) // 指定引用样式库文件路径
+                            .setCloneStyles(Paths.get("logs/1.普通写入.xlsx").toAbsolutePath().toString()) // 指定引用样式库文件路径
                             .rowNew(Rownum.of(1)) // 从第1行开始写
                             .cellNew(0).write(cellDatas.get(0))
                             .cellNew(1).write(cellDatas.get(1))
@@ -378,7 +385,7 @@ public class XSheetWriter implements ISheetWriter<XSheetWriter>, ISheetWriter.IC
                             ;
 
                     log.info(String.format("写入路径：%s",
-                            writer.saveWorkBook(FPath.of("logs", "4.样式库引用【普通写入】.xlsx")).absolute()
+                            writer.saveWorkBook(FPath.of("logs/4.样式库引用【普通写入】.xlsx")).absolute()
                     ));
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -423,7 +430,7 @@ public class XSheetWriter implements ISheetWriter<XSheetWriter>, ISheetWriter.IC
                             // 冻结第 1 列 和 第 2 行
                             .freeze(1, 2)
                             // 隐藏第 1 行
-                            .hideRow(Rownum.of(1).rowIndex())
+                            .hideRow(Rownum.of(1).index())
                             // 锁定 A1:J1，禁止编辑
                             .lock(Range.of("A1:J1"), CellStyles.builder().locked(true).fillPattern(FillPatternType.SOLID_FOREGROUND).fillForegroundColor(Colors.Grey25Percent.color).build())
                             // 解锁 A2:J10，可以编辑
@@ -433,7 +440,38 @@ public class XSheetWriter implements ISheetWriter<XSheetWriter>, ISheetWriter.IC
 //                            .autoColumnWidth()
                             ;
                     log.info(String.format("写入路径：%s",
-                            writer.saveWorkBook(FPath.of("logs", "5.下拉选项写入.xlsx")).absolute()
+                            writer.saveWorkBook(FPath.of("logs/5.下拉选项写入.xlsx")).absolute()
+                    ));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
+            };
+            supplier.get();
+        }
+        { // 写入行分组
+            Supplier supplier = () -> {
+                try {
+                    @Cleanup final XSSFWorkbook workbook = new XSSFWorkbook();
+                    workbook.createSheet("Sheet1");
+                    workbook.getSheet("Sheet1").setDefaultColumnWidth(15);
+
+                    final XSheetWriter writer = XSheetWriter.of(workbook.getSheet("Sheet1"));
+                    Num.RangeInt.of(1, 10).forEach(parent -> {
+                        writer.nextRowOfNew()
+                                .cell(0).writeText(Objects.toString(parent))
+                                .cell(1).writeText("父级代码");
+                        final List<Integer> rowIndexs = Num.RangeInt.of(0, Math.max(Util.randomMax(10), 1))
+                                .map(rowIndex -> writer.nextRowOfNew()
+                                        .cell(0).writeText(Objects.toString(parent + "" + (rowIndex + 1)))
+                                        .cell(1).writeText("子集代码")
+                                        .getRowIndex()
+                                )
+                                .collect(Collectors.toList());
+                        writer.groupRow(Num.RangeInt.of(rowIndexs));
+                    });
+                    log.info(String.format("写入路径：%s",
+                            writer.saveWorkBook(FPath.of("logs/6.子集分组.xlsx")).absolute()
                     ));
                 } catch (Exception e) {
                     e.printStackTrace();

@@ -11,6 +11,7 @@ import java.util.Objects;
  * @author Jason Xie on 2017/10/15.
  */
 public enum Month {
+    // 1月
     Jan("1月"),
     Feb("2月"),
     Mar("3月"),
@@ -36,7 +37,9 @@ public enum Month {
      * @return List<Header>
      */
     public static List<Header> buildHeaders(List<Header> headers) {
-        if (Objects.isNull(headers)) headers = new ArrayList<>();
+        if (Objects.isNull(headers)) {
+            headers = new ArrayList<>();
+        }
         Header.HeaderBuilder builder = Header.builder().type(DataType.NUMBER);
         {
             headers.add(builder.index(headers.size()).label("1月").build());

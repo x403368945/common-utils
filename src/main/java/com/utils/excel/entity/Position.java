@@ -10,7 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.Objects;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import static com.utils.enums.Patterns.EXCEL_ADDRESS;
 
 /**
  * 定义excel 单元格坐标
@@ -26,7 +27,7 @@ import java.util.regex.Pattern;
 public class Position {
 
     public static Position of(final String address) {
-        Matcher m = Pattern.compile("^([A-Z]+)([0-9]+)$").matcher(address);
+        final Matcher m = EXCEL_ADDRESS.matcher(address);
         return m.find() ? new Position(Integer.valueOf(m.group(2)), m.group(1)) : new Position();
     }
 
@@ -87,16 +88,6 @@ public class Position {
      */
     public String address() {
         return String.format("%s%d", column, row);
-    }
-
-    /**
-     * 将左右两边的坐标位置拼接；返回格式：A1:D4
-     *
-     * @param right {@link Position} 右边的坐标位置
-     * @return String
-     */
-    public String joinAddress(final Position right) {
-        return address().concat(":").concat(right.address());
     }
 
     public int rowIndex() {

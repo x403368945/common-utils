@@ -52,8 +52,12 @@ public class ExcelRewriter implements ISheetWriter<ExcelRewriter>, ISheetReader<
     @SneakyThrows
     public static ExcelRewriter of(final File file, final Options ops, final String password) {
         Objects.requireNonNull(file, "参数【file】是必须的");
-        if (!file.exists()) throw new NotFoundException("文件不存在：".concat(file.getAbsolutePath()));
-        if (!file.getName().matches("[\\s\\S]*\\.xls(x)?$")) throw new IllegalArgumentException("未知的文件后缀");
+        if (!file.exists()) {
+            throw new NotFoundException("文件不存在：".concat(file.getAbsolutePath()));
+        }
+        if (!file.getName().matches("[\\s\\S]*\\.xls(x)?$")) {
+            throw new IllegalArgumentException("未知的文件后缀");
+        }
         return new ExcelRewriter(WorkbookFactory.create(file, password, false), ops);
     }
 
@@ -115,8 +119,11 @@ public class ExcelRewriter implements ISheetWriter<ExcelRewriter>, ISheetReader<
         return this;
     }
 
+    @Override
     public ExcelRewriter row(final Row row) {
-        if (Objects.nonNull(row)) rowIndex = row.getRowNum();
+        if (Objects.nonNull(row)) {
+            rowIndex = row.getRowNum();
+        }
         this.row = row;
         this.cell = null; // 切换行，需要将 cell 置空
         return this;

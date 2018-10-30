@@ -12,7 +12,7 @@ import java.util.Objects;
 
 /**
  * 构建Map对象，支持链式请求
- * Created by Jason Xie on 2017-9-30
+ * @author Jason Xie on 2018-10-3
  */
 @Slf4j
 public class Maps<K, V> {
@@ -37,7 +37,7 @@ public class Maps<K, V> {
     public static Map<Object, Object> by(final Object key, final Object value) {
         Objects.requireNonNull(key, "参数【key】是必须的");
         Objects.requireNonNull(value, "参数【value】是必须的");
-        return new HashMap<Object, Object>() {{
+        return new HashMap<Object, Object>(1) {{
             put(key, value);
         }};
     }
@@ -45,7 +45,7 @@ public class Maps<K, V> {
     public static Map<String, Object> bySO(final String key, final Object value) {
         Objects.requireNonNull(key, "参数【key】是必须的");
         Objects.requireNonNull(value, "参数【value】是必须的");
-        return new HashMap<String, Object>() {{
+        return new HashMap<String, Object>(1) {{
             put(key, value);
         }};
     }
@@ -53,7 +53,7 @@ public class Maps<K, V> {
     public static Map<String, String> bySS(final String key, final String value) {
         Objects.requireNonNull(key, "参数【key】是必须的");
         Objects.requireNonNull(value, "参数【value】是必须的");
-        return new HashMap<String, String>() {{
+        return new HashMap<String, String>(1) {{
             put(key, value);
         }};
     }
@@ -67,17 +67,23 @@ public class Maps<K, V> {
     }
 
     public Maps<K, V> put(K key, V value) {
-        if (Objects.nonNull(key) && Objects.nonNull(value)) this.values.put(key, value);
+        if (Objects.nonNull(key) && Objects.nonNull(value)) {
+            this.values.put(key, value);
+        }
         return this;
     }
 
     public Maps<K, V> put(boolean hasTrue, K key, V value) {
-        if (hasTrue && Objects.nonNull(key) && Objects.nonNull(value)) this.values.put(key, value);
+        if (hasTrue && Objects.nonNull(key) && Objects.nonNull(value)) {
+            this.values.put(key, value);
+        }
         return this;
     }
 
     public Maps<K, V> putAll(Map<K, V> values) {
-        if (Objects.nonNull(values)) this.values.putAll(values);
+        if (Objects.nonNull(values)) {
+            this.values.putAll(values);
+        }
         return this;
     }
 

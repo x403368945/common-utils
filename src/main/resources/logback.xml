@@ -12,14 +12,10 @@
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <!-- 一是把日志信息转换成字节数组,二是把字节数组写入到输出流 -->
         <encoder>
-            <pattern>%highlight(%d{HHmmss.SSS} %5level - %caller{1}%m%n)</pattern>
+            <pattern>%highlight(%d{HH:mm:ss.SSS} %5level - %caller{1}%m%n)</pattern>
             <charset>UTF-8</charset>
         </encoder>
     </appender>
-
-    <!--
-        <logger name="org.hibernate.hql.internal" level="INFO" />
-    -->
 
     <!--
     - 根logger

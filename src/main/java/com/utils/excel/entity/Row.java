@@ -40,7 +40,9 @@ public class Row extends JSONObject {
      * @return {@link Row}
      */
     public Row addCell(String key, Cell value) {
-        if (Objects.nonNull(key) && Objects.nonNull(value)) super.put(key, value);
+        if (Objects.nonNull(key) && Objects.nonNull(value)) {
+            super.put(key, value);
+        }
         return this;
     }
 
@@ -51,7 +53,9 @@ public class Row extends JSONObject {
      * @return {@link Row}
      */
     public Row addChilds(final List<Row> rows) {
-        if (Util.isNotEmpty(rows)) super.put("childs", rows);
+        if (Util.isNotEmpty(rows)) {
+            super.put("childs", rows);
+        }
         return this;
     }
 
@@ -62,7 +66,9 @@ public class Row extends JSONObject {
      * @return {@link Row}
      */
     public Row addTable(final Table table) {
-        if (Util.isNotEmpty(table)) super.put("table", table);
+        if (Util.isNotEmpty(table)) {
+            super.put("table", table);
+        }
         return this;
     }
 
@@ -73,7 +79,9 @@ public class Row extends JSONObject {
      * @return {@link Row}
      */
     public Row copy(Row values) {
-        if (Objects.nonNull(values)) super.putAll(values);
+        if (Objects.nonNull(values)) {
+            super.putAll(values);
+        }
         return this;
     }
 

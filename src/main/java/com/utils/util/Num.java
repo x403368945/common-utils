@@ -1,15 +1,18 @@
 package com.utils.util;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.annotation.JSONType;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
-import java.util.Arrays;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -59,18 +62,33 @@ public class Num {
         }
 
         public String value(int fixed) {
-            if (fixed <= 0) return pattern;
+            if (fixed <= 0) {
+                return pattern;
+            }
             return pattern + '.' + String.format("%0{fixed}d".replace("{fixed}", fixed + ""), 0);
         }
     }
 
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
     @Data
-    @RequiredArgsConstructor(staticName = "of")
+    @Accessors(chain = true)
+    @JSONType(orders = {"min", "max"})
     public static class Range {
-        @NonNull
         private Number min;
-        @NonNull
         private Number max;
+
+        /**
+         * 构造数字区间
+         *
+         * @param min Number 获取最小值
+         * @param max Number 获取最大值
+         * @return {@link Range}
+         */
+        public static Range of(final Number min, final Number max) {
+            return new Range(min, max);
+        }
 
         /**
          * 检查 value 是否在 min,max 区间内；包含 min,max
@@ -79,7 +97,14 @@ public class Num {
          * @return boolean true：是，false：否
          */
         public boolean in(final Number value) {
-            return min.doubleValue() <= value.doubleValue() && value.doubleValue() <= max.doubleValue();
+            if (Objects.nonNull(getMin()) && Objects.nonNull(getMax())) {
+                return getMin().doubleValue() <= value.doubleValue() && value.doubleValue() <= getMax().doubleValue();
+            } else if (Objects.nonNull(getMin())) {
+                return getMin().doubleValue() <= value.doubleValue();
+            } else if (Objects.nonNull(getMax())) {
+                return value.doubleValue() <= getMax().doubleValue();
+            }
+            return false;
         }
 
         /**
@@ -89,7 +114,124 @@ public class Num {
          * @return boolean true：是，false：否
          */
         public boolean round(final Number value) {
-            return min.doubleValue() < value.doubleValue() && value.doubleValue() < max.doubleValue();
+            if (Objects.nonNull(getMin()) && Objects.nonNull(getMax())) {
+                return getMin().doubleValue() < value.doubleValue() && value.doubleValue() < getMax().doubleValue();
+            } else if (Objects.nonNull(getMin())) {
+                return getMin().doubleValue() < value.doubleValue();
+            } else if (Objects.nonNull(getMax())) {
+                return value.doubleValue() < getMax().doubleValue();
+            }
+            return false;
+        }
+
+        public Optional<Integer> minIntValue() {
+            return Optional.ofNullable(min).map(Number::intValue);
+        }
+
+        public Optional<Long> minLongValue() {
+            return Optional.ofNullable(min).map(Number::longValue);
+        }
+
+        public Optional<Double> minDoubleValue() {
+            return Optional.ofNullable(min).map(Number::doubleValue);
+        }
+
+        public Optional<Short> minShortValue() {
+            return Optional.ofNullable(min).map(Number::shortValue);
+        }
+
+        public Optional<Float> minFloatValue() {
+            return Optional.ofNullable(min).map(Number::floatValue);
+        }
+
+        public Optional<Integer> maxIntValue() {
+            return Optional.ofNullable(max).map(Number::intValue);
+        }
+
+        public Optional<Long> maxLongValue() {
+            return Optional.ofNullable(max).map(Number::longValue);
+        }
+
+        public Optional<Double> maxDoubleValue() {
+            return Optional.ofNullable(max).map(Number::doubleValue);
+        }
+
+        public Optional<Short> maxShortValue() {
+            return Optional.ofNullable(max).map(Number::shortValue);
+        }
+
+        public Optional<Float> maxFloatValue() {
+            return Optional.ofNullable(max).map(Number::floatValue);
+        }
+    }
+
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @Data
+    @Accessors(chain = true)
+    @JSONType(orders = {"min", "max"})
+    public static class RangeInt {
+        private int min;
+        private int max;
+
+        /**
+         * 构造数字区间
+         *
+         * @param min int 获取最小值
+         * @param max int 获取最大值
+         * @return {@link RangeInt}
+         */
+        public static RangeInt of(final int min, final int max) {
+            if (max <= 0) {
+                log.warn("参数【max】<=0");
+            }
+            return new RangeInt(min, max);
+        }
+
+        /**
+         * 构造数字区间
+         *
+         * @param values {@link Integer[]} 从数组中获取最小值和最大值区间
+         * @return {@link RangeInt}
+         */
+        public static RangeInt of(final Integer[] values) {
+            Arrays.sort(values);
+            return new RangeInt(values[0], values[values.length - 1]);
+        }
+
+        /**
+         * 构造数字区间
+         *
+         * @param values {@link Integer[]} 从数组中获取最小值和最大值区间
+         * @return {@link RangeInt}
+         */
+        public static RangeInt of(final List<Integer> values) {
+            values.sort(Comparator.naturalOrder());
+            return new RangeInt(values.get(0), values.get(values.size() - 1));
+        }
+
+        /**
+         * 检查 value 是否在 min,max 区间内；包含 min,max
+         *
+         * @param value {@link Integer} 被检查的值
+         * @return boolean true：是，false：否
+         */
+        public boolean in(final Integer value) {
+            if (Objects.isNull(value)) {
+                return false;
+            }
+            return min <= value && value <= max;
+        }
+
+        /**
+         * 检查 value 是否在 min,max 区间内；不包含 min,max
+         *
+         * @param value {@link Integer} 被检查的值
+         * @return boolean true：是，false：否
+         */
+        public boolean round(final Integer value) {
+            return min < value && value < max;
         }
 
         /**
@@ -99,7 +241,7 @@ public class Num {
          */
         public void forEach(Consumer<Integer> action) {
             Objects.requireNonNull(action, "参数【action】是必须的");
-            for (int i = min.intValue(); i <= max.longValue(); i++) {
+            for (int i = min; i <= max; i++) {
                 action.accept(i);
             }
         }
@@ -112,8 +254,105 @@ public class Num {
          * @return {@link Stream<R>}
          */
         public <R> Stream<R> map(Function<Integer, ? extends R> mapper) {
-            return Stream.iterate(min.intValue(), n -> n + 1)
-                    .limit(max.intValue() - min.intValue() + 1)
+            Objects.requireNonNull(mapper, "参数【mapper】是必须的");
+            return Stream.iterate(min, n -> n + 1)
+                    .limit(max - min + 1)
+                    .map(mapper);
+        }
+    }
+
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @Data
+    @Accessors(chain = true)
+    @JSONType(orders = {"min", "max"})
+    public static class RangeLong {
+        private long min;
+        private long max;
+
+        /**
+         * 构造数字区间
+         *
+         * @param min long 获取最小值
+         * @param max long 获取最大值
+         * @return {@link RangeLong}
+         */
+        public static RangeLong of(final long min, final long max) {
+            if (max <= 0) {
+                log.warn("参数【max】<=0");
+            }
+            return new RangeLong(min, max);
+        }
+
+        /**
+         * 构造数字区间
+         *
+         * @param values {@link Long[]} 从数组中获取最小值和最大值区间
+         * @return {@link RangeLong}
+         */
+        public static RangeLong of(final Long[] values) {
+            Arrays.sort(values);
+            return new RangeLong(values[0], values[values.length - 1]);
+        }
+
+        /**
+         * 构造数字区间
+         *
+         * @param values {@link List<Long>} 从集合中获取最小值和最大值区间
+         * @return {@link RangeLong}
+         */
+        public static RangeLong of(final List<Long> values) {
+            values.sort(Comparator.naturalOrder());
+            return new RangeLong(values.get(0), values.get(values.size() - 1));
+        }
+
+        /**
+         * 检查 value 是否在 min,max 区间内；包含 min,max
+         *
+         * @param value {@link Long} 被检查的值
+         * @return boolean true：是，false：否
+         */
+        public boolean in(final Long value) {
+            if (Objects.isNull(value)) {
+                return false;
+            }
+            return min <= value && value <= max;
+        }
+
+        /**
+         * 检查 value 是否在 min,max 区间内；不包含 min,max
+         *
+         * @param value {@link Long} 被检查的值
+         * @return boolean true：是，false：否
+         */
+        public boolean round(final Long value) {
+            return min < value && value < max;
+        }
+
+        /**
+         * 遍历区间，包含 min 和 max 值
+         *
+         * @param action {@link Consumer<Long:value>}
+         */
+        public void forEach(Consumer<Long> action) {
+            Objects.requireNonNull(action, "参数【action】是必须的");
+            for (Long i = min; i <= max; i++) {
+                action.accept(i);
+            }
+        }
+
+        /**
+         * 转换区间，包含 min 和 max 值
+         *
+         * @param mapper {@link Function<Long:value, R:返回数据类型>}
+         * @param <R>    返回数据类型
+         * @return {@link Stream<R>}
+         */
+        public <R> Stream<R> map(Function<Long, ? extends R> mapper) {
+            Objects.requireNonNull(mapper, "参数【mapper】是必须的");
+            return Stream.iterate(min, n -> n + 1)
+                    .limit(max - min + 1)
                     .map(mapper);
         }
     }
@@ -125,7 +364,9 @@ public class Num {
      * @return {@link Num}
      */
     public static Num of(Object value) {
-        if (Objects.isNull(value) || Objects.equals(value, "")) return new Num();
+        if (Objects.isNull(value) || Objects.equals(value, "")) {
+            return new Num();
+        }
         return of(Objects.toString(value));
     }
 
@@ -136,14 +377,24 @@ public class Num {
      * @return {@link Num}
      */
     public static Num of(Object value, Number defaultValue) {
-        if (Objects.isNull(value)) return new Num(defaultValue);
-        if (value instanceof Integer) of((Integer) value);
-        else if (value instanceof Long) of((Long) value);
-        else if (value instanceof Double) of((Double) value);
-        else if (value instanceof Short) of((Short) value);
-        else if (value instanceof Float) of((Float) value);
-        else if (value instanceof BigInteger) of((BigInteger) value);
-        else if (value instanceof BigDecimal) of((BigDecimal) value);
+        if (Objects.isNull(value)) {
+            return new Num(defaultValue);
+        }
+        if (value instanceof Integer) {
+            of((Integer) value);
+        } else if (value instanceof Long) {
+            of((Long) value);
+        } else if (value instanceof Double) {
+            of((Double) value);
+        } else if (value instanceof Short) {
+            of((Short) value);
+        } else if (value instanceof Float) {
+            of((Float) value);
+        } else if (value instanceof BigInteger) {
+            of((BigInteger) value);
+        } else if (value instanceof BigDecimal) {
+            of((BigDecimal) value);
+        }
         return of(Objects.toString(value), defaultValue);
     }
 
@@ -210,7 +461,9 @@ public class Num {
      * @return {@link Num}
      */
     public static Num ofZore(Number value) {
-        if (Objects.isNull(value)) return new Num(0);
+        if (Objects.isNull(value)) {
+            return new Num(0);
+        }
         return new Num(value);
     }
 
@@ -271,7 +524,9 @@ public class Num {
      * @return {@link Num}
      */
     public Num add(Num v) {
-        if (Objects.nonNull(v)) value = this.doubleValue() + v.doubleValue();
+        if (Objects.nonNull(v)) {
+            value = this.doubleValue() + v.doubleValue();
+        }
         return this;
     }
 
@@ -282,7 +537,9 @@ public class Num {
      * @return {@link Num}
      */
     public Num add(Number v) {
-        if (Objects.nonNull(v)) value = this.doubleValue() + v.doubleValue();
+        if (Objects.nonNull(v)) {
+            value = this.doubleValue() + v.doubleValue();
+        }
         return this;
     }
 
@@ -293,8 +550,9 @@ public class Num {
      * @return {@link Num}
      */
     public Num add(Number... values) {
-        if (Util.isNotEmpty(values))
+        if (Util.isNotEmpty(values)) {
             value = this.doubleValue() + Arrays.stream(values).filter(Objects::nonNull).mapToDouble(Number::doubleValue).sum();
+        }
         return this;
     }
 
@@ -432,6 +690,8 @@ public class Num {
             case DOUBLE:
             case SDOUBLE:
                 return doubleValue();
+            default:
+                break;
         }
         return value;
     }
@@ -452,8 +712,12 @@ public class Num {
      * @return String 格式化后的字符串
      */
     public String format(String pattern) {
-        if (Objects.isNull(value)) return null;
-        if (Objects.isNull(pattern)) pattern = Pattern.DOUBLE.value();
+        if (Objects.isNull(value)) {
+            return null;
+        }
+        if (Objects.isNull(pattern)) {
+            pattern = Pattern.DOUBLE.value();
+        }
         return new DecimalFormat(pattern).format(value);
     }
 
@@ -464,8 +728,12 @@ public class Num {
      * @return String 格式化后的字符串
      */
     public String format(Pattern pattern) {
-        if (Objects.isNull(value)) return null;
-        if (Objects.isNull(pattern)) pattern = Pattern.DOUBLE;
+        if (Objects.isNull(value)) {
+            return null;
+        }
+        if (Objects.isNull(pattern)) {
+            pattern = Pattern.DOUBLE;
+        }
         return new DecimalFormat(pattern.value()).format(value);
     }
 
@@ -475,7 +743,9 @@ public class Num {
      * @return String 格式化后的字符串
      */
     public String formatAmount() {
-        if (Objects.isNull(value)) return null;
+        if (Objects.isNull(value)) {
+            return null;
+        }
         return new DecimalFormat(SDOUBLE.value()).format(value);
     }
 
@@ -485,7 +755,7 @@ public class Num {
     }
 
     public static void main(String[] args) {
-        log.info("{}", Range.of(0, 10).toString());
+        log.info("{}", RangeInt.of(0, 10).toString());
         log.info("{}", Num.ofNull(" ").toInteger());
         log.info("{}", Num.ofNull(" ").intValue());
         log.info("{}", Num.ofNull(null).toDouble());
@@ -540,18 +810,23 @@ public class Num {
         log.info(Num.of("-1000000").format(SAUTO.value(4)));
 
         log.info(">>>>>>>");
-        log.info("0 in 1-10 : {}", Range.of(1, 10).in(0));
-        log.info("1 in 1-10 : {}", Range.of(1, 10).in(1));
-        log.info("2 in 1-10 : {}", Range.of(1, 10).in(2));
-        log.info("9 in 1-10 : {}", Range.of(1, 10).in(9));
-        log.info("10 in 1-10 : {}", Range.of(1, 10).in(10));
-        log.info("11 in 1-10 : {}", Range.of(1, 10).in(11));
-        log.info("0 round 1-10 : {}", Range.of(1, 10).round(0));
-        log.info("1 round 1-10 : {}", Range.of(1, 10).round(1));
-        log.info("2 round 1-10 : {}", Range.of(1, 10).round(2));
-        log.info("9 round 1-10 : {}", Range.of(1, 10).round(9));
-        log.info("10 round 1-10 : {}", Range.of(1, 10).round(10));
-        log.info("11 round 1-10 : {}", Range.of(1, 10).round(11));
+        log.info("0 in 1-10 : {}", RangeInt.of(1, 10).in(0));
+        log.info("1 in 1-10 : {}", RangeInt.of(1, 10).in(1));
+        log.info("2 in 1-10 : {}", RangeInt.of(1, 10).in(2));
+        log.info("9 in 1-10 : {}", RangeInt.of(1, 10).in(9));
+        log.info("10 in 1-10 : {}", RangeInt.of(1, 10).in(10));
+        log.info("11 in 1-10 : {}", RangeInt.of(1, 10).in(11));
+        log.info("0 round 1-10 : {}", RangeInt.of(1, 10).round(0));
+        log.info("1 round 1-10 : {}", RangeInt.of(1, 10).round(1));
+        log.info("2 round 1-10 : {}", RangeInt.of(1, 10).round(2));
+        log.info("9 round 1-10 : {}", RangeInt.of(1, 10).round(9));
+        log.info("10 round 1-10 : {}", RangeInt.of(1, 10).round(10));
+        log.info("11 round 1-10 : {}", RangeInt.of(1, 10).round(11));
+        log.info("range int array: {}", RangeInt.of(new Integer[]{9, 8, 1, 5, 4}));
+        log.info("range long array: {}", RangeLong.of(new Long[]{9L, 8L, 1L, 5L, 4L}));
+        log.info("range int list: {}", RangeInt.of(JSON.parseArray("[9, 8, 1, 5, 4]", Integer.class)));
+        log.info("range long list: {}", RangeLong.of(JSON.parseArray("[9, 8, 1, 5, 4]", Long.class)));
+
 
     }
 }

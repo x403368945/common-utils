@@ -40,7 +40,9 @@ public class Rownum {
      * @return {@link Rownum}
      */
     public Rownum set(int value) {
-        if (value < 0) throw new IllegalArgumentException("value 不能小于0");
+        if (value < 0) {
+            throw new IllegalArgumentException("value 不能小于0");
+        }
         this.rownum = value;
         return this;
     }
@@ -59,14 +61,14 @@ public class Rownum {
      *
      * @return int
      */
-    public int rowIndex() {
+    public int index() {
         return rownum - 1;
     }
 
     public static void main(String[] args) {
         final Rownum rownum = Rownum.of(0);
         for (int i = 0; i < 10; i++) {
-            System.out.println(Arrays.asList(rownum.next().get(), rownum.rowIndex()));
+            System.out.println(Arrays.asList(rownum.next().get(), rownum.index()));
         }
     }
 }

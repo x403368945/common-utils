@@ -114,10 +114,12 @@ public class CodeImage {
      */
     private Color getRandColor(int fc, int bc) {
         final Random random = new Random();
-        if (fc > 255)
+        if (fc > 255) {
             fc = 255;
-        if (bc > 255)
+        }
+        if (bc > 255) {
             bc = 255;
+        }
         final int r = fc + random.nextInt(bc - fc);
         final int g = fc + random.nextInt(bc - fc);
         final int b = fc + random.nextInt(bc - fc);
@@ -138,8 +140,9 @@ public class CodeImage {
     public void write(final OutputStream outputStream) {
         Objects.requireNonNull(outputStream, "参数【outputStream】是必须的");
         Objects.requireNonNull(image, "请先生成图片:generate(System.out::println)");
-        if (!ImageIO.write(image, ops.type.name(), outputStream))
+        if (!ImageIO.write(image, ops.type.name(), outputStream)) {
             throw new IOException("Could not write an image of format ".concat(ops.type.name()));
+        }
     }
 
     @SneakyThrows
