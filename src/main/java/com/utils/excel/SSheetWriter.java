@@ -44,7 +44,7 @@ public class SSheetWriter implements ISheetWriter<SSheetWriter>, ISheetWriter.IC
     }
 
     public static SSheetWriter ofNewWorkBook(final String sheetName) {
-        final SXSSFWorkbook wb = new SXSSFWorkbook();
+        final SXSSFWorkbook wb = new SXSSFWorkbook(500);
         wb.createSheet(sheetName);
         return of(wb.getSheet(sheetName));
     }
@@ -170,7 +170,7 @@ public class SSheetWriter implements ISheetWriter<SSheetWriter>, ISheetWriter.IC
         { // 普通写入
             Supplier supplier = () -> {
                 try {
-                    @Cleanup final SXSSFWorkbook workbook = new SXSSFWorkbook();
+                    @Cleanup final SXSSFWorkbook workbook = new SXSSFWorkbook(500);
                     workbook.createSheet("Sheet1");
                     workbook.getSheet("Sheet1").setDefaultColumnWidth(15);
                     // 日期格式样式
@@ -245,7 +245,7 @@ public class SSheetWriter implements ISheetWriter<SSheetWriter>, ISheetWriter.IC
         { // 复制
             Supplier supplier = () -> {
                 try {
-                    @Cleanup final SXSSFWorkbook workbook = new SXSSFWorkbook();
+                    @Cleanup final SXSSFWorkbook workbook = new SXSSFWorkbook(500);
                     workbook.createSheet("Sheet1");
                     workbook.getSheet("Sheet1").setDefaultColumnWidth(15);
                     // 日期格式样式
@@ -338,7 +338,7 @@ public class SSheetWriter implements ISheetWriter<SSheetWriter>, ISheetWriter.IC
         { // 公式重构
             Supplier supplier = () -> {
                 try {
-                    @Cleanup final SXSSFWorkbook workbook = new SXSSFWorkbook();
+                    @Cleanup final SXSSFWorkbook workbook = new SXSSFWorkbook(500);
                     workbook.createSheet("Sheet1");
                     workbook.getSheet("Sheet1").setDefaultColumnWidth(15);
                     SSheetWriter.of(workbook.getSheetAt(0));
@@ -364,7 +364,7 @@ public class SSheetWriter implements ISheetWriter<SSheetWriter>, ISheetWriter.IC
         { // 指定样式来源，测试样式库引用
             Supplier supplier = () -> {
                 try {
-                    @Cleanup final SXSSFWorkbook workbook = new SXSSFWorkbook();
+                    @Cleanup final SXSSFWorkbook workbook = new SXSSFWorkbook(500);
                     workbook.createSheet("Sheet1");
                     workbook.getSheet("Sheet1").setDefaultColumnWidth(15);
                     final SSheetWriter writer = SSheetWriter.of(workbook.getSheetAt(0))
@@ -390,7 +390,7 @@ public class SSheetWriter implements ISheetWriter<SSheetWriter>, ISheetWriter.IC
         { // 写入下拉选项，和批注
             Supplier supplier = () -> {
                 try {
-                    @Cleanup final SXSSFWorkbook workbook = new SXSSFWorkbook();
+                    @Cleanup final SXSSFWorkbook workbook = new SXSSFWorkbook(500);
                     workbook.createSheet("Sheet1");
                     workbook.getSheet("Sheet1").setDefaultColumnWidth(15);
 
@@ -445,7 +445,7 @@ public class SSheetWriter implements ISheetWriter<SSheetWriter>, ISheetWriter.IC
         { // 写入行分组
             Supplier supplier = () -> {
                 try {
-                    @Cleanup final SXSSFWorkbook workbook = new SXSSFWorkbook();
+                    @Cleanup final SXSSFWorkbook workbook = new SXSSFWorkbook(500);
                     workbook.createSheet("Sheet1");
                     workbook.getSheet("Sheet1").setDefaultColumnWidth(15);
 

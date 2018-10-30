@@ -89,7 +89,7 @@ public class Http {
         if (Objects.nonNull(args)) {
             for (Object value : args) // 替换 url 参数占位符
             {
-                url = url.replaceFirst("\\{([a-zA-Z0-9]+)?}", value.toString());
+                url = url.replaceFirst("\\{(\\w+)?}", value.toString());
             }
         }
         this.url = url;
@@ -147,7 +147,7 @@ public class Http {
                         .collect(Collectors.joining("&"));
                 break;
             default:
-                throw new IllegalArgumentException("未处理 content-type:" + type.comment);
+                throw new IllegalArgumentException("未处理 content-type:".concat(type.comment));
         }
         return RequestBody.create(type.mediaType, content);
     }
@@ -332,7 +332,7 @@ public class Http {
                                             Maps.ofSO()
                                                     .put("name", "Jason")
                                                     .put("phone", "18700000000")
-                                                    .buildRoundParams()
+                                                    .jsonKey()
                                     )
                                     .get()
                                     .orElse(EMPTY_RESPONSE)
@@ -346,7 +346,7 @@ public class Http {
                                             Maps.ofSO()
                                                     .put("name", "Jason")
                                                     .put("phone", "18700000000")
-                                                    .buildRoundParams()
+                                                    .jsonKey()
                                     )
                                     .get()
                                     .orElse(EMPTY_RESPONSE)
@@ -360,7 +360,7 @@ public class Http {
                                             Maps.ofSO()
                                                     .put("name", "Jason")
                                                     .put("phone", "18700000000")
-                                                    .buildRoundParams()
+                                                    .jsonKey()
                                     )
                                     .post()
                                     .orElse(EMPTY_RESPONSE)
@@ -374,7 +374,7 @@ public class Http {
                                             Maps.ofSO()
                                                     .put("name", "Jason")
                                                     .put("phone", "18700000000")
-                                                    .buildRoundParams()
+                                                    .jsonKey()
                                     )
                                     .put()
                                     .orElse(EMPTY_RESPONSE)
@@ -388,7 +388,7 @@ public class Http {
                                             Maps.ofSO()
                                                     .put("name", "Jason")
                                                     .put("phone", "18700000000")
-                                                    .buildRoundParams()
+                                                    .jsonKey()
                                     )
                                     .patch()
                                     .orElse(EMPTY_RESPONSE)

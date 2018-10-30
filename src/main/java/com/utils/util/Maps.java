@@ -95,8 +95,8 @@ public class Maps<K, V> {
         return (JSONObject) JSONObject.toJSON(this.values);
     }
 
-    public Map<String, Object> buildRoundParams() {
-        return Maps.bySO("params", json());
+    public Map<String, Object> jsonKey() {
+        return Maps.bySO("json", json());
     }
 
     public String json(SerializerFeature... features) {

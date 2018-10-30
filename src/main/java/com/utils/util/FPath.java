@@ -7,12 +7,19 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.lang.reflect.Array;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 
 /**
@@ -265,6 +272,81 @@ public class FPath {
 ////                log.info(sb.toString());
 //            log.info(System.currentTimeMillis() - start);
 //        }
+    }
+
+    /**
+     * 读取文件内容
+     *
+     * @return byte[]
+     */
+    @SneakyThrows
+    public byte[] readByte() {
+        log.debug("read file:{}", path.toString());
+        return Files.readAllBytes(path);
+//        { // MappedByteBuffer 比 ByteBuffer快 ；按字节读取，在构建String对象时可能产生乱码；必须要读完之后才能toString()
+//            long start = System.currentTimeMillis();
+//            StringBuilder sb = new StringBuilder();
+//            @Cleanup final FileChannel channel = FileChannel.open(path, EnumSet.of(StandardOpenOption.READ));
+//            int allocate = 1024, count = (int) channel.size() / allocate, mode = (int) channel.size() % allocate;
+//            final MappedByteBuffer buffer = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
+//            byte[] bytes = new byte[allocate];
+//            for (int i = 0; i < count; i++) {
+//                buffer.get(bytes);
+//                sb.append(new String(bytes));
+//            }
+//            if (mode > 0) {
+//                buffer.get(bytes, 0, mode);
+//                sb.append(new String(bytes, 0, mode));
+//            }
+////                log.info(sb.toString());
+//            log.info("{}", System.currentTimeMillis() - start);
+//        }
+    }
+
+    /**
+     * 读取文件内容；按 \n 返回所有行
+     *
+     * @return {@link List<String>}
+     */
+    @SneakyThrows
+    public List<String> readLines() {
+        log.debug("read file:{}", path.toString());
+        return Files.readAllLines(path);
+    }
+
+    /**
+     * 读取文件内容；按 \n 返回所有行
+     *
+     * @param charset {@link Charset} 指定编码
+     * @return {@link List<String>}
+     */
+    @SneakyThrows
+    public List<String> readLines(final Charset charset) {
+        log.debug("read file:{}", path.toString());
+        return Files.readAllLines(path, charset);
+    }
+
+    /**
+     * 按 \n 返回流
+     *
+     * @return {@link Stream<String>}
+     */
+    @SneakyThrows
+    public Stream<String> lines() {
+        log.debug("read file:{}", path.toString());
+        return Files.lines(path);
+    }
+
+    /**
+     * 按 \n 返回流
+     *
+     * @param charset {@link Charset} 指定编码
+     * @return {@link List<String>}
+     */
+    @SneakyThrows
+    public Stream<String> lines(final Charset charset) {
+        log.debug("read file:{}", path.toString());
+        return Files.lines(path, charset);
     }
 
     /**
