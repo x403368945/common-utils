@@ -27,7 +27,7 @@ import java.util.zip.ZipOutputStream;
  */
 @AllArgsConstructor
 @Slf4j
-public class FZip {
+public final class FZip {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder

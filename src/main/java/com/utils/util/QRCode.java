@@ -25,7 +25,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class QRCode {
+public final class QRCode {
 
     /**
      * 需要生成二维码的内容

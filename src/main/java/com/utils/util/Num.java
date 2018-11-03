@@ -26,7 +26,7 @@ import static com.utils.util.Num.Pattern.*;
  * @author Jason Xie on 2017/10/26.
  */
 @Slf4j
-public class Num {
+public final class Num {
     /**
      * 枚举：定义数字格式
      */

@@ -19,7 +19,7 @@ import java.util.Objects;
  * @author Jason Xie on 2017/10/31.
  */
 @Slf4j
-public class JSEngine {
+public final class JSEngine {
     private final ScriptEngine engine;
     private static volatile JSEngine instance;
 

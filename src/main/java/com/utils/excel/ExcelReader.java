@@ -27,7 +27,7 @@ import java.util.function.Consumer;
  * @author Jason Xie on 2018-8-8.
  */
 @Slf4j
-public class ExcelReader implements ISheetReader<ExcelReader> {
+public final class ExcelReader implements ISheetReader<ExcelReader> {
     private ExcelReader(final Workbook workbook) {
         this.workbook = workbook;
         this.dataFormatter = new DataFormatter();

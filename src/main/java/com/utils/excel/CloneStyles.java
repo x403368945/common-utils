@@ -12,7 +12,7 @@ import java.util.Objects;
  *
  * @author Jason Xie on 2018-8-8.
  */
-class CloneStyles {
+final class CloneStyles {
     CloneStyles(final StylesTable fromStyleTable, final Workbook toWorkbook) {
         this.toWorkbook = toWorkbook;
         this.fromStyleTable = fromStyleTable;

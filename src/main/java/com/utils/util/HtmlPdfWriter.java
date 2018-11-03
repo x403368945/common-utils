@@ -18,7 +18,7 @@ import static com.utils.enums.Charsets.UTF_8;
  * @author Jason Xie on 2017/12/11.
  */
 @Slf4j
-public class HtmlPdfWriter {
+public final class HtmlPdfWriter {
     private HtmlPdfWriter() {
     }
 

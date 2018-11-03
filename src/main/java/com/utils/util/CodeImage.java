@@ -23,7 +23,7 @@ import java.util.stream.Stream;
  * @author Jason Xie on 2017/11/21.
  */
 @AllArgsConstructor
-public class CodeImage {
+public final class CodeImage {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder

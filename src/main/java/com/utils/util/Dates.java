@@ -25,7 +25,7 @@ import static java.util.Calendar.*;
  * @author Jason Xie on 2017/10/28.
  */
 @Slf4j
-public class Dates {
+public final class Dates {
     private static final TimeZone TIME_ZONE = TimeZone.getTimeZone("GMT+8");
 
     /**

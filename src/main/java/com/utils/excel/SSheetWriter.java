@@ -1,6 +1,5 @@
 package com.utils.excel;
 
-import com.alibaba.fastjson.JSON;
 import com.utils.enums.Colors;
 import com.utils.excel.entity.Cell;
 import com.utils.excel.entity.Position;
@@ -33,7 +32,7 @@ import java.util.stream.Collectors;
  * @author Jason Xie on 2018-8-8.
  */
 @Slf4j
-public class SSheetWriter implements ISheetWriter<SSheetWriter>, ISheetWriter.ICopyRows<SSheetWriter> {
+public final class SSheetWriter implements ISheetWriter<SSheetWriter>, ISheetWriter.ICopyRows<SSheetWriter> {
     private SSheetWriter(final SXSSFSheet sheet, final Options ops) {
         this.ops = Objects.isNull(ops) ? Options.builder().build() : ops;
         this.workbook = sheet.getWorkbook();

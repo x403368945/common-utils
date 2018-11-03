@@ -20,7 +20,7 @@ import java.util.Objects;
  * @author Jason Xie on 2018-8-8.
  */
 @Slf4j
-public class ExcelRewriter implements ISheetWriter<ExcelRewriter>, ISheetReader<ExcelRewriter>, ISheetWriter.ICopyRows<ExcelRewriter> {
+public final class ExcelRewriter implements ISheetWriter<ExcelRewriter>, ISheetReader<ExcelRewriter>, ISheetWriter.ICopyRows<ExcelRewriter> {
     private ExcelRewriter(final Workbook workbook, final Options ops) {
         this.ops = Objects.isNull(ops) ? Options.builder().build() : ops;
         this.workbook = workbook;

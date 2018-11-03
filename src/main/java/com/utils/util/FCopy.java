@@ -23,7 +23,7 @@ import java.util.*;
  */
 @AllArgsConstructor
 @Slf4j
-public class FCopy {
+public final class FCopy {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder

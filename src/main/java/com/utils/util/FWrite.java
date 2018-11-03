@@ -21,7 +21,7 @@ import static java.nio.file.StandardOpenOption.APPEND;
  * @author Jason Xie on 2017/10/30.
  */
 @Slf4j
-public class FWrite {
+public final class FWrite {
     public static FWrite of(File file) {
         return new FWrite(file);
     }

@@ -15,7 +15,7 @@ import java.util.Objects;
  * @author Jason Xie on 2018-10-3
  */
 @Slf4j
-public class Maps<K, V> {
+public final class Maps<K, V> {
     private final Map<K, V> values;
 
     public static Maps<Object, Object> of() {

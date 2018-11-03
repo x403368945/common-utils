@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
  * @author Jason Xie on 2018-8-8.
  */
 @Slf4j
-public class XSheetWriter implements ISheetWriter<XSheetWriter>, ISheetWriter.ICopyRows<XSheetWriter> {
+public final class XSheetWriter implements ISheetWriter<XSheetWriter>, ISheetWriter.ICopyRows<XSheetWriter> {
     private XSheetWriter(final XSSFSheet sheet, final Options ops) {
         this.ops = Objects.isNull(ops) ? Options.builder().build() : ops;
         this.workbook = sheet.getWorkbook();

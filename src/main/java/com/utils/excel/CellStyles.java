@@ -23,7 +23,7 @@ import java.util.Optional;
 @Builder
 @Data
 @Accessors(chain = true)
-public class CellStyles
+public final class CellStyles
 //        implements CellStyle
 {
     /**

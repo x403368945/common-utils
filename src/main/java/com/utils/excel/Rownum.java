@@ -7,7 +7,7 @@ import java.util.Arrays;
  *
  * @author Jason Xie on 2017/10/22.
  */
-public class Rownum {
+public final class Rownum {
     private Rownum(int rownum) {
         this.rownum = rownum;
     }

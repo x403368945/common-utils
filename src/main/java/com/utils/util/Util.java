@@ -21,7 +21,7 @@ import java.util.stream.Stream;
  * @author Jason Xie 2016-11-23
  */
 @Slf4j
-public class Util {
+public final class Util {
     /**
      * 获取UUID；中间的 - 剔除
      *

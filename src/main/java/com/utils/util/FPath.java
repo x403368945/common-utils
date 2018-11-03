@@ -28,7 +28,7 @@ import java.util.stream.Stream;
  * @author Jason Xie on 2018/1/16.
  */
 @Slf4j
-public class FPath {
+public final class FPath {
     private Path path;
 
     private FPath(final Path path) {
