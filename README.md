@@ -117,7 +117,7 @@ com.utils.util.FZip:类:文件及文件夹压缩操作
 com.utils.util.HtmlPdfWriter:类:将html页面写入pdf；依赖：https://github.com/itext/itextpdf  
 com.utils.util.JSEngine:类:挂起JS引擎，执行JS代码    
 com.utils.util.Maps:类:链式构建Map  
-com.utils.util.Num:类:数字操作
+com.utils.util.Num:类:数字操作  
 com.utils.util.Num#Range:类:数字区间操作  
 com.utils.util.Num#RangeInt:类:int数字区间操作  
 com.utils.util.Num#RangeLong:类:long数字区间操作  
