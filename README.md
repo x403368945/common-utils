@@ -16,8 +16,8 @@ git clone https://github.com/x403368945/common-utils.git
 编译安装 jar 包到本地仓库
 ```
 mvn install
-# mvn install 会默认会打包源码并跳过测试
-# mvn source:jar install -Dmaven.test.skip=true
+# 默认会打包源码并跳过测试
+# mvn install == mvn source:jar install -Dmaven.test.skip=true
 ```
 maven 依赖
 ```
@@ -50,7 +50,7 @@ maven 依赖
 //   优点：代码量少逻辑简单；
 //   缺点：JPA 只支持 ID 字段作为更新条件
 // 方案2【推荐】：代码构建需要更新的字段，因为数据库有些字段可能不适合设置默认值
-//   优点：更灵活，场景可适配；大部分场景下，只有ID作为更新匹配条件无法满足需求
+//   优点：更灵活，场景可适配；可以使用 ID 组合其他字段作为更新匹配条件
 //   缺点：代码量增加
 
 @NoArgsConstructor：生成无参构造函数
