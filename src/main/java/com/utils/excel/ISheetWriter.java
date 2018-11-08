@@ -216,12 +216,22 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
      * @return <T extends ISheetWriter>
      */
     default T cellOfNew(final int columnIndex) {
-        cell(Optional
+        return cell(Optional
                 .ofNullable(getRow().getCell(columnIndex))
                 .orElseGet(() -> getRow().createCell(columnIndex, CellType.BLANK))
         );
-        return (T) this;
     }
+
+    /**
+     * 选择操作单元格，当单元格不存在时创建单元格，并设置单元格类型为 CellType.BLANK
+     *
+     * @param column {@link Column} 列名
+     * @return <T extends ISheetWriter>
+     */
+    default T cellOfNew(final Column column) {
+        return cellOfNew(column.ordinal());
+    }
+
 
     /**
      * 新建操作单元格
@@ -230,8 +240,17 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
      * @return <T extends ISheetWriter>
      */
     default T cellNew(final int columnIndex) {
-        cell(getRow().createCell(columnIndex, CellType.BLANK));
-        return (T) this;
+        return cell(getRow().createCell(columnIndex, CellType.BLANK));
+    }
+
+    /**
+     * 新建操作单元格
+     *
+     * @param column {@link Column} 列名
+     * @return <T extends ISheetWriter>
+     */
+    default T cellNew(final Column column) {
+        return cellOfNew(column.ordinal());
     }
 
     /**
@@ -350,6 +369,18 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
     default T freeze(final int column, final int row) {
         getSheet().createFreezePane(column, row);
         return (T) this;
+    }
+
+    /**
+     * 冻结行和列<br>
+     * freeze(1, 1) : 表示冻结第 1 列和第 1 行
+     *
+     * @param column Column 冻结列号；为0表示不冻结或取消冻结
+     * @param row    int 冻结行号；为0表示不冻结或取消冻结
+     * @return <T extends ISheetWriter>
+     */
+    default T freeze(final Column column, final int row) {
+        return freeze(column.ordinal() + 1, row);
     }
 
     /**
@@ -600,6 +631,17 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
     /**
      * 设置列分组
      *
+     * @param fromColumn {@link Column}  起始列，包含
+     * @param toColumn   {@link Column}  结束列，包含
+     * @return <T extends ISheetWriter>
+     */
+    default T groupColumn(final Column fromColumn, final Column toColumn) {
+        return groupColumn(fromColumn.ordinal(), toColumn.ordinal());
+    }
+
+    /**
+     * 设置列分组
+     *
      * @param range {@link com.utils.util.Num.RangeInt} 分组列索引区间
      * @return <T extends ISheetWriter>
      */
@@ -629,6 +671,16 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
     default T hideColumn(final int columnIndex) {
         getSheet().setColumnHidden(columnIndex, true);
         return (T) this;
+    }
+
+    /**
+     * 隐藏列
+     *
+     * @param column {@link Column} 隐藏列
+     * @return <T extends ISheetWriter>
+     */
+    default T hideColumn(final Column column) {
+        return hideColumn(column.ordinal());
     }
 
     /**

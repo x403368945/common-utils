@@ -138,7 +138,7 @@ public enum Column {
         Objects.requireNonNull(rownums, "参数【rownums】是必须的");
         return rownums.isEmpty()
                 ? ""
-                : String.format("SUM(%s)", rownums.stream().map(this::address).collect(joining(",")));
+                : rownums.stream().map(this::address).collect(joining("+"));
     }
 
     /**
@@ -182,7 +182,7 @@ public enum Column {
         Objects.requireNonNull(rownums, "参数【rownums】是必须的");
         return rownums.isEmpty()
                 ? ""
-                : String.format("AVG(%s)", rownums.stream().map(this::address).collect(joining(",")));
+                : String.format("(%s)/%d", rownums.stream().map(this::address).collect(joining("+")), rownums.size());
     }
 
     /**
