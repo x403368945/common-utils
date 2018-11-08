@@ -99,7 +99,7 @@ public final class QRCode {
                             .height(100)
                             .width(100)
                             .type(Image.JPEG)
-                            .text("http://anavss.com")
+                            .text("http://github.com")
                             .build()
                             .write(
                                     Paths.get("logs", "二维码.jpeg").toAbsolutePath().toFile()
@@ -111,7 +111,7 @@ public final class QRCode {
                             .height(100)
                             .width(100)
                             .type(Image.PNG)
-                            .text("http://anavss.com")
+                            .text("http://github.com")
                             .build()
                             .write(
                                     Paths.get("logs", "二维码.png").toAbsolutePath().toFile()
@@ -123,7 +123,7 @@ public final class QRCode {
                             .height(100)
                             .width(100)
                             .type(Image.JPEG)
-                            .text("http://anavss.com")
+                            .text("http://github.com")
                             .build()
                             .base64()
             );
@@ -132,7 +132,7 @@ public final class QRCode {
                             .height(100)
                             .width(100)
                             .type(Image.PNG)
-                            .text("http://anavss.com")
+                            .text("http://github.com")
                             .build()
                             .base64()
             );

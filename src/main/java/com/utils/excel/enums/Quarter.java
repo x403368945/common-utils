@@ -12,10 +12,10 @@ import java.util.Objects;
  */
 public enum Quarter {
     // 第一季度
-    One("第一季度"),
-    Two("第二季度"),
-    Three("第三季度"),
-    Four("第四季度"),
+    ONE("第一季度"),
+    TWO("第二季度"),
+    THREE("第三季度"),
+    FOUR("第四季度"),
     ;
     /**枚举属性说明*/
     final String comment;
@@ -46,28 +46,28 @@ public enum Quarter {
         }
         Header.HeaderBuilder builder = Header.builder().type(DataType.NUMBER);
         {
-            builder.group(One.comment);
+            builder.group(ONE.comment);
             headers.add(builder.index(startIndex++).label("1月").build());
             headers.add(builder.index(startIndex++).label("2月").build());
             headers.add(builder.index(startIndex++).label("3月").build());
             headers.add(builder.index(startIndex++).label("合计").build());
         }
         {
-            builder.group(Two.comment);
+            builder.group(TWO.comment);
             headers.add(builder.index(startIndex++).label("4月").build());
             headers.add(builder.index(startIndex++).label("5月").build());
             headers.add(builder.index(startIndex++).label("6月").build());
             headers.add(builder.index(startIndex++).label("合计").build());
         }
         {
-            builder.group(Three.comment);
+            builder.group(THREE.comment);
             headers.add(builder.index(startIndex++).label("7月").build());
             headers.add(builder.index(startIndex++).label("8月").build());
             headers.add(builder.index(startIndex++).label("9月").build());
             headers.add(builder.index(startIndex++).label("合计").build());
         }
         {
-            builder.group(Four.comment);
+            builder.group(FOUR.comment);
             headers.add(builder.index(startIndex++).label("10月").build());
             headers.add(builder.index(startIndex++).label("11月").build());
             headers.add(builder.index(startIndex++).label("12月").build());

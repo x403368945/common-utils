@@ -196,11 +196,5 @@ public enum Column {
     }
 
     public static void main(String[] args) {
-        for (Column n1 : Column.values()) {
-            for (Column n2 : Column.values()) {
-                System.out.print(n1.name() + n2.name() + ",");
-            }
-            System.out.println("");
-        }
     }
 }

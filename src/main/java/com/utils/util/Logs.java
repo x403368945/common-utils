@@ -45,12 +45,12 @@ public final class Logs {
         if (Objects.isNull(home)) {
             home = File.separator;
         }
-        uid = '_' + ((Objects.nonNull(uid) && uid.length() > 0) ? uid : String.format("%06d", new Random().nextInt(999999)));
+        uid = (Objects.nonNull(uid) && uid.length() > 0) ? uid : String.format("%06d", new Random().nextInt(999999));
         this.filePath = Paths.get(
                 home,
                 "logs",
                 clazz.getSimpleName(),
-                new SimpleDateFormat("yyyyMMddHHmmssSSS").format(System.currentTimeMillis()) + uid + ".log"
+                new SimpleDateFormat("yyyyMMddHHmmssSSS").format(System.currentTimeMillis()).concat("_").concat(uid).concat(".log")
         ).toAbsolutePath().toString();
         final File file = new File(filePath);
         file.getParentFile().mkdirs();

@@ -51,7 +51,7 @@ public enum DataType {
             );
             sb.append("});").append("\n");
             sb.append("// 枚举值转换为选项集合").append("\n");
-            sb.append(String.format("const %sOptions = [", className)).append("\n");
+            sb.append(String.format("export const %sOptions = [", className)).append("\n");
             Stream.of(DataType.values()).forEach(item -> sb.append(
                     "\t{value: {class}.{name}.value, label: {class}.{name}.comment},"
                             .replace("{class}", className)
@@ -59,7 +59,7 @@ public enum DataType {
                     ).append("\n")
             );
             sb.append("];").append("\n");
-            sb.append("export {\n\t{class} as default, \n\t{class}Options as options\n};".replace("{class}", className));
+            sb.append("export default {class};".replace("{class}", className));
             System.out.println(
                     "JS文件输出路径：\n" +
                             FWrite.of("logs", className.concat(".js")).write(sb.toString()).getAbsolute().orElse(null));

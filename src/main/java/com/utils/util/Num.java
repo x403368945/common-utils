@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -26,7 +27,7 @@ import static com.utils.util.Num.Pattern.*;
  * @author Jason Xie on 2017/10/26.
  */
 @Slf4j
-public final class Num {
+public class Num {
     /**
      * 枚举：定义数字格式
      */
@@ -47,25 +48,48 @@ public final class Num {
         // 带千位符，保留2位小数
         SDOUBLE("#,##0.00"),
         // 带千位符，保留 fixed 位小数；调用value(fixed)方法指定fixed
-        SAUTO("#,##0"),;
+        SAUTO("#,##0"),
+        ;
         /**
          * 格式
          */
         final String pattern;
+        final Function<Number, String> format;
+        final BiFunction<Number, Integer, String> fixed;
 
-        Pattern(String pattern) {
+        Pattern(final String pattern) {
             this.pattern = pattern;
-        }
-
-        public String value() {
-            return pattern;
-        }
-
-        public String value(int fixed) {
-            if (fixed <= 0) {
-                return pattern;
+            this.format = v -> new DecimalFormat(pattern).format(v);
+            switch (this.name()) {
+                case "AUTO":
+                case "SAUTO":
+                    this.fixed = (v, fixed) ->
+                            new DecimalFormat((fixed <= 0) ? this.pattern : this.pattern.concat(".").concat(String.format("%0{fixed}d".replace("{fixed}", Objects.toString(fixed)), 0))).format(v);
+                    break;
+                default:
+                    this.fixed = null;
             }
-            return pattern + '.' + String.format("%0{fixed}d".replace("{fixed}", fixed + ""), 0);
+        }
+
+        /**
+         * 格式化数字
+         *
+         * @param v {@link Number} 被格式化值
+         * @return {@link String}
+         */
+        public String format(final Number v) {
+            return format.apply(v);
+        }
+
+        /**
+         * 格式化数字
+         *
+         * @param v     {@link Number} 被格式化值
+         * @param fixed {@link int} 保留小数位
+         * @return {@link String}
+         */
+        public String format(final Number v, final int fixed) {
+            return this.fixed.apply(v, fixed);
         }
     }
 
@@ -716,7 +740,7 @@ public final class Num {
             return null;
         }
         if (Objects.isNull(pattern)) {
-            pattern = Pattern.DOUBLE.value();
+            return Pattern.DOUBLE.format(value);
         }
         return new DecimalFormat(pattern).format(value);
     }
@@ -732,9 +756,9 @@ public final class Num {
             return null;
         }
         if (Objects.isNull(pattern)) {
-            pattern = Pattern.DOUBLE;
+            return Pattern.DOUBLE.format(value);
         }
-        return new DecimalFormat(pattern.value()).format(value);
+        return pattern.format(value);
     }
 
     /**
@@ -746,7 +770,7 @@ public final class Num {
         if (Objects.isNull(value)) {
             return null;
         }
-        return new DecimalFormat(SDOUBLE.value()).format(value);
+        return SDOUBLE.format(value);
     }
 
     @Override
@@ -798,16 +822,17 @@ public final class Num {
         log.info(Num.of("-1000000").format(FLOAT));
         log.info(Num.of(1000000).format(DOUBLE));
         log.info(Num.of("-1000000").format(DOUBLE));
-        log.info(Num.of(1000000).format(AUTO.value(4)));
-        log.info(Num.of("-1000000").format(AUTO.value(4)));
+
         log.info(Num.of(1000000).format(SLONG));
         log.info(Num.of("-1000000").format(SLONG));
         log.info(Num.of(1000000).format(SFLOAT));
         log.info(Num.of("-1000000").format(SFLOAT));
         log.info(Num.of(1000000).format(SDOUBLE));
         log.info(Num.of("-1000000").format(SDOUBLE));
-        log.info(Num.of(1000000).format(SAUTO.value(4)));
-        log.info(Num.of("-1000000").format(SAUTO.value(4)));
+        log.info(AUTO.format(1000000, 4));
+        log.info(AUTO.format(-1000000, 4));
+        log.info(SAUTO.format(1000000, 4));
+        log.info(SAUTO.format(-1000000, 4));
 
         log.info(">>>>>>>");
         log.info("0 in 1-10 : {}", RangeInt.of(1, 10).in(0));

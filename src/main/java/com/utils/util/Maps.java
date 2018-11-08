@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * 构建Map对象，支持链式请求
+ * 构建Map对象，支持链式构建
  * @author Jason Xie on 2018-10-3
  */
 @Slf4j

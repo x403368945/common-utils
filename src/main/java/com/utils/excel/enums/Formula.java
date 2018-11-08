@@ -6,7 +6,6 @@ import com.utils.excel.entity.Range;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * 枚举：Excel 基本公式操作
@@ -15,7 +14,8 @@ import java.util.stream.Collectors;
  */
 public enum Formula {
     SUM("求和"),
-    AVG("求平均值"),;
+    AVG("求平均值"),
+    ;
 
     final String comment;
 
@@ -69,17 +69,22 @@ public enum Formula {
 
     /**
      * 按单元格坐标构建函数
-     * SUM(A1,A2,A10)
-     * AVG(A1,A2,B10)
+     * SUM(A1,A2,A10) ; SUM(这里有数量限制 30 )
+     * AVG(A1,A2,B10) ; AVG(这里有数量限制 30 )
      *
      * @param address {@link List<String:address:A1>}
      * @return {@link String}
      */
     public String of(final List<String> address) {
         Objects.requireNonNull(address, "参数【address】是必须的");
-        return address.isEmpty()
-                ? ""
-                : String.format("%s(%s)", this.name(), address.stream().collect(Collectors.joining(",")));
+        if (address.isEmpty()) return "";
+        switch (this) {
+            case SUM:
+                return String.join("+", address);
+            case AVG:
+                return String.format("(%s)/%d", String.join("+", address), address.size());
+        }
+        throw new NullPointerException(String.format("未实现逻辑【%s】", this.name()));
     }
 
     /**

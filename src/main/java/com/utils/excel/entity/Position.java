@@ -50,7 +50,7 @@ public class Position {
         ++index;
         do {
             column = Objects.toString((char) (((index - 1) % 26) + 65)).concat(column);
-            index = Double.valueOf(Math.floor((index - 1) / 26)).intValue();
+            index = Double.valueOf(Math.floor((index - 1.0) / 26)).intValue();
         } while (index > 0);
         return new Position(0, column);
     }
@@ -75,7 +75,7 @@ public class Position {
         ++index;
         do {
             column = Objects.toString((char) (((index - 1) % 26) + 65)).concat(column);
-            index = Double.valueOf(Math.floor((index - 1) / 26)).intValue();
+            index = Double.valueOf(Math.floor((index - 1.0) / 26)).intValue();
         } while (index > 0);
         this.column = column;
         return this;
