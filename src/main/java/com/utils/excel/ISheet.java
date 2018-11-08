@@ -225,10 +225,47 @@ public interface ISheet<T> {
     }
 
     /**
+     * 判断 sheet 是否为隐藏状态
+     *
+     * @return boolean true：隐藏
+     */
+    default boolean isHiddenSheet() {
+        return getWorkbook().isSheetHidden(getWorkbook().getSheetIndex(getSheet()));
+    }
+
+    /**
+     * 获取 sheet 总数
+     *
+     * @return int
+     */
+    default int sheetCount() {
+        return getWorkbook().getNumberOfSheets();
+    }
+
+    /**
+     * 获取 sheet 索引
+     *
+     * @return int
+     */
+    default int sheetIndex() {
+        return getWorkbook().getSheetIndex(getSheet());
+    }
+
+    /**
+     * 获取 sheet 名称
+     *
+     * @return {@link String}
+     */
+    default String sheetName() {
+        return getSheet().getSheetName();
+    }
+
+    /**
      * 关闭 Workbook 对象
      */
     @SneakyThrows
     default void close() {
         getWorkbook().close();
     }
+
 }
