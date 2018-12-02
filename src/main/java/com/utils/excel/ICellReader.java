@@ -102,20 +102,15 @@ interface ICellReader<T extends ICellReader> {
                 }
                 // Cell.getCachedFormulaResultTypeEnum() 可以判断公式计算结果得出的数据类型；前置条件必须是 Cell.getCellTypeEnum() = CellType.FORMULA
                 switch (getCell().getCachedFormulaResultType()) {
-                    case _NONE:
-                        break;
                     case NUMERIC:
-                        return Optional.of(getCell().getNumericCellValue());
+                    return Optional.of(getCell().getNumericCellValue());
                     case STRING:
-                        return Optional.of(getCell().getStringCellValue());
+                    return Optional.of(getCell().getStringCellValue());
+                    case _NONE:
                     case FORMULA:
-                        break;
                     case BLANK:
-                        break;
                     case BOOLEAN:
-                        break;
                     case ERROR:
-                        break;
                     default:
                         break;
                 }

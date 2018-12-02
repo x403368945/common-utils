@@ -58,7 +58,7 @@ public enum Formula {
      * SUM(A1:A10)
      * AVG(A1:B10)
      *
-     * @param range {@link Range:<start:A1, end:A10>}
+     * @param range {@link Range:{start:A1, end:A10>}}
      * @return {@link String}
      */
     public String of(final Range range) {

@@ -131,7 +131,7 @@ public enum Column {
     /**
      * SUM(A1,A2,A10)
      *
-     * @param rownums {@link List <Integer:rownum:1>}
+     * @param rownums {@link List<Integer:rownum:1>}
      * @return {@link String}
      */
     public String sum(final List<Integer> rownums) {
@@ -175,7 +175,7 @@ public enum Column {
     /**
      * AVG(A1,A2,A10)
      *
-     * @param rownums {@link List <Integer:rownum:1>}
+     * @param rownums {@link List<Integer:rownum:1>}
      * @return {@link String}
      */
     public String avg(final List<Integer> rownums) {

@@ -209,7 +209,7 @@ public final class CellStyles
      * @return CellStyle
      */
     public CellStyle append(final CellStyle style) {
-        XSSFCellStyle cellStyle = (XSSFCellStyle) style;
+        final XSSFCellStyle cellStyle = (XSSFCellStyle) style;
         if (Objects.isNull(cellStyle)) return null;
         if (Objects.nonNull(dataFormat)) cellStyle.setDataFormat(dataFormat);
         if (Objects.nonNull(font)) cellStyle.setFont(font);
