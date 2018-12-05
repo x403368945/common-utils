@@ -1,23 +1,29 @@
 package com.utils.util;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.utils.excel.enums.Week;
-import lombok.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.util.Calendar.*;
+import static com.utils.util.Dates.Pattern.*;
 
 /**
  * 日期处理类
@@ -26,140 +32,73 @@ import static java.util.Calendar.*;
  */
 @Slf4j
 public final class Dates {
-    private static final TimeZone TIME_ZONE = TimeZone.getTimeZone("GMT+8");
+    private static final ZoneId ZONE_ID = ZoneId.of("GMT+8");
 
     /**
      * 枚举：定义日期格式
      */
     public enum Pattern {
-        // 年度
-        yyyy("yyyy"),
-        MM("MM"),
-        dd("dd"),
-        HH_mm_ss("HH:mm:ss"),
-        HH_mm("HH:mm"),
-        HH("HH"),
-        mm("mm"),
-        ss("ss"),
+        yyyy_MM_dd_HH_mm_ss_SSS("yyyy-MM-dd HH:mm:ss.SSS"),
+        yyyy_MM_dd_HH_mm_ss("yyyy-MM-dd HH:mm:ss"),
         yyyy_MM_dd("yyyy-MM-dd"),
         yyyy_MM("yyyy-MM"),
+        yy_MM_dd("yy-MM-dd"),
+        HH_mm_ss("HH:mm:ss"),
+        HH_mm("HH:mm"),
+
+        yyyyMMddHHmmssSSS("yyyyMMddHHmmssSSS"),
+        yyyyMMddHHmmss("yyyyMMddHHmmss"),
         yyyyMMdd("yyyyMMdd"),
         yyyyMM("yyyyMM"),
-        yyyy_MM_dd_HH_mm_ss("yyyy-MM-dd HH:mm:ss"),
-        yyyy_MM_dd_HHmmss("yyyy-MM-dd HHmmss"),
-        yyyyMMddHHmmss("yyyyMMddHHmmss"),
-        yyyyMMddHHmmssSSS("yyyyMMddHHmmssSSS"),
-        yy_MM_dd("yy-MM-dd"),
         HHmmssSSS("HHmmssSSS"),
         HHmmss("HHmmss"),
 
         zh_yyyy_MM_dd_HH_mm_ss("yyyy年MM月dd日 HH时mm分"),
         zh_yyyy_MM_dd("yyyy年MM月dd日"),
-        zh_yyyy_MM("yyyy年MM月"),;
+        zh_yyyy_MM("yyyy年MM月"),
+        ;
         /**
          * 枚举属性说明
          */
         private final String comment;
+        private final DateTimeFormatter formatter;
 
         public String value() {
             return this.comment;
         }
 
-        Pattern(String comment) {
+        Pattern(final String comment) {
             this.comment = comment;
-        }
-    }
-
-    /**
-     * @deprecated 未完善, 暂时不可用
-     */
-    @AllArgsConstructor
-    @Builder
-    @Accessors(fluent = true, chain = true)
-    @Deprecated
-    public static class DateObject {
-        private static DateObject parse(String jsonText) { // "{'y':0,'m':0,'d':0,'h':0,'mm':0,'s':0,'ms':0}"
-            JSONObject obj = JSON.parseObject(jsonText.replace("'", "\""));
-            int y = obj.getIntValue("y");
-            int m = obj.getIntValue("m");
-            int d = obj.getIntValue("d");
-            int h = obj.getIntValue("h");
-            int mm = obj.getIntValue("mm");
-            int s = obj.getIntValue("s");
-            int ms = obj.getIntValue("ms");
-            DateObject dateObject = DateObject.builder().y(y).m(m).d(d).h(h).mm(mm).s(s).ms(ms).build();
-            if (m > 12 && d <= 12) { // m 和 d 交换位置
-                dateObject.m = d;
-                dateObject.d = m;
-            }
-            return dateObject;
+            this.formatter = DateTimeFormatter.ofPattern(comment);
         }
 
         /**
-         * 识别日期格式
+         * 获取日期字符
          *
-         * @param value String
-         * @return {@link DateObject}
+         * @return {@link String}
          */
-        public static DateObject of(String value) {
-            if (Objects.isNull(value) || "".equals(value.trim())) {
-                return DateObject.builder().build();
-            }
-            try {
-                value = value.trim();
-//                "{'y':0,'m':0,'d':0,'h':0,'mm':0,'s':0,'ms':0}"
-                if (value.replace(" ", "").matches("^\\d+$")) { // 纯数字
-                    switch (value.length()) {
-                        case 6: // 6 位数字，时分秒 > HHmmss
-                            return parse(value.replaceAll("^(\\d{2})(\\d{2})(\\d{2})$", "{'y':0,'m':0,'d':0,'h':$1,'mm':$2,'s':$3,'ms':0}"));
-                        case 8: // 8 位数字，年月日 > yyyyMMdd
-                            return parse(value.replaceAll("^(\\d{4})(\\d{2})(\\d{2})$", "{'y':$1,'m':$2,'d':$3,'h':0,'mm':0,'s':0,'ms':0}"));
-                        case 9: // 9 位数字，时分秒毫秒 > HHmmssSSS
-                            return parse(value.replaceAll("^(\\d{2})(\\d{2})(\\d{2})(\\d{3})$", "{'y':0,'m':0,'d':0,'h':$1,'mm':$2,'s':$3,'ms':$4}"));
-                        case 14: // 14 位数字，年月日时分秒 > yyyyMMddHHmmss
-                            return parse(value.replaceAll("^(\\d{4})(\\d{2})(\\d{2})(\\d{2})(\\d{2})(\\d{2})$", "{'y':$1,'m':$2,'d':$3,'h':$4,'mm':$5,'s':$6,'ms':0}"));
-                        case 17: // 17 位数字，年月日时分秒毫秒 > yyyyMMddHHmmssSSS
-                            return parse(value.replaceAll("^(\\d{4})(\\d{2})(\\d{2})(\\d{2})(\\d{2})(\\d{2})(\\d{3})$", "{'y':$1,'m':$2,'d':$3,'h':$4,'mm':$5,'s':$6,'ms':$7}"));
-                        default:
-                            throw new IllegalArgumentException("未识别的日期格式");
-                    }
-                }
-                if (value.matches("^\\d{4}.\\d{1,2}.\\d{1,2} \\d{1,2}.\\d{1,2}.\\d{1,2}$")) { // yyyyMMddHHmmss
-                    return parse(value.replace("^(\\d{4}).(\\d{1,2}).(\\d{1,2}) (\\d{1,2}).(\\d{1,2}).(\\d{1,2})$", "{'y':$1,'m':$2,'d':$3,'h':$4,'mm':$5,'s':$6,'ms':0}"));
-                }
-                if (value.matches("^\\d{4}.\\d{1,2}.\\d{1,2}[T ]\\d{1,2}.\\d{1,2}.\\d{1,2}.\\d{1,3}(Z)?$")) { // yyyyMMddHHmmssSSS
-                    return parse(value.replace("^(\\d{4}).(\\d{1,2}).(\\d{1,2})[T ](\\d{1,2}).(\\d{1,2}).(\\d{1,2}).(\\d{1,3})(Z)?$", "{'y':$1,'m':$2,'d':$3,'h':$4,'mm':$5,'s':$6,'ms':$7}"));
-                }
-                if (value.matches("^\\d{4}.\\d{1,2}.\\d{1,2}$")) { // yyyyMMdd
-                    return parse(value.replaceAll("^(\\d{4})(\\d{1,2})(\\d{1,2})$", "{'y':$1,'m':$2,'d':$3,'h':0,'mm':0,'s':0,'ms':0}"));
-                }
-                if (value.matches("^\\d{1,2}.\\d{1,2}.\\d{1,2}$")) { // hhmmss
-                    return parse(value.replaceAll("^(\\d{2})(\\d{1,2})(\\d{1,2})$", "{'y':0,'m':0,'d':0,'h':$1,'mm':$2,'s':$3,'ms':0}"));
-                }
-                throw new IllegalArgumentException("未识别的日期格式");
-            } catch (Exception e) {
-                throw new IllegalArgumentException("日期转换失败，value:".concat(value));
-            }
+        public String now() {
+            return LocalDateTime.now(ZONE_ID).format(formatter);
         }
 
-        private int y;
-        private int m;
-        private int d;
-        private int h;
-        private int mm;
-        private int s;
-        private int ms;
-
-        public Dates toDates() {
-            return new Dates().year(y).month(m).day(d).h(h).m(mm).s(s).ms(ms);
+        /**
+         * 转换为日期操作对象
+         *
+         * @param value String 日期
+         * @return {@link Dates}
+         */
+        public Dates parse(final String value) {
+            return new Dates(LocalDateTime.parse(value, formatter));
         }
 
-        public Date toDate() {
-            return toDates().date();
-        }
-
-        public Date toTimestamp() {
-            return toDates().timestamp();
+        /**
+         * 格式化日期
+         *
+         * @param value {@link LocalDateTime}
+         * @return {@link String}
+         */
+        public String format(final LocalDateTime value) {
+            return value.format(formatter);
         }
     }
 
@@ -273,33 +212,66 @@ public final class Dates {
     /**
      * 构造时间处理对象：指定时间
      *
-     * @param value Timestamp
+     * @param value {@link LocalDateTime}
+     * @return {@link Dates}
+     */
+    public static Dates of(final LocalDateTime value) {
+        Objects.requireNonNull(value, "参数【value】是必须的");
+        return new Dates(value);
+    }
+
+    /**
+     * 构造时间处理对象：指定时间
+     *
+     * @param value {@link LocalDate}
+     * @return {@link Dates}
+     */
+    public static Dates of(final LocalDate value) {
+        Objects.requireNonNull(value, "参数【value】是必须的");
+        return new Dates(value.atStartOfDay());
+    }
+
+    /**
+     * 构造时间处理对象：指定时间
+     *
+     * @param value {@link LocalTime}
+     * @return {@link Dates}
+     */
+    public static Dates of(final LocalTime value) {
+        Objects.requireNonNull(value, "参数【value】是必须的");
+        return new Dates(value.atDate(LocalDate.now(ZONE_ID)));
+    }
+
+    /**
+     * 构造时间处理对象：指定时间
+     *
+     * @param value {@link Timestamp}
      * @return {@link Dates}
      */
     public static Dates of(final Timestamp value) {
         Objects.requireNonNull(value, "参数【value】是必须的");
-        return new Dates(value.getTime());
+        return new Dates(value.toLocalDateTime());
     }
 
     /**
      * 构造时间处理对象：指定时间
      *
-     * @param value Date
+     * @param value {@link Date}
      * @return {@link Dates}
      */
     public static Dates of(final Date value) {
         Objects.requireNonNull(value, "参数【value】是必须的");
-        return new Dates(value.getTime());
+        return new Dates(new Timestamp(value.getTime()).toLocalDateTime());
     }
 
     /**
      * 构造时间处理对象：指定时间
      *
-     * @param value Timestamp
+     * @param value long
      * @return {@link Dates}
      */
     public static Dates of(final long value) {
-        return new Dates(value);
+        return new Dates(new Timestamp(value).toLocalDateTime());
     }
 
     /**
@@ -313,37 +285,86 @@ public final class Dates {
         Objects.requireNonNull(value, "参数【value】是必须的");
         Objects.requireNonNull(pattern, "参数【pattern】是必须的");
         try {
-            return new Dates(new SimpleDateFormat(pattern.value()).parse(value).getTime());
+            return of(new SimpleDateFormat(pattern.value()).parse(value).getTime());
+//            return pattern.parse(value); // LocalDateTime 容错性低，格式必须完全匹配才能转换
         } catch (ParseException e) {
             throw new IllegalArgumentException(String.format("日期转换失败，value:%s > pattern:%s", value, pattern));
         }
     }
 
+    /**
+     * 构造时间处理对象
+     *
+     * @param value String 日期字符串
+     * @return {@link Dates}
+     */
+    public static Dates parse(String value) {
+        Objects.requireNonNull(value, "参数【value】是必须的");
+        Objects.requireNonNull("".equals(value.trim()) ? null : "", "参数【value】是必须的");
+        try {
+            value = value.trim().replaceAll("[^\\d]", "");
+            String pattern;
+            switch (value.length()) {
+                case 17:
+                    pattern = Integer.valueOf(value.substring(4, 6)) > 12 ? "yyyyddMMHHmmssSSS" : "yyyyMMddHHmmssSSS";
+                    break;
+                case 14:
+                    pattern = Integer.valueOf(value.substring(4, 6)) > 12 ? "yyyyddMMHHmmss" : "yyyyMMddHHmmss";
+                    break;
+                case 9:
+                    pattern = "HHmmssSSS";
+                    break;
+                case 8:
+                    pattern = Integer.valueOf(value.substring(4, 6)) > 12 ? "yyyyddMM" : "yyyyMMdd";
+                    break;
+                case 6:
+                    pattern = "HHmmss";
+                    break;
+                default:
+                    throw new IllegalArgumentException("未识别的日期格式:".concat(value));
+            }
+            return of(new SimpleDateFormat(pattern).parse(value).getTime());
+//            return new Dates(LocalDateTime.parse(value, DateTimeFormatter.ofPattern(pattern)));
+        } catch (ParseException e) {
+            e.printStackTrace();
+            throw new IllegalArgumentException(String.format("日期转换失败，value:%s", value));
+        }
+    }
+
+
     private Dates() {
+        this.obj = LocalDateTime.now();
     }
 
-    private Dates(long value) {
-        this.calendar.setTimeInMillis(value);
+    private Dates(final LocalDateTime value) {
+        this.obj = value;
     }
 
-    private final Calendar calendar = Calendar.getInstance(TIME_ZONE);
+    private LocalDateTime obj;
+
+    /**
+     * @return {@link LocalDateTime}
+     */
+    public LocalDateTime get() {
+        return obj;
+    }
 
     /**
      * 转换为long
      *
      * @return long
      */
-    public long get() {
-        return calendar.getTimeInMillis();
+    public long getTimeMillis() {
+        return Timestamp.valueOf(obj).getTime();
     }
 
     /**
      * 转换为 Timestamp
      *
-     * @return Timestamp
+     * @return {@link Timestamp}
      */
     public Timestamp timestamp() {
-        return new Timestamp(calendar.getTimeInMillis());
+        return Timestamp.valueOf(obj);
     }
 
     /**
@@ -352,29 +373,29 @@ public final class Dates {
      * @return {@link Date}
      */
     public Date date() {
-        return calendar.getTime();
+        return Timestamp.valueOf(obj);
     }
 
     /**
      * 格式化为字符串, 必须指定格式
      *
-     * @param pattern Pattern
+     * @param pattern {@link Pattern}
      * @return String
      */
     public String format(final Pattern pattern) {
         Objects.requireNonNull(pattern, "参数【pattern】是必须的");
-        return format(pattern.value());
+        return pattern.format(obj);
     }
 
     /**
      * 格式化为字符串, 必须指定格式
      *
-     * @param pattern Pattern
+     * @param pattern {@link Pattern}
      * @return String
      */
     public String format(final String pattern) {
         Objects.requireNonNull(pattern, "参数【pattern】是必须的");
-        return new SimpleDateFormat(pattern).format(calendar.getTime());
+        return obj.format(DateTimeFormatter.ofPattern(pattern));
     }
 
     /**
@@ -383,7 +404,7 @@ public final class Dates {
      * @return String
      */
     public String formatDate() {
-        return format(Pattern.yyyy_MM_dd);
+        return yyyy_MM_dd.format(obj);
     }
 
     /**
@@ -392,7 +413,7 @@ public final class Dates {
      * @return String
      */
     public String formatTime() {
-        return format(Pattern.HH_mm_ss);
+        return HH_mm_ss.format(obj);
     }
 
     /**
@@ -401,7 +422,7 @@ public final class Dates {
      * @return String
      */
     public String formatDateTime() {
-        return format(Pattern.yyyy_MM_dd_HH_mm_ss);
+        return yyyy_MM_dd_HH_mm_ss.format(obj);
     }
 
     /**
@@ -410,7 +431,7 @@ public final class Dates {
      * @return int
      */
     public int year() {
-        return calendar.get(YEAR);
+        return obj.getYear();
     }
 
     /**
@@ -419,7 +440,7 @@ public final class Dates {
      * @return int
      */
     public int month() {
-        return calendar.get(MONTH) + 1;
+        return obj.getMonthValue();
     }
 
     /**
@@ -428,7 +449,7 @@ public final class Dates {
      * @return int
      */
     public int day() {
-        return calendar.get(DAY_OF_MONTH);
+        return obj.getDayOfMonth();
     }
 
     /**
@@ -437,7 +458,7 @@ public final class Dates {
      * @return {@link Week}
      */
     public Week week() {
-        return Week.values()[calendar.get(DAY_OF_WEEK) - 1];
+        return Week.values()[obj.getDayOfWeek().ordinal()];
     }
 
     /**
@@ -446,7 +467,7 @@ public final class Dates {
      * @return int
      */
     public int h() {
-        return calendar.get(HOUR);
+        return obj.getHour();
     }
 
     /**
@@ -455,7 +476,7 @@ public final class Dates {
      * @return int
      */
     public int m() {
-        return calendar.get(MINUTE);
+        return obj.getMinute();
     }
 
     /**
@@ -464,16 +485,16 @@ public final class Dates {
      * @return int
      */
     public int s() {
-        return calendar.get(SECOND);
+        return obj.getSecond();
     }
 
     /**
-     * 获取：毫秒
+     * 获取：微秒
      *
      * @return int
      */
-    public int ms() {
-        return calendar.get(MILLISECOND);
+    public int ns() {
+        return obj.getNano();
     }
 
     /**
@@ -483,7 +504,7 @@ public final class Dates {
      * @return {@link Dates}
      */
     public Dates year(int value) {
-        calendar.set(YEAR, value);
+        obj = obj.withYear(value);
         return this;
     }
 
@@ -494,7 +515,7 @@ public final class Dates {
      * @return {@link Dates}
      */
     public Dates month(int value) {
-        calendar.set(MONTH, Math.min(12, value) - 1);
+        obj = obj.withMonth(Math.min(12, value));
         return this;
     }
 
@@ -505,7 +526,7 @@ public final class Dates {
      * @return {@link Dates}
      */
     public Dates day(int value) {
-        calendar.set(DAY_OF_MONTH, Math.min(calendar.getActualMaximum(DAY_OF_MONTH), value));
+        obj = obj.withDayOfMonth(Math.min(value, obj.with(TemporalAdjusters.lastDayOfMonth()).getDayOfMonth()));
         return this;
     }
 
@@ -516,7 +537,7 @@ public final class Dates {
      * @return {@link Dates}
      */
     public Dates h(int value) {
-        calendar.set(HOUR_OF_DAY, Math.min(23, value));
+        obj = obj.withHour(Math.min(23, value));
         return this;
     }
 
@@ -527,7 +548,7 @@ public final class Dates {
      * @return {@link Dates}
      */
     public Dates m(int value) {
-        calendar.set(MINUTE, Math.min(59, value));
+        obj = obj.withMinute(Math.min(59, value));
         return this;
     }
 
@@ -538,18 +559,18 @@ public final class Dates {
      * @return {@link Dates}
      */
     public Dates s(int value) {
-        calendar.set(SECOND, Math.min(59, value));
+        obj = obj.withSecond(Math.min(59, value));
         return this;
     }
 
     /**
-     * 指定：秒
+     * 指定：纳秒
      *
      * @param value int
      * @return {@link Dates}
      */
-    public Dates ms(int value) {
-        calendar.set(MILLISECOND, Math.min(999, value));
+    public Dates ns(int value) {
+        obj = obj.withNano(value);
         return this;
     }
 
@@ -560,7 +581,7 @@ public final class Dates {
      * @return {@link Dates}
      */
     public Dates addYear(int value) {
-        calendar.add(YEAR, value);
+        obj = obj.plusYears(value);
         return this;
     }
 
@@ -571,7 +592,7 @@ public final class Dates {
      * @return {@link Dates}
      */
     public Dates addMonth(int value) {
-        calendar.add(MONTH, value);
+        obj = obj.plusMonths(value);
         return this;
     }
 
@@ -582,7 +603,7 @@ public final class Dates {
      * @return {@link Dates}
      */
     public Dates addDay(int value) {
-        calendar.add(DAY_OF_MONTH, value);
+        obj = obj.plusDays(value);
         return this;
     }
 
@@ -593,7 +614,7 @@ public final class Dates {
      * @return {@link Dates}
      */
     public Dates addWeek(int value) {
-        calendar.add(WEEK_OF_YEAR, value);
+        obj = obj.plusWeeks(value);
         return this;
     }
 
@@ -604,7 +625,7 @@ public final class Dates {
      * @return {@link Dates}
      */
     public Dates addHour(int value) {
-        calendar.add(HOUR, value);
+        obj = obj.plusHours(value);
         return this;
     }
 
@@ -615,7 +636,7 @@ public final class Dates {
      * @return {@link Dates}
      */
     public Dates addMinute(int value) {
-        calendar.add(MINUTE, value);
+        obj = obj.plusMinutes(value);
         return this;
     }
 
@@ -626,7 +647,7 @@ public final class Dates {
      * @return {@link Dates}
      */
     public Dates addSecond(int value) {
-        calendar.add(SECOND, value);
+        obj = obj.plusSeconds(value);
         return this;
     }
 
@@ -636,10 +657,10 @@ public final class Dates {
      * @return {@link Dates}
      */
     public Dates prevMonday() {
-        // addWeek(-1) ；即上周
-        addWeek(-1);
-        // 设置为周一
-        calendar.set(DAY_OF_WEEK, Week.Mon.ordinal() + 1);
+        obj = obj.minusWeeks(1) // minusWeeks(1) ；即上周
+                .minusDays(obj.getDayOfWeek().ordinal()) // 设置为周一
+        ;
+//        obj = obj.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)); // 上一个周一，当前为周一时有bug
         return this;
     }
 
@@ -649,32 +670,32 @@ public final class Dates {
      * @return {@link Dates}
      */
     public Dates nextMonday() {
-        // addWeek(1) ；即下周
-        addWeek(1);
-        // 设置为周一
-        calendar.set(DAY_OF_WEEK, Week.Mon.ordinal() + 1);
+        obj = obj.plusWeeks(1) // plusWeeks(1) ；即下周
+                .minusDays(obj.getDayOfWeek().ordinal()) // 设置为周一
+        ;
+//        obj = obj.with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY));  // 下一个周一，当前为周一时有bug
         return this;
     }
 
     /**
      * 当天的开始时间
-     * 设置为当天 0 时 0 分 0 秒 0 毫秒
+     * 设置为当天 0 时 0 分 0 秒 0 纳秒
      *
      * @return {@link Dates}
      */
     public Dates beginTimeOfDay() {
-        h(0).m(0).s(0).ms(0);
+        h(0).m(0).s(0).ns(0);
         return this;
     }
 
     /**
      * 当天的结束时间
-     * 设置为当天 23 时 59 分 59 秒 999 毫秒
+     * 设置为当天 23 时 59 分 59 秒 999 纳秒
      *
      * @return {@link Dates}
      */
     public Dates endTimeOfDay() {
-        h(23).m(59).s(59).ms(999);
+        h(23).m(59).s(59).ns(999999999);
         return this;
     }
 
@@ -689,31 +710,37 @@ public final class Dates {
     }
 
     /**
+     * 设置为下个月1号
+     *
+     * @return {@link Dates}
+     */
+    public Dates firstDayOfNextMonth() {
+        obj = obj.with(TemporalAdjusters.firstDayOfNextMonth());
+        return this;
+    }
+
+    /**
      * 设置为当月最后一天
      *
      * @return {@link Dates}
      */
     public Dates lastDayOfMonth() {
-        day(calendar.getActualMaximum(DAY_OF_MONTH));
+        obj = obj.with(TemporalAdjusters.lastDayOfMonth());
         return this;
     }
 
     /**
-     * 比对两个日期<br>
-     * 小于 destDate 返回 -1；左小，右大；2018-01-01 | 2018-01-02=-1 <br>
-     * 大于 destDate 返回 1； 右大，左小；2018-01-02 | 2018-01-01= 1<br>
-     * 相等返回 0
+     * 比对两个日期
+     * <pre>
+     *     小于 destDate 返回 -1；左小，右大；2018-01-01 | 2018-01-02=-1
+     *     大于 destDate 返回 1； 右大，左小；2018-01-02 | 2018-01-01= 1
+     *     相等返回 0
      *
      * @param destDate Dates
      * @return int
      */
     public int compare(Dates destDate) {
-        long src = this.get();
-        long dest = destDate.get();
-        if (src == dest) {
-            return 0;
-        }
-        return (src < dest) ? -1 : 1;
+        return this.obj.compareTo(destDate.get());
     }
 
     /**
@@ -767,12 +794,14 @@ public final class Dates {
     }
 
     /**
-     * 获取时间间隔，单位：毫秒
+     * 获取时间间隔
      *
-     * @return long
+     * @return {@link Duration}
      */
-    public long getTimeConsuming() {
-        return System.currentTimeMillis() - this.get();
+    public Duration getTimeConsuming() {
+// import java.time.Duration;
+// import java.time.Period;
+        return Duration.between(obj, LocalDateTime.now());
     }
 
     /**
@@ -781,17 +810,10 @@ public final class Dates {
      * @return String
      */
     public String getTimeConsumingText() {
-        int second = (int) (getTimeConsuming() / 1000);
-        int minute = Math.abs(second / 60);
-        second = Math.abs(second % 60);
-        StringBuilder sb = new StringBuilder();
-        if (Math.abs(minute) > 0) {
-            sb.append(minute).append("分");
-        }
-        if (second > 0) {
-            sb.append(second).append("秒");
-        }
-        return sb.toString();
+        final Duration duration = getTimeConsuming();
+        return (Math.abs(duration.toHours()) > 0 ? String.format("%d时", duration.toHours()) : "")
+                .concat(Math.abs(duration.toMinutes()) > 0 ? String.format("%d分", duration.toMinutes() % 60) : "")
+                .concat(String.format("%d秒", (duration.toMillis() / 1000) % 60));
     }
 
     /**
@@ -802,7 +824,7 @@ public final class Dates {
      * @return int 相差天数
      */
     public int getDifferDay(Dates destDate) {
-        return (int) (destDate.get() - this.get() / (1000 * 60 * 60 * 24));
+        return (int) Duration.between(obj, destDate.get()).toDays();
     }
 
     /**
@@ -854,14 +876,14 @@ public final class Dates {
 
     @Override
     public String toString() {
-        return format("yyyy-MM-dd HH:mm:ss.SSS");
+        return formatDateTime();
     }
 
     public static void main(String[] args) {
         log.info(Dates.now().format(Pattern.yyyy_MM));
-        log.info(Dates.now().formatDateTime());
-        log.info(Dates.now().formatDate());
         log.info(Dates.now().formatTime());
+        log.info(Dates.now().formatDate());
+        log.info(Dates.now().formatDateTime());
         log.info(Dates.of(new Date()).addYear(1).format("yyyy-MM-dd"));
         log.info(Dates.of(new Timestamp(System.currentTimeMillis())).formatDateTime());
         log.info("{}", Dates.now().getRangeOfMonth());
@@ -871,8 +893,8 @@ public final class Dates {
         Dates dates = Dates.now();
         log.info(dates.formatDateTime());
         log.info("{}", dates.get());
-        log.info("{}", Dates.of(dates.formatDateTime(), Pattern.yyyy_MM_dd_HH_mm_ss).get());
-        log.info(Dates.of("2017-01-17 08:56:03 +0000", Pattern.yyyy_MM_dd).formatDate());
+        log.info("{}", Dates.of(dates.formatDateTime(), yyyy_MM_dd_HH_mm_ss).get());
+        log.info(Dates.of("2017-01-17 08:56:03 +0000", yyyy_MM_dd).formatDate());
 
         log.info("左 > 右 true：{}", Dates.now().addDay(1).gt(Dates.now()));
         log.info("左 > 右 false：{}", Dates.now().gt(Dates.now().addDay(1)));
@@ -886,79 +908,7 @@ public final class Dates {
         log.info("左 <= 右 true：{}", Dates.now().beginTimeOfDay().le(Dates.now().beginTimeOfDay()));
         log.info("左 <= 右 true：{}", Dates.now().beginTimeOfDay().le(Dates.now().addDay(1).beginTimeOfDay()));
         log.info("左 <= 右 false：{}", Dates.now().addDay(1).beginTimeOfDay().le(Dates.now().beginTimeOfDay()));
-        try { // UTC 日期
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-            simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-            log.info("2018-02-01T01:25:04.226Z > {}", simpleDateFormat.parse("2018-02-01T01:25:04.226Z").getTime());
-            log.info("2018-02-01T01:25:04.226Z > {}", Dates.of(simpleDateFormat.parse("2018-02-01T01:25:04.226Z").getTime()).formatDateTime());
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
-
-//        System.out.printf("now: %s%n", LocalDateTime.now());
-//        System.out.printf("Apr 15, 1994 @ 11:30am: %s%n",
-//                LocalDateTime.of(1994, Month.APRIL, 15, 11, 30));
-//        System.out.printf("now (from Instant): %s%n",
-//                LocalDateTime.ofInstant(Instant.now(), ZoneId.systemDefault()));
-//        System.out.printf("6 months from now: %s%n",
-//                LocalDateTime.now().plusMonths(6));
-//        System.out.printf("6 months ago: %s%n",
-//                LocalDateTime.now().minusMonths(6));
 
     }
-
-//    /**
-//     * 获取当前线程的decimalFormat工具类,因为该类是非同步的
-//     * @param pattern 格式
-//     * @return 该实例
-//     */
-//    private static DecimalFormat getDecimal(final String pattern){
-//        ThreadLocal<DecimalFormat> instance = moneyMap.get(pattern);
-//        if (instance == null){
-//            synchronized (MoneyUtil.class){
-//                instance = moneyMap.get(pattern);
-//                if (instance == null){
-//                    instance = new ThreadLocal<DecimalFormat>(){
-//                        @Override
-//                        protected DecimalFormat initialValue() {
-//                            return new DecimalFormat(pattern);
-//                        }
-//                    };
-//                }
-//                moneyMap.put(pattern,instance);
-//            }
-//        }
-//        return instance.get();
-//    }
-
-//    /**
-//     * 返回一个ThreadLocal的sdf,每个线程只会new一次sdf
-//     *
-//     * @param pattern SimpleDateFormat规则
-//     * @return 该实例
-//     */
-//    private static SimpleDateFormat getSdf(final String pattern){
-//        ThreadLocal<SimpleDateFormat> t = sdfMap.get(pattern);
-//        // 此处的双重判断和同步是为了防止sdfMap这个单例被多次put重复的sdf
-//        if (t == null){
-//            synchronized (DateUtil.class){
-//                // 只有Map中还没有这个pattern的sdf才会生成新的sdf并放入map
-//                logger.debug("put new sdf of pattern " + pattern + " to map");
-//                // 这里是关键,使用ThreadLocal<SimpleDateFormat>替代原来直接new SimpleDateFormat
-//                t = sdfMap.get(pattern);
-//                if (t == null){
-//                    t = new ThreadLocal<SimpleDateFormat>(){
-//                        @Override
-//                        protected SimpleDateFormat initialValue() {
-//                            logger.debug("thread: " + Thread.currentThread() + " init pattern: " + pattern);
-//                            return new SimpleDateFormat(pattern);
-//                        }
-//                    };
-//                }
-//                sdfMap.put(pattern,t);
-//            }
-//        }
-//        return t.get();
-//    }
 
 }

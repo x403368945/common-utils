@@ -14,14 +14,14 @@ import java.util.stream.Stream;
  */
 @Slf4j
 public enum Week {
-    // 星期日
-    Sun("星期日", "Sunday"),
     Mon("星期一", "Monday"),
     Tue("星期二", "Tuesday"),
     Wed("星期三", "Wednesday"),
     Thu("星期四", "Thursday"),
     Fri("星期五", "Friday"),
-    Sat("星期六", "Saturday");
+    Sat("星期六", "Saturday"),
+    Sun("星期日", "Sunday"),
+    ;
     final String zh;
     final String en;
 
