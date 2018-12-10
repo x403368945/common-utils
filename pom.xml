@@ -127,6 +127,7 @@
                     <source>1.8</source>
                     <target>1.8</target>
                     <encoding>UTF-8</encoding>
+                    <skip>true</skip>
                 </configuration>
             </plugin>
             <!-- 打包的时候跳过单元测试-->

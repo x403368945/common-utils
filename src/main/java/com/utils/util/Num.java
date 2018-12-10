@@ -1,22 +1,15 @@
 package com.utils.util;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.annotation.JSONType;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
 import static com.utils.util.Num.Pattern.*;
 
@@ -93,242 +86,29 @@ public class Num {
         }
     }
 
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    @Data
-    @Accessors(chain = true)
-    @JSONType(orders = {"min", "max"})
-    public static class Range {
-        private Number min;
-        private Number max;
+    public interface IRange<T extends Number> {
+        T getMin();
+
+        T getMax();
 
         /**
-         * 构造数字区间
+         * 检查 value 是否在 min,max 区间内；包含 min,max
          *
-         * @param min Number 获取最小值
-         * @param max Number 获取最大值
-         * @return {@link Range}
+         * @param value {@link Double} 被检查的值
+         * @return boolean true：是，false：否
          */
-        public static Range of(final Number min, final Number max) {
-            return new Range(min, max);
+        default boolean in(final Double value) {
+            return Objects.nonNull(value) && getMin().doubleValue() <= value && value <= getMax().doubleValue();
         }
 
         /**
          * 检查 value 是否在 min,max 区间内；包含 min,max
          *
-         * @param value {@link Number} 被检查的值
+         * @param value {@link Float} 被检查的值
          * @return boolean true：是，false：否
          */
-        public boolean in(final Number value) {
-            if (Objects.nonNull(getMin()) && Objects.nonNull(getMax())) {
-                return getMin().doubleValue() <= value.doubleValue() && value.doubleValue() <= getMax().doubleValue();
-            } else if (Objects.nonNull(getMin())) {
-                return getMin().doubleValue() <= value.doubleValue();
-            } else if (Objects.nonNull(getMax())) {
-                return value.doubleValue() <= getMax().doubleValue();
-            }
-            return false;
-        }
-
-        /**
-         * 检查 value 是否在 min,max 区间内；不包含 min,max
-         *
-         * @param value {@link Number} 被检查的值
-         * @return boolean true：是，false：否
-         */
-        public boolean round(final Number value) {
-            if (Objects.nonNull(getMin()) && Objects.nonNull(getMax())) {
-                return getMin().doubleValue() < value.doubleValue() && value.doubleValue() < getMax().doubleValue();
-            } else if (Objects.nonNull(getMin())) {
-                return getMin().doubleValue() < value.doubleValue();
-            } else if (Objects.nonNull(getMax())) {
-                return value.doubleValue() < getMax().doubleValue();
-            }
-            return false;
-        }
-
-        public Optional<Integer> minIntValue() {
-            return Optional.ofNullable(min).map(Number::intValue);
-        }
-
-        public Optional<Long> minLongValue() {
-            return Optional.ofNullable(min).map(Number::longValue);
-        }
-
-        public Optional<Double> minDoubleValue() {
-            return Optional.ofNullable(min).map(Number::doubleValue);
-        }
-
-        public Optional<Short> minShortValue() {
-            return Optional.ofNullable(min).map(Number::shortValue);
-        }
-
-        public Optional<Float> minFloatValue() {
-            return Optional.ofNullable(min).map(Number::floatValue);
-        }
-
-        public Optional<Integer> maxIntValue() {
-            return Optional.ofNullable(max).map(Number::intValue);
-        }
-
-        public Optional<Long> maxLongValue() {
-            return Optional.ofNullable(max).map(Number::longValue);
-        }
-
-        public Optional<Double> maxDoubleValue() {
-            return Optional.ofNullable(max).map(Number::doubleValue);
-        }
-
-        public Optional<Short> maxShortValue() {
-            return Optional.ofNullable(max).map(Number::shortValue);
-        }
-
-        public Optional<Float> maxFloatValue() {
-            return Optional.ofNullable(max).map(Number::floatValue);
-        }
-    }
-
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    @Data
-    @Accessors(chain = true)
-    @JSONType(orders = {"min", "max"})
-    public static class RangeInt {
-        private int min;
-        private int max;
-
-        /**
-         * 构造数字区间
-         *
-         * @param min int 获取最小值
-         * @param max int 获取最大值
-         * @return {@link RangeInt}
-         */
-        public static RangeInt of(final int min, final int max) {
-            if (max <= 0) {
-                log.warn("参数【max】<=0");
-            }
-            return new RangeInt(min, max);
-        }
-
-        /**
-         * 构造数字区间
-         *
-         * @param values {@link Integer[]} 从数组中获取最小值和最大值区间
-         * @return {@link RangeInt}
-         */
-        public static RangeInt of(final Integer[] values) {
-            Arrays.sort(values);
-            return new RangeInt(values[0], values[values.length - 1]);
-        }
-
-        /**
-         * 构造数字区间
-         *
-         * @param values {@link Integer[]} 从数组中获取最小值和最大值区间
-         * @return {@link RangeInt}
-         */
-        public static RangeInt of(final List<Integer> values) {
-            values.sort(Comparator.naturalOrder());
-            return new RangeInt(values.get(0), values.get(values.size() - 1));
-        }
-
-        /**
-         * 检查 value 是否在 min,max 区间内；包含 min,max
-         *
-         * @param value {@link Integer} 被检查的值
-         * @return boolean true：是，false：否
-         */
-        public boolean in(final Integer value) {
-            if (Objects.isNull(value)) {
-                return false;
-            }
-            return min <= value && value <= max;
-        }
-
-        /**
-         * 检查 value 是否在 min,max 区间内；不包含 min,max
-         *
-         * @param value {@link Integer} 被检查的值
-         * @return boolean true：是，false：否
-         */
-        public boolean round(final Integer value) {
-            return min < value && value < max;
-        }
-
-        /**
-         * 遍历区间，包含 min 和 max 值
-         *
-         * @param action {@link Consumer<Integer:value>}
-         */
-        public void forEach(Consumer<Integer> action) {
-            Objects.requireNonNull(action, "参数【action】是必须的");
-            for (int i = min; i <= max; i++) {
-                action.accept(i);
-            }
-        }
-
-        /**
-         * 转换区间，包含 min 和 max 值
-         *
-         * @param mapper {@link Function<Integer:value, R:返回数据类型>}
-         * @param <R>    返回数据类型
-         * @return {@link Stream<R>}
-         */
-        public <R> Stream<R> map(Function<Integer, ? extends R> mapper) {
-            Objects.requireNonNull(mapper, "参数【mapper】是必须的");
-            return Stream.iterate(min, n -> n + 1)
-                    .limit(max - min + 1)
-                    .map(mapper);
-        }
-    }
-
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    @Data
-    @Accessors(chain = true)
-    @JSONType(orders = {"min", "max"})
-    public static class RangeLong {
-        private long min;
-        private long max;
-
-        /**
-         * 构造数字区间
-         *
-         * @param min long 获取最小值
-         * @param max long 获取最大值
-         * @return {@link RangeLong}
-         */
-        public static RangeLong of(final long min, final long max) {
-            if (max <= 0) {
-                log.warn("参数【max】<=0");
-            }
-            return new RangeLong(min, max);
-        }
-
-        /**
-         * 构造数字区间
-         *
-         * @param values {@link Long[]} 从数组中获取最小值和最大值区间
-         * @return {@link RangeLong}
-         */
-        public static RangeLong of(final Long[] values) {
-            Arrays.sort(values);
-            return new RangeLong(values[0], values[values.length - 1]);
-        }
-
-        /**
-         * 构造数字区间
-         *
-         * @param values {@link List<Long>} 从集合中获取最小值和最大值区间
-         * @return {@link RangeLong}
-         */
-        public static RangeLong of(final List<Long> values) {
-            values.sort(Comparator.naturalOrder());
-            return new RangeLong(values.get(0), values.get(values.size() - 1));
+        default boolean in(final Float value) {
+            return Objects.nonNull(value) && getMin().floatValue() <= value && value <= getMax().floatValue();
         }
 
         /**
@@ -337,11 +117,48 @@ public class Num {
          * @param value {@link Long} 被检查的值
          * @return boolean true：是，false：否
          */
-        public boolean in(final Long value) {
-            if (Objects.isNull(value)) {
-                return false;
-            }
-            return min <= value && value <= max;
+        default boolean in(final Long value) {
+            return Objects.nonNull(value) && getMin().longValue() <= value && value <= getMax().longValue();
+        }
+
+        /**
+         * 检查 value 是否在 min,max 区间内；包含 min,max
+         *
+         * @param value {@link Integer} 被检查的值
+         * @return boolean true：是，false：否
+         */
+        default boolean in(final Integer value) {
+            return Objects.nonNull(value) && getMin().intValue() <= value && value <= getMax().intValue();
+        }
+
+        /**
+         * 检查 value 是否在 min,max 区间内；包含 min,max
+         *
+         * @param value {@link Short} 被检查的值
+         * @return boolean true：是，false：否
+         */
+        default boolean in(final Short value) {
+            return Objects.nonNull(value) && getMin().shortValue() <= value && value <= getMax().shortValue();
+        }
+
+        /**
+         * 检查 value 是否在 min,max 区间内；不包含 min,max
+         *
+         * @param value {@link Double} 被检查的值
+         * @return boolean true：是，false：否
+         */
+        default boolean round(final Double value) {
+            return Objects.nonNull(value) && getMin().doubleValue() < value && value < getMax().doubleValue();
+        }
+
+        /**
+         * 检查 value 是否在 min,max 区间内；不包含 min,max
+         *
+         * @param value {@link Float} 被检查的值
+         * @return boolean true：是，false：否
+         */
+        default boolean round(final Float value) {
+            return Objects.nonNull(value) && getMin().floatValue() < value && value < getMax().floatValue();
         }
 
         /**
@@ -350,35 +167,30 @@ public class Num {
          * @param value {@link Long} 被检查的值
          * @return boolean true：是，false：否
          */
-        public boolean round(final Long value) {
-            return min < value && value < max;
+        default boolean round(final Long value) {
+            return Objects.nonNull(value) && getMin().longValue() < value && value < getMax().longValue();
         }
 
         /**
-         * 遍历区间，包含 min 和 max 值
+         * 检查 value 是否在 min,max 区间内；不包含 min,max
          *
-         * @param action {@link Consumer<Long:value>}
+         * @param value {@link Integer} 被检查的值
+         * @return boolean true：是，false：否
          */
-        public void forEach(Consumer<Long> action) {
-            Objects.requireNonNull(action, "参数【action】是必须的");
-            for (Long i = min; i <= max; i++) {
-                action.accept(i);
-            }
+        default boolean round(final Integer value) {
+            return Objects.nonNull(value) && getMin().intValue() < value && value < getMax().intValue();
         }
 
         /**
-         * 转换区间，包含 min 和 max 值
+         * 检查 value 是否在 min,max 区间内；不包含 min,max
          *
-         * @param mapper {@link Function<Long:value, R:返回数据类型>}
-         * @param <R>    返回数据类型
-         * @return {@link Stream<R>}
+         * @param value {@link Short} 被检查的值
+         * @return boolean true：是，false：否
          */
-        public <R> Stream<R> map(Function<Long, ? extends R> mapper) {
-            Objects.requireNonNull(mapper, "参数【mapper】是必须的");
-            return Stream.iterate(min, n -> n + 1)
-                    .limit(max - min + 1)
-                    .map(mapper);
+        default boolean round(final Short value) {
+            return Objects.nonNull(value) && getMin().shortValue() < value && value < getMax().shortValue();
         }
+
     }
 
     /**
@@ -851,7 +663,5 @@ public class Num {
         log.info("range long array: {}", RangeLong.of(new Long[]{9L, 8L, 1L, 5L, 4L}));
         log.info("range int list: {}", RangeInt.of(JSON.parseArray("[9, 8, 1, 5, 4]", Integer.class)));
         log.info("range long list: {}", RangeLong.of(JSON.parseArray("[9, 8, 1, 5, 4]", Long.class)));
-
-
     }
 }

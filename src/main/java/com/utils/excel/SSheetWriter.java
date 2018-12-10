@@ -7,7 +7,7 @@ import com.utils.excel.entity.Range;
 import com.utils.excel.enums.DataType;
 import com.utils.util.Dates;
 import com.utils.util.FPath;
-import com.utils.util.Num;
+import com.utils.util.RangeInt;
 import com.utils.util.Util;
 import lombok.Cleanup;
 import lombok.Getter;
@@ -145,6 +145,7 @@ public final class SSheetWriter implements ISheetWriter<SSheetWriter>, ISheetWri
         return this;
     }
 
+    @SuppressWarnings({"unchecked", "deprecation"})
     public static void main(String[] args) {
         Paths.get("logs").toFile().mkdir();
         { // 测试公式行号替换
@@ -449,18 +450,18 @@ public final class SSheetWriter implements ISheetWriter<SSheetWriter>, ISheetWri
                     workbook.getSheet("Sheet1").setDefaultColumnWidth(15);
 
                     final SSheetWriter writer = SSheetWriter.of(workbook.getSheet("Sheet1"));
-                    Num.RangeInt.of(1, 10).forEach(parent -> {
+                    RangeInt.of(1, 10).forEach(parent -> {
                         writer.nextRowOfNew()
                                 .cell(0).writeText(Objects.toString(parent))
                                 .cell(1).writeText("父级代码");
-                        final List<Integer> rowIndexs = Num.RangeInt.of(0, Math.max(Util.randomMax(10), 1))
+                        final List<Integer> rowIndexs = RangeInt.of(0, Math.max(Util.randomMax(10), 1))
                                 .map(rowIndex -> writer.nextRowOfNew()
                                         .cell(0).writeText(Objects.toString(parent + "" + (rowIndex + 1)))
                                         .cell(1).writeText("子集代码")
                                         .getRowIndex()
                                 )
                                 .collect(Collectors.toList());
-                        writer.groupRow(Num.RangeInt.of(rowIndexs));
+                        writer.groupRow(RangeInt.of(rowIndexs));
                     });
                     log.info(String.format("写入路径：%s",
                             writer.saveWorkBook(FPath.of("logs/6.子集分组.xlsx")).absolute()

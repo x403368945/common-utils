@@ -1,6 +1,5 @@
 package com.utils.excel;
 
-import com.alibaba.fastjson.JSON;
 import com.utils.enums.Colors;
 import com.utils.excel.entity.Cell;
 import com.utils.excel.entity.Position;
@@ -8,12 +7,11 @@ import com.utils.excel.entity.Range;
 import com.utils.excel.enums.DataType;
 import com.utils.util.Dates;
 import com.utils.util.FPath;
-import com.utils.util.Num;
+import com.utils.util.RangeInt;
 import com.utils.util.Util;
 import lombok.Cleanup;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.math3.analysis.function.Max;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -21,10 +19,7 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -149,10 +144,11 @@ public final class XSheetWriter implements ISheetWriter<XSheetWriter>, ISheetWri
 
     @Override
     public XSheetWriter copyTo(int toRowIndex) {
-        sheet.copyRows(Arrays.asList(row), toRowIndex, ops.cellCopyPolicy);
+        sheet.copyRows(Collections.singletonList(row), toRowIndex, ops.cellCopyPolicy);
         return this;
     }
 
+    @SuppressWarnings({"unchecked", "deprecation"})
     public static void main(String[] args) {
         Paths.get("logs").toFile().mkdir();
         { // 测试公式行号替换
@@ -457,18 +453,18 @@ public final class XSheetWriter implements ISheetWriter<XSheetWriter>, ISheetWri
                     workbook.getSheet("Sheet1").setDefaultColumnWidth(15);
 
                     final XSheetWriter writer = XSheetWriter.of(workbook.getSheet("Sheet1"));
-                    Num.RangeInt.of(1, 10).forEach(parent -> {
+                    RangeInt.of(1, 10).forEach(parent -> {
                         writer.nextRowOfNew()
                                 .cell(0).writeText(Objects.toString(parent))
                                 .cell(1).writeText("父级代码");
-                        final List<Integer> rowIndexs = Num.RangeInt.of(0, Math.max(Util.randomMax(10), 1))
+                        final List<Integer> rowIndexs = RangeInt.of(0, Math.max(Util.randomMax(10), 1))
                                 .map(rowIndex -> writer.nextRowOfNew()
                                         .cell(0).writeText(Objects.toString(parent + "" + (rowIndex + 1)))
                                         .cell(1).writeText("子集代码")
                                         .getRowIndex()
                                 )
                                 .collect(Collectors.toList());
-                        writer.groupRow(Num.RangeInt.of(rowIndexs));
+                        writer.groupRow(RangeInt.of(rowIndexs));
                     });
                     log.info(String.format("写入路径：%s",
                             writer.saveWorkBook(FPath.of("logs/6.子集分组.xlsx")).absolute()

@@ -1,7 +1,6 @@
 package com.utils.util;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.utils.util.Num.RangeInt;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 

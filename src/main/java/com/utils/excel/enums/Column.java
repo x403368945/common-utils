@@ -2,7 +2,7 @@ package com.utils.excel.enums;
 
 import com.utils.excel.entity.Position;
 import com.utils.excel.entity.Range;
-import com.utils.util.Num.RangeInt;
+import com.utils.util.RangeInt;
 
 import java.util.Arrays;
 import java.util.List;

@@ -3,7 +3,7 @@ package com.utils.excel;
 import com.utils.excel.entity.Position;
 import com.utils.excel.entity.Range;
 import com.utils.excel.enums.Column;
-import com.utils.util.Num;
+import com.utils.util.RangeInt;
 import lombok.*;
 import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -35,6 +35,7 @@ import static com.utils.enums.Patterns.d_FIND;
  *
  * @author Jason Xie on 2018-8-8.
  */
+@SuppressWarnings("unchecked")
 public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWriter<T> {
     @Builder
     class Options {
@@ -608,10 +609,10 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
     /**
      * 设置行分组
      *
-     * @param range {@link com.utils.util.Num.RangeInt} 分组行索引区间
+     * @param range {@link com.utils.util.RangeInt} 分组行索引区间
      * @return <T extends ISheetWriter>
      */
-    default T groupRow(final Num.RangeInt range) {
+    default T groupRow(final RangeInt range) {
         groupRow(range.getMin(), range.getMax());
         return (T) this;
     }
@@ -642,10 +643,10 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
     /**
      * 设置列分组
      *
-     * @param range {@link com.utils.util.Num.RangeInt} 分组列索引区间
+     * @param range {@link com.utils.util.RangeInt} 分组列索引区间
      * @return <T extends ISheetWriter>
      */
-    default T groupColumn(final Num.RangeInt range) {
+    default T groupColumn(final RangeInt range) {
         groupColumn(range.getMin(), range.getMax());
         return (T) this;
     }

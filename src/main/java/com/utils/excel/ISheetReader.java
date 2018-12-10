@@ -39,6 +39,7 @@ public interface ISheetReader<T extends ISheetReader> extends ISheet<T>, ICellRe
      *
      * @return <T extends ISheetReader>
      */
+    @SuppressWarnings("unchecked")
     default T next() {
         setRowIndex(getRowIndex() + 1); // 设置下一行 rowIndex ，判断是否已读完
         if (hasEnd()) {
