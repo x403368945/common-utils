@@ -13,6 +13,7 @@ import java.io.FileOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -56,12 +57,21 @@ public interface ISheet<T> {
      */
     default T hasSheet(final Supplier<? extends RuntimeException> ex) {
         if (Objects.isNull(getSheet())) {
-            if (Objects.isNull(ex)) {
-                throw new NullPointerException("选定sheet不存在");
-            }
-            throw ex.get();
+            if (Objects.nonNull(ex)) throw ex.get();
         }
         return (T) this;
+    }
+
+    /**
+     * 以当前行索引为基础，跳过指定行数
+     *
+     * @return {@link Optional<T extends ISheet>}
+     */
+    default Optional<T> hasSheet() {
+        if (Objects.isNull(getSheet())) {
+            return Optional.empty();
+        }
+        return Optional.of((T) this);
     }
 
     /**
