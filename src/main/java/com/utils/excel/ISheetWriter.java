@@ -685,6 +685,27 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
     }
 
     /**
+     * 显示列
+     *
+     * @param columnIndex {@link int} 显示列索引
+     * @return <T extends ISheetWriter>
+     */
+    default T showColumn(final int columnIndex) {
+        getSheet().setColumnHidden(columnIndex, false);
+        return (T) this;
+    }
+
+    /**
+     * 显示列
+     *
+     * @param column {@link Column} 显示列
+     * @return <T extends ISheetWriter>
+     */
+    default T showColumn(final Column column) {
+        return showColumn(column.ordinal());
+    }
+
+    /**
      * 自动调整列宽；该方法效果不太理想
      *
      * @return <T extends ISheetWriter>
