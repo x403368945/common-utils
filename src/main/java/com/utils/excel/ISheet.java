@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * Sheet 读写需要的基本方法
@@ -46,6 +47,22 @@ public interface ISheet<T> {
      * @return {@link Sheet}
      */
     Sheet getSheet();
+
+    /**
+     * 以当前行索引为基础，跳过指定行数
+     *
+     * @param ex {@link Supplier<RuntimeException>} 自定义异常
+     * @return <T extends ISheet>
+     */
+    default T hasSheet(final Supplier<? extends RuntimeException> ex) {
+        if (Objects.isNull(getSheet())) {
+            if (Objects.isNull(ex)) {
+                throw new NullPointerException("选定sheet不存在");
+            }
+            throw ex.get();
+        }
+        return (T) this;
+    }
 
     /**
      * 获取当前操作行
