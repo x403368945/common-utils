@@ -7,18 +7,14 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.lang.reflect.Array;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 
@@ -122,12 +118,44 @@ public final class FPath {
     }
 
     /**
+     * 是否为目录，当为目录时执行consumer
+     *
+     * @param hasTrue  {@link Consumer<FPath>} 为 true 时执行
+     * @param hasfalse {@link Consumer<FPath>} 为 false 时执行
+     * @return {@link FPath}
+     */
+    public FPath isDirectory(final Consumer<FPath> hasTrue, final Consumer<FPath> hasfalse) {
+        if (path.toFile().isDirectory()) {
+            if (Objects.nonNull(hasTrue)) hasTrue.accept(this);
+        } else {
+            if (Objects.nonNull(hasfalse)) hasfalse.accept(this);
+        }
+        return this;
+    }
+
+    /**
      * 是否为目录
      *
      * @return true：目录，fasle：非目录
      */
     public boolean isDirectory() {
         return path.toFile().isDirectory();
+    }
+
+    /**
+     * 文件或目录是否存在，当文件或目录存在时执行consumer
+     *
+     * @param hasTrue  {@link Consumer<FPath>} 为 true 时执行
+     * @param hasfalse {@link Consumer<FPath>} 为 false 时执行
+     * @return {@link FPath}
+     */
+    public FPath exist(final Consumer<FPath> hasTrue, final Consumer<FPath> hasfalse) {
+        if (path.toFile().exists()) {
+            if (Objects.nonNull(hasTrue)) hasTrue.accept(this);
+        } else {
+            if (Objects.nonNull(hasfalse)) hasfalse.accept(this);
+        }
+        return this;
     }
 
     /**
@@ -144,8 +172,23 @@ public final class FPath {
      *
      * @return File 返回File对象，便于链式调用
      */
+    public FPath mkdirsParent() {
+        FPath.of(path.toFile().getParentFile()).exist(null, fPath -> {
+            if (!fPath.file().mkdirs()) {
+                throw new RuntimeException("目录创建失败:".concat(fPath.file().getAbsolutePath()));
+            }
+            fPath.chmod(755);
+        });
+        return this;
+    }
+
+    /**
+     * 创建目录；成功后返回file对象，便于链式调用，失败时抛出异常
+     *
+     * @return File 返回File对象，便于链式调用
+     */
     public FPath mkdirs() {
-        File file = path.toFile();
+        final File file = path.toFile();
         if (!file.exists()) {
             if (!file.mkdirs()) {
                 throw new RuntimeException("文件目录创建失败:".concat(file.getAbsolutePath()));
