@@ -50,7 +50,19 @@ public interface ISheet<T> {
     Sheet getSheet();
 
     /**
-     * 以当前行索引为基础，跳过指定行数
+     * 判断sheet是否存在
+     *
+     * @return {@link Optional<ISheet>}
+     */
+    default Optional<T> hasSheet() {
+        if (Objects.isNull(getSheet())) {
+            return Optional.empty();
+        }
+        return Optional.of((T) this);
+    }
+
+    /**
+     * 判断sheet是否存在，不存在则抛出用户指定异常，若不指定异常，则不抛出
      *
      * @param ex {@link Supplier<RuntimeException>} 自定义异常
      * @return <T extends ISheet>
@@ -65,13 +77,17 @@ public interface ISheet<T> {
     /**
      * 以当前行索引为基础，跳过指定行数
      *
-     * @return {@link Optional<T extends ISheet>}
+     * @param hasTrue  {@link Consumer<ISheet>} 为 true 时执行
+     * @param hasFalse {@link Consumer<ISheet>} 为 false 时执行
+     * @return <T extends ISheet>
      */
-    default Optional<T> hasSheet() {
-        if (Objects.isNull(getSheet())) {
-            return Optional.empty();
+    default T hasSheet(final Consumer<T> hasTrue, final Consumer<T> hasFalse) {
+        if (Objects.nonNull(getSheet())) {
+            if (Objects.nonNull(hasTrue)) hasTrue.accept((T) this);
+        } else {
+            if (Objects.nonNull(hasFalse)) hasFalse.accept((T) this);
         }
-        return Optional.of((T) this);
+        return (T) this;
     }
 
     /**
@@ -285,6 +301,39 @@ public interface ISheet<T> {
      */
     default String sheetName() {
         return getSheet().getSheetName();
+    }
+
+    /**
+     * 选中当前 sheet
+     *
+     * @return <T extends ISheet>
+     */
+    default T selectedSheet() {
+        getWorkbook().setSelectedTab(sheetIndex());
+        return (T) this;
+    }
+
+    /**
+     * 选中指定 sheet
+     *
+     * @param index int 指定 sheet 索引
+     * @return <T extends ISheet>
+     */
+    default T selectedSheet(final int index) {
+        getWorkbook().setSelectedTab(index);
+        return (T) this;
+    }
+
+
+    /**
+     * 选中指定 sheet
+     *
+     * @param name String 指定 sheet 名字
+     * @return <T extends ISheet>
+     */
+    default T selectedSheet(final String name) {
+        getWorkbook().setSelectedTab(getWorkbook().getSheetIndex(name));
+        return (T) this;
     }
 
     /**

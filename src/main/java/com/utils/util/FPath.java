@@ -121,14 +121,14 @@ public final class FPath {
      * 是否为目录，当为目录时执行consumer
      *
      * @param hasTrue  {@link Consumer<FPath>} 为 true 时执行
-     * @param hasfalse {@link Consumer<FPath>} 为 false 时执行
+     * @param hasFalse {@link Consumer<FPath>} 为 false 时执行
      * @return {@link FPath}
      */
-    public FPath isDirectory(final Consumer<FPath> hasTrue, final Consumer<FPath> hasfalse) {
+    public FPath isDirectory(final Consumer<FPath> hasTrue, final Consumer<FPath> hasFalse) {
         if (path.toFile().isDirectory()) {
             if (Objects.nonNull(hasTrue)) hasTrue.accept(this);
         } else {
-            if (Objects.nonNull(hasfalse)) hasfalse.accept(this);
+            if (Objects.nonNull(hasFalse)) hasFalse.accept(this);
         }
         return this;
     }
@@ -146,14 +146,14 @@ public final class FPath {
      * 文件或目录是否存在，当文件或目录存在时执行consumer
      *
      * @param hasTrue  {@link Consumer<FPath>} 为 true 时执行
-     * @param hasfalse {@link Consumer<FPath>} 为 false 时执行
+     * @param hasFalse {@link Consumer<FPath>} 为 false 时执行
      * @return {@link FPath}
      */
-    public FPath exist(final Consumer<FPath> hasTrue, final Consumer<FPath> hasfalse) {
+    public FPath exist(final Consumer<FPath> hasTrue, final Consumer<FPath> hasFalse) {
         if (path.toFile().exists()) {
             if (Objects.nonNull(hasTrue)) hasTrue.accept(this);
         } else {
-            if (Objects.nonNull(hasfalse)) hasfalse.accept(this);
+            if (Objects.nonNull(hasFalse)) hasFalse.accept(this);
         }
         return this;
     }
