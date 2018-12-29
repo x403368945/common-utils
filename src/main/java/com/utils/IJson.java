@@ -11,7 +11,7 @@ import static com.alibaba.fastjson.serializer.SerializerFeature.*;
 /**
  * JSON 格式化基础方法
  *
- * @author Jason Xie 2017-9-26
+ * @author 谢长春 2017-9-26
  */
 public interface IJson {
 

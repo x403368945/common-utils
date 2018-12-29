@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 
 /**
  * EXCEL数据类型定义
- * @author Jason Xie on 2018-10-3
+ * @author 谢长春 on 2018-10-3
  */
 public enum DataType {
     /** 数值*/
@@ -39,7 +39,7 @@ public enum DataType {
             StringBuilder sb = new StringBuilder();
             sb.append("/**\n")
                     .append(" * ").append(name).append("\n")
-                    .append(String.format(" * Created by Jason Xie on %s.\n", Dates.now().formatDate()))
+                    .append(String.format(" * Created by 谢长春 on %s.\n", Dates.now().formatDate()))
                     .append(" */\n");
             sb.append("// 枚举值定义").append("\n");
             sb.append(String.format("const %s = Object.freeze({", className)).append("\n");

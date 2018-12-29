@@ -13,7 +13,7 @@ package com.utils.enums;
  * 5xx（服务器错误）
  * 这些状态代码表示服务器在尝试处理请求时发生内部错误。 这些错误可能是服务器本身的错误，而不是请求出错。
  *
- * @author Jason Xie on 2018-10-3
+ * @author 谢长春 on 2018-10-3
  */
 public enum HttpState {
     // HTTP 状态描述

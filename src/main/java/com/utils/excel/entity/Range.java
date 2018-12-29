@@ -1,7 +1,7 @@
 package com.utils.excel.entity;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.annotation.JSONType;
+import com.utils.IJson;
 import com.utils.excel.enums.Formula;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,7 +22,7 @@ import java.util.stream.Stream;
 /**
  * 定义excel 单元格区间
  *
- * @author Jason Xie on 2017/10/13.
+ * @author 谢长春 on 2017/10/13.
  */
 @NoArgsConstructor
 @AllArgsConstructor
@@ -31,7 +31,7 @@ import java.util.stream.Stream;
 @Accessors(chain = true)
 @JSONType(orders = {"start", "end"})
 @Slf4j
-public class Range {
+public class Range implements IJson {
     public static Range of(final String range) {
         if (!range.matches("^[A-Z]+\\d+:[A-Z]+\\d+$")) {
             throw new IllegalArgumentException("区间值不正确");
@@ -96,7 +96,7 @@ public class Range {
     /**
      * 遍历选定区间
      *
-     * @param action {@link BiConsumer<Integer:rowIndex, Integer:columnIndex>}
+     * @param action {@link BiConsumer}{@link BiConsumer<Integer:rowIndex, Integer:columnIndex>}
      */
     public void forEach(final BiConsumer<Integer, Integer> action) {
         Objects.requireNonNull(action, "参数【action】是必须的");
@@ -110,7 +110,7 @@ public class Range {
     /**
      * 转换选定区间，行索引和列索引归集为数组
      *
-     * @param mapper {@link BiFunction<Integer:rowIndex, Integer:columnIndex, R:返回数据类型>}
+     * @param mapper {@link BiFunction}{@link BiFunction<Integer:rowIndex, Integer:columnIndex, R:返回数据类型>}
      * @param <R>    返回数据类型
      * @return {@link Stream<R>}
      */
@@ -126,7 +126,7 @@ public class Range {
 
     @Override
     public String toString() {
-        return JSON.toJSONString(this);
+        return json();
     }
 
     public static void main(String[] args) {

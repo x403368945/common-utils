@@ -24,7 +24,7 @@ import java.util.function.Consumer;
 /**
  * 【.xsl|.xslx】 文件读取
  *
- * @author Jason Xie on 2018-8-8.
+ * @author 谢长春 on 2018-8-8.
  */
 @Slf4j
 public final class ExcelReader implements ISheetReader<ExcelReader> {
@@ -169,8 +169,8 @@ public final class ExcelReader implements ISheetReader<ExcelReader> {
     /**
      * 获取当前行指定列数据
      *
-     * @param headers List<Header> 来自 {@link ExcelReader#headers()}
-     * @return {@link com.utils.excel.entity.Row<int:Header对象中的index字段值, String:单元格内容>}
+     * @param headers {@link List}{@link List<Header>} 来自 {@link ExcelReader#headers()}
+     * @return {@link com.utils.excel.entity.Row}{@link com.utils.excel.entity.Row<int:Header对象中的index字段值, String:单元格内容>}
      */
     public com.utils.excel.entity.Row rowObject(final List<Header> headers) {
         final LinkedHashMap<String, String> map = new LinkedHashMap<>();
@@ -190,8 +190,8 @@ public final class ExcelReader implements ISheetReader<ExcelReader> {
     /**
      * 获取当前行指定列数据
      *
-     * @param mapHeaders {@link Map<String:列头字段名, Integer:列索引>} 来自 {@link ExcelReader#mapHeaders()}
-     * @return {@link LinkedHashMap<String:Header对象中的label字段值, String:单元格内容>}
+     * @param mapHeaders {@link Map}{@link Map<String:列头字段名, Integer:列索引>} 来自 {@link ExcelReader#mapHeaders()}
+     * @return {@link LinkedHashMap}{@link LinkedHashMap<String:Header对象中的label字段值, String:单元格内容>}
      */
     public LinkedHashMap<String, String> rowObject(final Map<String, Integer> mapHeaders) {
         final LinkedHashMap<String, String> map = new LinkedHashMap<>();
@@ -202,7 +202,7 @@ public final class ExcelReader implements ISheetReader<ExcelReader> {
     /**
      * 获取当前行，整行数据
      *
-     * @return {@link LinkedHashMap<Integer:列索引, String:单元格内容>}
+     * @return {@link LinkedHashMap}{@link LinkedHashMap<Integer:列索引, String:单元格内容>}
      */
     public LinkedHashMap<Integer, String> rowObject() {
         final LinkedHashMap<Integer, String> map = new LinkedHashMap<>();

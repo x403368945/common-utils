@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * 数据表格头部<br>
  * {index: 0, label: '房租', type: 'Number', group: "固定成本",tag:"标签"}<br>
- * @author Jason Xie on 2017/10/15.
+ * @author 谢长春 on 2017/10/15.
  */
 @NoArgsConstructor
 @AllArgsConstructor

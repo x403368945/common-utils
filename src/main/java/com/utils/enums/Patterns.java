@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 /**
  * 正则表达式预编译
  *
- * @author Jason Xie on 2018-10-3
+ * @author 谢长春 on 2018-10-3
  */
 public enum Patterns {
     // \d+ 匹配纯数字

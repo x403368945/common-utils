@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 /**
  * 【.xlsx】限定最大缓行的数据写入操作；写入完成之后需要调用 close 方法；否则可能造成内存泄露
  *
- * @author Jason Xie on 2018-8-8.
+ * @author 谢长春 on 2018-8-8.
  */
 @Slf4j
 public final class SSheetWriter implements ISheetWriter<SSheetWriter>, ISheetWriter.ICopyRows<SSheetWriter> {

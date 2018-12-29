@@ -13,7 +13,7 @@ import java.util.function.Supplier;
 /**
  * Cell单元格读取操作
  *
- * @author Jason Xie on 2018-8-8.
+ * @author 谢长春 on 2018-8-8.
  */
 interface ICellReader<T extends ICellReader> {
     /**
@@ -134,7 +134,7 @@ interface ICellReader<T extends ICellReader> {
     /**
      * 获取单元格数据原始值，consumer里面参数是Optional，可以通过 .orElse() 指定默认值
      *
-     * @param consumer {@link Consumer<Optional<Object>>} 处理单元格数据
+     * @param consumer {@link Consumer}{@link Consumer<Optional<Object>>} 处理单元格数据
      * @return <T extends ICellReader>
      */
     default T value(final Consumer<Optional<Object>> consumer) {
@@ -194,7 +194,7 @@ interface ICellReader<T extends ICellReader> {
     /**
      * 获取单元格文本，consumer里面参数是Optional，可以通过 .orElse() 指定默认值
      *
-     * @param consumer {@link Consumer<Optional<String>>} 处理单元格数据
+     * @param consumer {@link Consumer}{@link Consumer<Optional<String>>} 处理单元格数据
      * @return <T extends ICellReader>
      */
     default T stringValue(final Consumer<Optional<String>> consumer) {
@@ -245,7 +245,7 @@ interface ICellReader<T extends ICellReader> {
     /**
      * 获取单元格数值，consumer里面参数是Optional，可以通过 .orElse() 指定默认值
      *
-     * @param consumer {@link Consumer<Optional<Num>>} 处理单元格数据
+     * @param consumer {@link Consumer}{@link Consumer<Optional<Num>>} 处理单元格数据
      * @return <T extends ICellReader>
      */
     default T numberValue(final Consumer<Optional<Num>> consumer) {
@@ -274,7 +274,7 @@ interface ICellReader<T extends ICellReader> {
     /**
      * 获取单元格数值，consumer里面参数是Optional，可以通过 .orElse() 指定默认值
      *
-     * @param consumer {@link Consumer<Optional<Integer>>} 处理单元格数据
+     * @param consumer {@link Consumer}{@link Consumer<Optional<Integer>>} 处理单元格数据
      * @return <T extends ICellReader>
      */
     default T intValue(final Consumer<Optional<Integer>> consumer) {
@@ -303,7 +303,7 @@ interface ICellReader<T extends ICellReader> {
     /**
      * 获取单元格数值，consumer里面参数是Optional，可以通过 .orElse() 指定默认值
      *
-     * @param consumer {@link Consumer<Optional<Short>>} 处理单元格数据
+     * @param consumer {@link Consumer}{@link Consumer<Optional<Short>>} 处理单元格数据
      * @return <T extends ICellReader>
      */
     default T shortValue(final Consumer<Optional<Short>> consumer) {
@@ -332,7 +332,7 @@ interface ICellReader<T extends ICellReader> {
     /**
      * 获取单元格数值，consumer里面参数是Optional，可以通过 .orElse() 指定默认值
      *
-     * @param consumer {@link Consumer<Optional<Long>>} 处理单元格数据
+     * @param consumer {@link Consumer}{@link Consumer<Optional<Long>>} 处理单元格数据
      * @return <T extends ICellReader>
      */
     default T longValue(final Consumer<Optional<Long>> consumer) {
@@ -361,7 +361,7 @@ interface ICellReader<T extends ICellReader> {
     /**
      * 获取单元格数值，consumer里面参数是Optional，可以通过 .orElse() 指定默认值
      *
-     * @param consumer {@link Consumer<Optional<Double>>} 处理单元格数据
+     * @param consumer {@link Consumer}{@link Consumer<Optional<Double>>} 处理单元格数据
      * @return <T extends ICellReader>
      */
     default T doubleValue(final Consumer<Optional<Double>> consumer) {
@@ -393,7 +393,7 @@ interface ICellReader<T extends ICellReader> {
     /**
      * 获取单元格日期对象，consumer里面参数是Optional，可以通过 .orElse() 指定默认值
      *
-     * @param consumer {@link Consumer<Optional<Dates>>} 处理单元格数据
+     * @param consumer {@link Consumer}{@link Consumer<Optional<Dates>>} 处理单元格数据
      * @return <T extends ICellReader>
      */
     default T dateValue(final Consumer<Optional<Dates>> consumer) {
@@ -413,7 +413,7 @@ interface ICellReader<T extends ICellReader> {
     /**
      * 获取公式 不使用占位符替换行号，consumer里面参数是Optional，可以通过 .orElse() 指定默认值
      *
-     * @param consumer {@link Consumer<Optional<String>>} 处理单元格公式
+     * @param consumer {@link Consumer}{@link Consumer<Optional<Dates>>} 处理单元格公式
      * @return <T extends ICellReader>
      */
     default T formula(final Consumer<Optional<String>> consumer) {
@@ -424,7 +424,7 @@ interface ICellReader<T extends ICellReader> {
     /**
      * 获取公式
      *
-     * @param rowIndex {@link Supplier<Integer:rowIndex>} 获取行索引,行索引+1获得公式中间的行号，将行号使用 {0} 占位
+     * @param rowIndex {@link Supplier}{@link Supplier<Integer:rowIndex>} 获取行索引,行索引+1获得公式中间的行号，将行号使用 {0} 占位
      * @return String
      */
     default String formula(final Supplier<Integer> rowIndex) {
@@ -442,8 +442,8 @@ interface ICellReader<T extends ICellReader> {
     /**
      * 获取公式，consumer里面参数是Optional，可以通过 .orElse() 指定默认值
      *
-     * @param rowIndex {@link Supplier<Integer:rowIndex>} 获取行索引,行索引+1获得公式中间的行号，将行号使用 {0} 占位
-     * @param consumer {@link Consumer<Optional<String>>} 处理单元格公式
+     * @param rowIndex {@link Supplier}{@link Supplier<Integer:rowIndex>} 获取行索引,行索引+1获得公式中间的行号，将行号使用 {0} 占位
+     * @param consumer {@link Consumer}{@link Consumer<Optional<String>>} 处理单元格公式
      * @return <T extends ICellReader>
      */
     default T formula(final Supplier<Integer> rowIndex, final Consumer<Optional<String>> consumer) {
@@ -466,7 +466,7 @@ interface ICellReader<T extends ICellReader> {
     /**
      * 获取单元格批注，consumer里面参数是Optional，可以通过 .orElse() 指定默认值
      *
-     * @param consumer {@link Consumer<Optional<String>>} 处理单元格批注
+     * @param consumer {@link Consumer}{@link Consumer<Optional<String>>} 处理单元格批注
      * @return <T extends ICellReader>
      */
     default T comment(final Consumer<Optional<String>> consumer) {
@@ -486,7 +486,7 @@ interface ICellReader<T extends ICellReader> {
     /**
      * 获取样式索引
      *
-     * @param consumer {@link Consumer<Integer>} 处理单元格批注
+     * @param consumer {@link Consumer}{@link Consumer<Integer>} 处理单元格批注
      * @return <T extends ICellReader>
      */
     default T sindex(final Consumer<Integer> consumer) {
@@ -506,7 +506,7 @@ interface ICellReader<T extends ICellReader> {
     /**
      * 获取字符串格式化表达式
      *
-     * @param consumer {@link Consumer<String>} 处理单元格批注
+     * @param consumer {@link Consumer}{@link Consumer<String>} 处理单元格批注
      * @return <T extends ICellReader>
      */
     default T dataFormat(final Consumer<String> consumer) {
@@ -546,7 +546,7 @@ interface ICellReader<T extends ICellReader> {
     /**
      * 获取单元格数据类型，consumer里面参数是Optional，可以通过 .orElse() 指定默认值
      *
-     * @param consumer {@link Consumer<Optional<DataType>>} 处理单元格数据类型
+     * @param consumer {@link Consumer}{@link Consumer<Optional<DataType>>} 处理单元格数据类型
      * @return <T extends ICellReader>
      */
     default T dataType(final Consumer<Optional<DataType>> consumer) {
@@ -569,7 +569,7 @@ interface ICellReader<T extends ICellReader> {
     /**
      * 获取单元格数据类型，consumer里面参数是Optional，可以通过 .orElse() 指定默认值
      *
-     * @param consumer {@link Consumer<Optional<CellType>>} 处理单元格数据类型
+     * @param consumer {@link Consumer}{@link Consumer<Optional<CellType>>} 处理单元格数据类型
      * @return <T extends ICellReader>
      */
     default T cellType(final Consumer<Optional<CellType>> consumer) {

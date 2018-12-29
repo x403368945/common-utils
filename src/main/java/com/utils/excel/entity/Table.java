@@ -13,7 +13,7 @@ import java.util.List;
 
 /**
  * Excel sheet 表格实体对象
- * @author Jason Xie on 2017/10/15.
+ * @author 谢长春 on 2017/10/15.
  */
 @NoArgsConstructor
 @AllArgsConstructor
@@ -27,7 +27,8 @@ public class Table implements IJson {
 //        return JSON.parseObject(jsonText, new TypeReference<Result<Table>>() {});
 //    }
     /**
-     * 表头集合 => <br>
+     * <pre>
+     * 表头集合 =>
      [
      {index: 0, label: '房租', type: 'NUMBER', group: "固定成本",tag:"标签"},
      {index: 1, label: '工资', type: 'NUMBER', group: "固定成本",tag:"标签"}
@@ -35,7 +36,8 @@ public class Table implements IJson {
      */
     private List<Header> header;
     /**
-     * 表格行集合, （0.1.....）表示表头中的index，取值时，可以通过遍历表头的index字段获取值<br>
+     * <pre>
+     * 表格行集合, （0.1.....）表示表头中的index，取值时，可以通过遍历表头的index字段获取值
      [
      {
      0: {type: 'NUMBER', text: "$1000", value: 1000},
@@ -45,7 +47,8 @@ public class Table implements IJson {
      */
     private List<Row> body;
     /**
-     * 表格底部合计行,（0.1.....）表示表头中的index，取值时，可以通过遍历表头的index字段获取值<br>
+     * <pre>
+     * 表格底部合计行,（0.1.....）表示表头中的index，取值时，可以通过遍历表头的index字段获取值
      {
      0: {type: 'NUMBER', text: "$2000", value: 2000},
      1: {type: 'NUMBER', text: "$2000", value: 2000}

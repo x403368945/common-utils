@@ -8,7 +8,7 @@ import java.util.Objects;
 
 /**
  * 季度
- * @author Jason Xie on 2017/10/15.
+ * @author 谢长春 on 2017/10/15.
  */
 public enum Quarter {
     // 第一季度
@@ -25,8 +25,8 @@ public enum Quarter {
 
     /**
      * 按季度分组构建表格头部
-     * @param headers List<Header>
-     * @return List<Header>
+     * @param headers {@link List}{@link List<Header>}
+     * @return {@link List}{@link List<Header>}
      */
     public static List<Header> buildHeaders(List<Header> headers) {
         if (Objects.isNull(headers)) {
@@ -36,9 +36,9 @@ public enum Quarter {
     }
     /**
      * 按季度分组构建表格头部
-     * @param headers List<Header>
+     * @param headers {@link List}{@link List<Header>}
      * @param startIndex int index 起始值
-     * @return List<Header>
+     * @return {@link List}{@link List<Header>}
      */
     public static List<Header> buildHeaders(List<Header> headers, int startIndex) {
         if (Objects.isNull(headers)) {

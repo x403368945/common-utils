@@ -1,6 +1,5 @@
 package com.utils.excel.enums;
 
-import com.alibaba.fastjson.JSON;
 import com.utils.util.Dates;
 import com.utils.util.Maps;
 import lombok.extern.slf4j.Slf4j;
@@ -8,9 +7,15 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.stream.Stream;
 
 /**
- * 枚举：星期
+ * <pre>
+ * 枚举：星期；
+ * 与新的日期操作类返回的 {@link java.time.DayOfWeek} 相似
+ * 注意与原来的 {@link java.util.Calendar#DAY_OF_WEEK} 的差别
+ * {@link java.util.Calendar#DAY_OF_WEEK} 获取周日为数字 0，即：{"0":"日","1":"一","2":"二","3":"三","4":"四","5":"五","6":"六"}
+ * {@link java.time.DayOfWeek#SUNDAY}{@link java.time.DayOfWeek#SUNDAY#ordinal()}  获取周日为数字为 6 ，即：{"0":"一","1":"二","2":"三","3":"四","4":"五","5":"六","6":"日"}
+ * {@link java.time.DayOfWeek#SUNDAY}{@link java.time.DayOfWeek#SUNDAY#getValue()} 获取周日为数字为 7 ，即：{"1":"一","2":"二","3":"三","4":"四","5":"五","6":"六","7":"日"}
  *
- * @author Jason Xie on 2017/11/1.
+ * @author 谢长春 on 2017/11/1.
  */
 @Slf4j
 public enum Week {
@@ -38,7 +43,7 @@ public enum Week {
     }
 
     public String json() {
-        return JSON.toJSONString(Maps.ofSS().put("zh_CN", zh).put("en_US", en).build());
+        return Maps.ofSS().put("zh_CN", zh).put("en_US", en).json();
     }
 
     Week(final String zh, final String en) {

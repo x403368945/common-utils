@@ -16,7 +16,7 @@ import java.util.Objects;
 /**
  * 获取javascript执行引擎，执行 js 操作
  *
- * @author Jason Xie on 2017/10/31.
+ * @author 谢长春 on 2017/10/31.
  */
 @Slf4j
 public final class JSEngine {

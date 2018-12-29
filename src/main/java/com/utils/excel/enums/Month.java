@@ -8,7 +8,7 @@ import java.util.Objects;
 
 /**
  * 月份
- * @author Jason Xie on 2017/10/15.
+ * @author 谢长春 on 2017/10/15.
  */
 public enum Month {
     // 1月
@@ -33,8 +33,8 @@ public enum Month {
 
     /**
      * 构建表格头部
-     * @param headers {@link List<Header>}
-     * @return {@link List<Header>}
+     * @param headers {@link List}{@link List<Header>}
+     * @return {@link List}{@link List<Header>}
      */
     public static List<Header> buildHeaders(List<Header> headers) {
         if (Objects.isNull(headers)) {

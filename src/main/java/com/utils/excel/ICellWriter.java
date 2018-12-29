@@ -19,7 +19,7 @@ import static com.utils.util.Dates.Pattern.yyyy_MM_dd;
 /**
  * Cell单元格写入操作
  *
- * @author Jason Xie on 2018-8-8.
+ * @author 谢长春 on 2018-8-8.
  */
 interface ICellWriter<T extends ICellWriter> {
     /**
@@ -113,7 +113,7 @@ interface ICellWriter<T extends ICellWriter> {
     /**
      * 向当前单元格写入数据
      *
-     * @param cellTypes {@link Map<Integer:columnIndex, CellType:写入数据单元格类型>}
+     * @param cellTypes {@link Map}{@link Map<Integer:columnIndex, CellType:写入数据单元格类型>}
      * @param value     Object 写入值
      * @return <T extends ICellWriter>
      */
@@ -259,7 +259,7 @@ interface ICellWriter<T extends ICellWriter> {
     /**
      * 向当前单元格写入公式
      *
-     * @param formula {@link Supplier<String:公式表达式>} 公式构造器
+     * @param formula {@link Supplier}{@link Supplier<String:公式表达式>} 公式构造器
      * @return <T extends ICellWriter>
      */
     default T writeFormula(final Supplier<String> formula) {
@@ -338,7 +338,7 @@ interface ICellWriter<T extends ICellWriter> {
     /**
      * 向当前单元格写入下拉列表选项
      *
-     * @param items {@link List<String:下拉选项>}
+     * @param items {@link List}{@link List<String:下拉选项>}
      * @return <T extends ISheetWriter>
      */
     default T writeDropdownList(final List<String> items) {

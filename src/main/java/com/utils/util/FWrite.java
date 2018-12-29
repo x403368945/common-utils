@@ -18,7 +18,7 @@ import static java.nio.file.StandardOpenOption.APPEND;
  * 文件复制操作
  * 注：copy() 方法不支持指定目标文件绝对路径；即目标永远是目录，而不是确切的文件名；若要复制到指定目标文件，请调用copyTo() 方法指定
  *
- * @author Jason Xie on 2017/10/30.
+ * @author 谢长春 on 2017/10/30.
  */
 @Slf4j
 public final class FWrite {

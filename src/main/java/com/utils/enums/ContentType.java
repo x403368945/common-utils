@@ -3,7 +3,7 @@ package com.utils.enums;
 /**
  * HTTP Content-type
  *
- * @author Jason Xie on 2017/12/20.
+ * @author 谢长春 on 2017/12/20.
  */
 public enum ContentType {
     // 二进制流

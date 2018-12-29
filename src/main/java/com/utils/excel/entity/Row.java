@@ -14,7 +14,7 @@ import java.util.Objects;
 /**
  * excel 数据行（解析得到数据行，也可以自由构建数据行）
  *
- * @author Jason Xie on 2017/11/3.
+ * @author 谢长春 on 2017/11/3.
  */
 public class Row extends JSONObject {
     public static Row build() {
@@ -49,7 +49,7 @@ public class Row extends JSONObject {
     /**
      * 添加子节点集合
      *
-     * @param rows {@link List<Row:数据行对象>}
+     * @param rows {@link List}{@link List<Row:数据行对象>}
      * @return {@link Row}
      */
     public Row addChilds(final List<Row> rows) {

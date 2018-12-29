@@ -15,7 +15,7 @@ import java.util.concurrent.*;
 /**
  * https://mp.weixin.qq.com/s?__biz=MzI3NzE0NjcwMg==&mid=2650122732&idx=1&sn=2e49fcf3b88623f7415162be2d099e1e&chksm=f36bb4cdc41c3ddbcc3389489bb465f33f8a52f6c39a3e920b7d983738ea2523d1462c18e458&mpshare=1&scene=1&srcid=1205QXNwrERT4cWRBIUUdLBH#rd
  *
- * @author Jason Xie 2018/12/5
+ * @author 谢长春 2018/12/5
  */
 public class DateTest {
 

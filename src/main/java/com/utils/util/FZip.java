@@ -23,7 +23,7 @@ import java.util.zip.ZipOutputStream;
  * 例1：当 from = D:\files\dir ；则默认 to = D:\files\dir.zip <br>
  * 例2：当 from = D:\files\content.txt ；则默认 to = D:\files\content.zip <br>
  *
- * @author Jason Xie on 2017/10/30.
+ * @author 谢长春 on 2017/10/30.
  */
 @AllArgsConstructor
 @Slf4j
@@ -38,11 +38,13 @@ public final class FZip {
         @Builder.Default
         private boolean isRecursion = true;
         /**
-         * Consumer<Integer> 压缩进度回调
+         * {@link Consumer}{@link Consumer<Integer>}压缩进度回调
          */
         private Consumer<Integer> progress;
         /**
+         * <pre>
          * 设置不包含文件的正则表达式
+         * {@link Predicate}{@link Predicate<String>}
          */
         private Predicate<String> exclude;
     }

@@ -20,14 +20,14 @@ import java.util.function.Supplier;
 /**
  * Sheet 读写需要的基本方法
  *
- * @author Jason Xie on 2018-8-8.
+ * @author 谢长春 on 2018-8-8.
  */
 public interface ISheet<T> {
     /**
      * 当前操作对象作为参数，执行完之后返回当前对象；
      * 没啥特别的作用，只是为了让一些不能使用链式一直写完的代码可以包在链式调用里面；
      *
-     * @param consumer Consumer<T>
+     * @param consumer {@link Consumer}{@link Consumer<T>}
      * @return <T>
      */
     default T execute(final Consumer<T> consumer) {
@@ -52,7 +52,7 @@ public interface ISheet<T> {
     /**
      * 判断sheet是否存在
      *
-     * @return {@link Optional<ISheet>}
+     * @return {@link Optional}{@link Optional<ISheet>}
      */
     default Optional<T> hasSheet() {
         if (Objects.isNull(getSheet())) {
@@ -64,7 +64,7 @@ public interface ISheet<T> {
     /**
      * 判断sheet是否存在，不存在则抛出用户指定异常，若不指定异常，则不抛出
      *
-     * @param ex {@link Supplier<RuntimeException>} 自定义异常
+     * @param ex {@link Supplier}{@link Supplier<RuntimeException>} 自定义异常
      * @return <T extends ISheet>
      */
     default T hasSheet(final Supplier<? extends RuntimeException> ex) {
@@ -77,8 +77,8 @@ public interface ISheet<T> {
     /**
      * 以当前行索引为基础，跳过指定行数
      *
-     * @param hasTrue  {@link Consumer<ISheet>} 为 true 时执行
-     * @param hasFalse {@link Consumer<ISheet>} 为 false 时执行
+     * @param hasTrue  {@link Consumer}{@link Consumer<ISheet>} 为 true 时执行
+     * @param hasFalse {@link Consumer}{@link Consumer<ISheet>} 为 false 时执行
      * @return <T extends ISheet>
      */
     default T hasSheet(final Consumer<T> hasTrue, final Consumer<T> hasFalse) {
@@ -227,7 +227,7 @@ public interface ISheet<T> {
     /**
      * 获取当前操作行所有列的数据类型，便于后面写入时确定数据类型
      *
-     * @return {@link Map<Integer:列索引, CellType:单元格类型>}
+     * @return {@link Map}{@link Map<Integer:列索引, CellType:单元格类型>}
      */
     default Map<Integer, CellType> cellTypes() {
         final Map<Integer, CellType> cellTypes = new HashMap<>(20);
@@ -238,7 +238,7 @@ public interface ISheet<T> {
     /**
      * 获取当前 Sheet 所有comments
      *
-     * @return {@link Map<String:A1单元格坐标, String:批注>
+     * @return {@link Map>{@link Map<String:A1单元格坐标, String:批注>
      */
     default Map<String, String> comments() {
         final Map<CellAddress, ? extends Comment> cellComments = getSheet().getCellComments();

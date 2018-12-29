@@ -18,7 +18,7 @@ import java.util.concurrent.*;
  * https://mp.weixin.qq.com/s/zFBXJEaQ2s3dvNwYLz_MRA
  * </pre>
  *
- * @author Jason Xie  2016-11-23
+ * @author 谢长春  2016-11-23
  */
 @Slf4j
 public abstract class ThreadPool {
@@ -107,9 +107,9 @@ public abstract class ThreadPool {
     /**
      * invokeAll()是同步的，其需要等待任务的完成，才能返回。submit()是异步的
      *
-     * @param tasks {@link Collection<Callable>} Callable 任务集合
+     * @param tasks {@link Collection>}{@link Collection<Callable>} Callable 任务集合
      * @param <T>   执行任务后返回结果
-     * @return {@link List<Future>}
+     * @return {@link List}{@link List<Future>}
      */
     @SneakyThrows
     public <T> List<Future<T>> invokeAll(final Collection<? extends Callable<T>> tasks) {
@@ -119,10 +119,10 @@ public abstract class ThreadPool {
     /**
      * invokeAll()是同步的，其需要等待任务的完成，才能返回。submit()是异步的
      *
-     * @param tasks   {@link Collection<Callable>} Callable 任务集合
+     * @param tasks   {@link Collection}{@link Collection<Callable>} Callable 任务集合
      * @param <T>     执行任务后返回结果
      * @param timeout long 超时时间
-     * @return {@link List<Future>}
+     * @return {@link List}{@link List<Future>}
      */
     @SneakyThrows
     public <T> List<Future<T>> invokeAll(final Collection<? extends Callable<T>> tasks, final long timeout) {
@@ -132,7 +132,7 @@ public abstract class ThreadPool {
     /**
      * invokeAny() 取第一个任务的返回值，然后调用interrupt方法中断其它任务。
      *
-     * @param tasks {@link Collection<Callable>} Callable 任务集合
+     * @param tasks {@link Collection}{@link Collection<Callable>} Callable 任务集合
      * @param <T>   执行任务后返回结果
      * @return T
      */
@@ -144,7 +144,7 @@ public abstract class ThreadPool {
     /**
      * invokeAny() 取第一个任务的返回值，然后调用interrupt方法中断其它任务。
      *
-     * @param tasks   {@link Collection<Callable>} Callable 任务集合
+     * @param tasks   {@link Collection}{@link Collection<Callable>} Callable 任务集合
      * @param <T>     执行任务后返回结果
      * @param timeout long 超时时间
      * @return T

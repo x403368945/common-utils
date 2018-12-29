@@ -12,7 +12,7 @@ import java.util.Objects;
 
 /**
  * 构建Map对象，支持链式构建
- * @author Jason Xie on 2018-10-3
+ * @author 谢长春 on 2018-10-3
  */
 @Slf4j
 public final class Maps<K, V> {
@@ -107,30 +107,30 @@ public final class Maps<K, V> {
         { // demo
             log.info(
                     Maps.ofSS()
-                            .put("111", "Jason")
+                            .put("111", "JX")
                             .put("222", "Jack")
                             .json(SerializerFeature.PrettyFormat)
             );
             log.info(
                     Maps.of(Integer.class, String.class)
-                            .put(1, "Jason")
+                            .put(1, "JX")
                             .put(2, "Jack")
                             .json(SerializerFeature.PrettyFormat)
             );
 //            log.info(
 //                        Maps.of(Integer.class, Item.class)
-//                            .put(1, Item.builder().label("name").value("Jason").build())
+//                            .put(1, Item.builder().label("name").value("JX").build())
 //                            .put(2, Item.builder().label("name").value("Jack").build())
 //                            .json(SerializerFeature.PrettyFormat)
 //            );
 //            log.info(
 //                    Maps.of(Integer.class, Item.class)
 //                            .putAll(Maps.of(Integer.class, Item.class)
-//                                    .put(3, Item.builder().label("name").value("Jason").build())
+//                                    .put(3, Item.builder().label("name").value("JX").build())
 //                                    .put(4, Item.builder().label("name").value("Jack").build())
 //                                    .build())
 //                            .putAll(null)
-//                            .put(1, Item.builder().label("name").value("Jason").build())
+//                            .put(1, Item.builder().label("name").value("JX").build())
 //                            .put(2, Item.builder().label("name").value("Jack").build())
 //                            .json(SerializerFeature.PrettyFormat)
 //            );

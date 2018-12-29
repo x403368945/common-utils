@@ -10,7 +10,7 @@ import java.util.Objects;
 /**
  * 枚举：Excel 基本公式操作
  *
- * @author Jason Xie 2018/10/29
+ * @author 谢长春 2018/10/29
  */
 public enum Formula {
     SUM("求和"),
@@ -72,7 +72,7 @@ public enum Formula {
      * SUM(A1,A2,A10) ; SUM(这里有数量限制 30 )
      * AVG(A1,A2,B10) ; AVG(这里有数量限制 30 )
      *
-     * @param address {@link List<String:address:A1>}
+     * @param address {@link List}{@link List<String:address:A1>}
      * @return {@link String}
      */
     public String of(final List<String> address) {

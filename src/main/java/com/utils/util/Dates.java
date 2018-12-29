@@ -28,7 +28,7 @@ import static com.utils.util.Dates.Pattern.*;
 /**
  * 日期处理类
  *
- * @author Jason Xie on 2017/10/28.
+ * @author 谢长春 on 2017/10/28.
  */
 @Slf4j
 public final class Dates {
@@ -157,7 +157,7 @@ public final class Dates {
         /**
          * 遍历选定区间：按天
          *
-         * @param action {@link BiConsumer<Timestamp:start, Timestamp:end> } <br>start=2018-01-01 00:00:00.000 <br>end=2018-01-01 23:59:59.999
+         * @param action {@link BiConsumer}{@link BiConsumer<Timestamp:start, Timestamp:end> } <br>start=2018-01-01 00:00:00.000 <br>end=2018-01-01 23:59:59.999
          */
         public void forEach(BiConsumer<Timestamp, Timestamp> action) {
             Objects.requireNonNull(action, "参数【action】是必须的");
@@ -172,7 +172,7 @@ public final class Dates {
         /**
          * 遍历选定区间：按月
          *
-         * @param action {@link BiConsumer<Timestamp:start, Timestamp:end> } <br>start=2018-01-01 00:00:00.000 <br>end=2018-01-31 23:59:59.999
+         * @param action {@link BiConsumer}{@link BiConsumer<Timestamp:start, Timestamp:end> } <br>start=2018-01-01 00:00:00.000 <br>end=2018-01-31 23:59:59.999
          */
         public void forEachMonth(BiConsumer<Timestamp, Timestamp> action) {
             Objects.requireNonNull(action, "参数【action】是必须的");
@@ -837,7 +837,7 @@ public final class Dates {
      * 获取本年按季度划分的时间区间集合
      * 数据示例：[{"begin":"2017-01-01 00:00:00","end":"2017-03-31 23:59:59"}, {"begin":"2017-04-01 00:00:00","end":"2017-06-30 23:59:59"}, {"begin":"2017-07-01 00:00:00","end":"2017-09-30 23:59:59"}, {"begin":"2017-10-01 00:00:00","end":"2017-12-31 23:59:59"}]
      *
-     * @return List<Range>
+     * @return {@link List}{@link List<Range>}
      */
     public List<Range> getRangeOfQuarter() {
         return Stream.of(

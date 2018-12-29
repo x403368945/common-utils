@@ -10,7 +10,7 @@ import java.util.Objects;
 /**
  * Base64 编码解码工具类
  *
- * @author Jason Xie  2016-11-23
+ * @author 谢长春  2016-11-23
  */
 public final class Base64 {
 
@@ -98,7 +98,7 @@ public final class Base64 {
         System.out.println(Base64.encode(JSON.toJSONString(new HashMap<String, String>() {{
             put("", "");
         }})));
-        System.out.println(Base64.encode("{\"name\":\"Jason\"} "));
+        System.out.println(Base64.encode("{\"name\":\"JX\"} "));
         System.out.println(Base64.encode("测试"));
         System.out.println(Base64.encode("5rWL6K+V"));
         System.out.println(Base64.encode(",./<>?<[]-=)_())("));

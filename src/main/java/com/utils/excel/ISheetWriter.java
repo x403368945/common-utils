@@ -33,7 +33,7 @@ import static com.utils.enums.Patterns.d_FIND;
 /**
  * Sheet 写操作相关的方法封装
  *
- * @author Jason Xie on 2018-8-8.
+ * @author 谢长春 on 2018-8-8.
  */
 @SuppressWarnings("unchecked")
 public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWriter<T> {
@@ -446,7 +446,7 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
     /**
      * 向指定区域单元格写入下拉列表选项
      *
-     * @param items List<String> 下拉选项集合
+     * @param items {@link List}{@link List<String>} 下拉选项集合
      * @param range {@link Range} 写入区域，A1:A10
      * @return <T extends ISheetWriter>
      */
@@ -1160,7 +1160,7 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
         /**
          * 当前操作对象作为参数
          *
-         * @param consumer Consumer<HoldRow>
+         * @param consumer {@link Consumer}{@link Consumer<HoldRow>}
          */
         public void end(final Consumer<HoldRow> consumer) {
             consumer.accept(this);

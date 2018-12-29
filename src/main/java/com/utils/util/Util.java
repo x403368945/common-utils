@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 /**
  * 系统工具类
  *
- * @author Jason Xie 2016-11-23
+ * @author 谢长春 2016-11-23
  */
 @Slf4j
 public final class Util {
@@ -363,8 +363,8 @@ public final class Util {
     /**
      * 合并map
      *
-     * @param dest    {@link Map<String, Object>}
-     * @param sources {@link Map<String, Object>}
+     * @param dest    {@link Map}{@link Map<String, Object>}
+     * @param sources {@link Map}{@link Map<String, Object>}
      */
     public static void assign(final Map<String, Object> dest, Map<String, Object>... sources) {
         for (Map<String, Object> map : sources) {
@@ -417,7 +417,7 @@ public final class Util {
      * 打印日志，并返回原对象；可以自定义日志输出
      *
      * @param obj      <T>
-     * @param consumer Consumer<T>
+     * @param consumer {@link Consumer}{@link Consumer<T>}
      * @return T
      */
     public static <T> T peek(final T obj, final Consumer<T> consumer) {
@@ -461,7 +461,7 @@ public final class Util {
      *
      * @param list List 需要切割的集合
      * @param size int 每个集合的大小
-     * @return {@link List<List<T>>}
+     * @return {@link List}{@link List<List<T>>}
      */
     public static <T> List<List<T>> partition(final List<T> list, final int size) {
         final int max = list.size();

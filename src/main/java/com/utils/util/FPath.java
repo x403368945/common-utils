@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 /**
  * 文件路径处理及文件对象操作
  *
- * @author Jason Xie on 2018/1/16.
+ * @author 谢长春 on 2018/1/16.
  */
 @Slf4j
 public final class FPath {
@@ -120,8 +120,8 @@ public final class FPath {
     /**
      * 是否为目录，当为目录时执行consumer
      *
-     * @param hasTrue  {@link Consumer<FPath>} 为 true 时执行
-     * @param hasFalse {@link Consumer<FPath>} 为 false 时执行
+     * @param hasTrue  {@link Consumer}{@link Consumer<FPath>} 为 true 时执行
+     * @param hasFalse {@link Consumer}{@link Consumer<FPath>} 为 false 时执行
      * @return {@link FPath}
      */
     public FPath isDirectory(final Consumer<FPath> hasTrue, final Consumer<FPath> hasFalse) {
@@ -145,8 +145,8 @@ public final class FPath {
     /**
      * 文件或目录是否存在，当文件或目录存在时执行consumer
      *
-     * @param hasTrue  {@link Consumer<FPath>} 为 true 时执行
-     * @param hasFalse {@link Consumer<FPath>} 为 false 时执行
+     * @param hasTrue  {@link Consumer}{@link Consumer<FPath>} 为 true 时执行
+     * @param hasFalse {@link Consumer}{@link Consumer<FPath>} 为 false 时执行
      * @return {@link FPath}
      */
     public FPath exist(final Consumer<FPath> hasTrue, final Consumer<FPath> hasFalse) {
@@ -210,7 +210,7 @@ public final class FPath {
     /**
      * 删除路径下的文件
      *
-     * @param names String[] 文件名
+     * @param names {@link List}{@link List<String>} 文件名
      */
     public void delete(final List<String> names) {
         if (Util.isEmpty(names)) {
@@ -349,7 +349,7 @@ public final class FPath {
     /**
      * 读取文件内容；按 \n 返回所有行
      *
-     * @return {@link List<String>}
+     * @return {@link List}{@link List<String>}
      */
     @SneakyThrows
     public List<String> readLines() {
@@ -361,7 +361,7 @@ public final class FPath {
      * 读取文件内容；按 \n 返回所有行
      *
      * @param charset {@link Charset} 指定编码
-     * @return {@link List<String>}
+     * @return {@link List}{@link List<String>}
      */
     @SneakyThrows
     public List<String> readLines(final Charset charset) {
@@ -372,7 +372,7 @@ public final class FPath {
     /**
      * 按 \n 返回流
      *
-     * @return {@link Stream<String>}
+     * @return {@link Stream}{@link Stream<String>}
      */
     @SneakyThrows
     public Stream<String> lines() {
@@ -384,7 +384,7 @@ public final class FPath {
      * 按 \n 返回流
      *
      * @param charset {@link Charset} 指定编码
-     * @return {@link List<String>}
+     * @return {@link List}{@link List<String>}
      */
     @SneakyThrows
     public Stream<String> lines(final Charset charset) {

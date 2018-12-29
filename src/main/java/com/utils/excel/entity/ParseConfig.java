@@ -20,7 +20,8 @@ import java.util.Map;
 /**
  * 数据表格头部<br>
  * {index: 0, label: '房租', type: 'Number', group: "固定成本",tag:"标签"}<br>
- * @author Jason Xie on 2017/10/15.
+ *
+ * @author 谢长春 on 2017/10/15.
  */
 @NoArgsConstructor
 @AllArgsConstructor
@@ -35,23 +36,27 @@ public class ParseConfig implements IJson {
      */
     private int startRowNum;
     /**
-     * 数据表头，数据结构示例：<br>
-     [
-     {index: 0, label: '房租', type: 'Number', group: "固定成本",tag:"标签"},
-     {index: 1, label: '工资', type: 'Number', group: "固定成本",tag:"标签"}
-     ]
+     * <pre>
+     * 数据表头，数据结构示例：
+     * [
+     * {index: 0, label: '房租', type: 'Number', group: "固定成本",tag:"标签"},
+     * {index: 1, label: '工资', type: 'Number', group: "固定成本",tag:"标签"}
+     * ]
      */
     private List<Header> header;
     /**
-     * 数据表合计行配置<br>
+     * <pre>
+     * 数据表合计行配置
      * 不是必须配置项，没有footer就不用配置
+     * {@link Map}{@link Map<String:key, String:value>}
      */
     private Map<String, String> footer;
     /**
-     * 扩展字段坐标<br>
-     * 不是必须配置项，没有扩展属性就不用配置<br>
-     * 数据结构示例：<br>
-     {"dept":"B2","seq":"G2","year":"O2","compileDept":"T2","compileUser":"Z2","compileTime":"AF2"}
+     * <pre>
+     * 扩展字段坐标
+     * 不是必须配置项，没有扩展属性就不用配置
+     * 数据结构示例：
+     * {"dept":"B2","seq":"G2","year":"O2","compileDept":"T2","compileUser":"Z2","compileTime":"AF2"}
      */
     private Object extras;
 //
@@ -81,48 +86,56 @@ public class ParseConfig implements IJson {
 //    private List<JSONObject> groups;
 
     /**
-     * 设置合计行字段名和列坐标 <br>
-     * param label String 合计单元格文本，默认：合计<br>
-     * param column 合计单元格文本所在列，默认：A 列<br>
+     * <pre>
+     * 设置合计行字段名和列坐标
+     * param label String 合计单元格文本，默认：合计
+     * param column 合计单元格文本所在列，默认：A 列
      */
-    public ParseConfig setFooter(){
+    public ParseConfig setFooter() {
         this.footer = defaultFooter();
         return this;
     }
+
     /**
      * 设置合计行字段名和列坐标
-     * @param label {@link String} 合计单元格文本【合计】
+     *
+     * @param label  {@link String} 合计单元格文本【合计】
      * @param column {@link String} 合计单元格文本所在列【B】
      */
-    public ParseConfig setFooter(final String label, final String column){
+    public ParseConfig setFooter(final String label, final String column) {
         this.footer = Maps.ofSS().put("label", label).put("column", column).build();
         return this;
     }
+
     /**
      * 设置合计行字段名和列坐标
+     *
      * @param column {@link String} 合计单元格文本所在列【B】
      */
-    public ParseConfig setFooter(final String column){
+    public ParseConfig setFooter(final String column) {
         this.footer = Maps.ofSS().put("label", "合计").put("column", column).build();
         return this;
     }
 
     /**
      * 获取底部合计文字单元格坐标
+     *
      * @return {@link Position}
      */
     @JSONField(serialize = false, deserialize = false)
-    public Position getFooterColumnAddress(){
+    public Position getFooterColumnAddress() {
         return Position.builder().column(getFooter().get("column")).build();
     }
 
-    public static Map<String, String> footer(final String column){
+    public static Map<String, String> footer(final String column) {
         return Maps.ofSS().put("label", "合计").put("column", column).build();
     }
-    public static Map<String, String> footer(final String label, final String column){
+
+    public static Map<String, String> footer(final String label, final String column) {
         return Maps.ofSS().put("label", label).put("column", column).build();
     }
-    public static Map<String, String> defaultFooter(){
+
+    public static Map<String, String> defaultFooter() {
         return footer("合计", "A");
     }
 

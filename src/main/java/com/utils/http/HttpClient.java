@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * http 客户端定义
  *
- * @author Jason Xie on 2017/11/21.
+ * @author 谢长春 on 2017/11/21.
  */
 @Slf4j
 public class HttpClient {
@@ -137,7 +137,7 @@ public class HttpClient {
      * 发送 http|https 请求
      * @param client {@link OkHttpClient}
      * @param request {@link Request}
-     * @return {@link Optional<ResponseBody>}
+     * @return {@link Optional}{@link Optional<ResponseBody>}
      */
     public Optional<ResponseBody> send(final OkHttpClient client, final Request request) {
         try {

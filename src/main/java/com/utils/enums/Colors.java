@@ -5,7 +5,7 @@ import java.awt.*;
 /**
  * 颜色枚举
  *
- * @author Jason Xie on 2017/11/18.
+ * @author 谢长春 on 2017/11/18.
  */
 public enum Colors {
     // 黑色

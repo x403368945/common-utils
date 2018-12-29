@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 
 /**
  * 数字区间操作类
- * @author Jason Xie 2018/12/10
+ * @author 谢长春 2018/12/10
  */
 @NoArgsConstructor
 @AllArgsConstructor
@@ -57,7 +57,7 @@ public class RangeLong implements Num.IRange<Long> {
     /**
      * 构造数字区间
      *
-     * @param values {@link List <Long>} 从集合中获取最小值和最大值区间
+     * @param values {@link List}{@link List<Long>} 从集合中获取最小值和最大值区间
      * @return {@link RangeLong}
      */
     public static RangeLong of(final List<Long> values) {
@@ -68,9 +68,9 @@ public class RangeLong implements Num.IRange<Long> {
     /**
      * 遍历区间，包含 min 和 max 值
      *
-     * @param action {@link Consumer <Long:value>}
+     * @param action {@link Consumer}{@link Consumer<Long:value>}
      */
-    public void forEach(Consumer<Long> action) {
+    public void forEach(final Consumer<Long> action) {
         Objects.requireNonNull(action, "参数【action】是必须的");
         for (Long i = min; i <= max; i++) {
             action.accept(i);
@@ -80,11 +80,11 @@ public class RangeLong implements Num.IRange<Long> {
     /**
      * 转换区间，包含 min 和 max 值
      *
-     * @param mapper {@link Function <Long:value, R:返回数据类型>}
+     * @param mapper {@link Function}{@link Function<Long:value, R:返回数据类型>}
      * @param <R>    返回数据类型
      * @return {@link Stream<R>}
      */
-    public <R> Stream<R> map(Function<Long, ? extends R> mapper) {
+    public <R> Stream<R> map(final Function<Long, ? extends R> mapper) {
         Objects.requireNonNull(mapper, "参数【mapper】是必须的");
         return Stream.iterate(min, n -> n + 1)
                 .limit(max - min + 1)

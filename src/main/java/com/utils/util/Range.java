@@ -7,10 +7,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+
 /**
  * 数字区间操作类
  *
- * @author Jason Xie 2018/12/10
+ * @author 谢长春 2018/12/10
  */
 @NoArgsConstructor
 @AllArgsConstructor
@@ -30,5 +35,27 @@ public class Range<T extends Number> implements Num.IRange<T> {
         range.setMin(min);
         range.setMax(max);
         return range;
+    }
+
+    /**
+     * 构造数字区间
+     *
+     * @param values {@link Number}[] 从数组中获取最小值和最大值区间
+     * @return {@link Range} {@link Range<T extends Number>}
+     */
+    public static <T extends Number> Range of(final T[] values) {
+        Arrays.sort(values);
+        return new Range<T>(values[0], values[values.length - 1]);
+    }
+
+    /**
+     * 构造数字区间
+     *
+     * @param values {@link List}{@link List<T extends Number>} 从数组中获取最小值和最大值区间
+     * @return {@link Range}{@link Range<T extends Number>}
+     */
+    public static <T extends Number> Range<T> of(final List<T> values) {
+        values.sort(Comparator.comparingDouble(Number::doubleValue));
+        return new Range<T>(values.get(0), values.get(values.size() - 1));
     }
 }

@@ -13,7 +13,7 @@ import static java.util.stream.Collectors.joining;
 /**
  * Excel 列名定义
  *
- * @author Jason Xie on 2017/10/15.
+ * @author 谢长春 on 2017/10/15.
  */
 public enum Column {
     A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
@@ -131,7 +131,7 @@ public enum Column {
     /**
      * SUM(A1,A2,A10)
      *
-     * @param rownums {@link List<Integer:rownum:1>}
+     * @param rownums {@link List}{@link List<Integer:rownum:1>}
      * @return {@link String}
      */
     public String sum(final List<Integer> rownums) {
@@ -175,7 +175,7 @@ public enum Column {
     /**
      * AVG(A1,A2,A10)
      *
-     * @param rownums {@link List<Integer:rownum:1>}
+     * @param rownums {@link List}{@link List<Integer:rownum:1>}
      * @return {@link String}
      */
     public String avg(final List<Integer> rownums) {

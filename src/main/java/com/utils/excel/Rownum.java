@@ -5,7 +5,7 @@ import java.util.Arrays;
 /**
  * 定义行号获取和自增规则；由于在匿名内部类或stream操作时，直接使用int值无法进行增量操作，故将值和增量方法定义类属性和行为
  *
- * @author Jason Xie on 2017/10/22.
+ * @author 谢长春 on 2017/10/22.
  */
 public final class Rownum {
     private Rownum(int rownum) {

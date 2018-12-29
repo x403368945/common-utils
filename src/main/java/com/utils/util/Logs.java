@@ -13,7 +13,7 @@ import java.util.Random;
 /**
  * 日志工具类
  *
- * @author Jason Xie 2017年5月4日
+ * @author 谢长春 2017年5月4日
  */
 @Slf4j
 public final class Logs {

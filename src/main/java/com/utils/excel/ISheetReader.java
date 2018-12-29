@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 /**
  * Sheet 读操作相关的方法封装
  *
- * @author Jason Xie on 2018-8-8.
+ * @author 谢长春 on 2018-8-8.
  */
 public interface ISheetReader<T extends ISheetReader> extends ISheet<T>, ICellReader<T> {
 
@@ -64,7 +64,7 @@ public interface ISheetReader<T extends ISheetReader> extends ISheet<T>, ICellRe
     /**
      * 判断是否已经读完
      *
-     * @param ending {@link Consumer<Integer:rowIndex>} 最后一行读完之后触发该操作，参数为最后一行索引
+     * @param ending {@link Consumer}{@link Consumer<Integer:rowIndex>} 最后一行读完之后触发该操作，参数为最后一行索引
      * @return boolean false：已经读完了
      */
     default boolean hasNext(final Consumer<Integer> ending) {
@@ -98,7 +98,7 @@ public interface ISheetReader<T extends ISheetReader> extends ISheet<T>, ICellRe
      * 获取头部列名加索引
      * 警告：重复的列名将会被覆盖；若不能保证列名不重复，请使用 {@link ISheetReader#headers()}
      *
-     * @return {@link Map <String:单元格文本内容, Integer:单元格列索引>}
+     * @return {@link Map}{@link Map<String:单元格文本内容, Integer:单元格列索引>}
      */
     default LinkedHashMap<String, Integer> mapHeaders() {
         final LinkedHashMap<String, Integer> map = new LinkedHashMap<>();

@@ -20,7 +20,7 @@ import java.util.stream.Stream;
 /**
  * 生成图片验证码
  *
- * @author Jason Xie on 2017/11/21.
+ * @author 谢长春 on 2017/11/21.
  */
 @AllArgsConstructor
 public final class CodeImage {
@@ -65,7 +65,7 @@ public final class CodeImage {
     /**
      * 生成图片
      *
-     * @param consumer {@link Consumer<String:code:生成的验证码>} 处理验证码
+     * @param consumer {@link Consumer}{@link Consumer<String:code:生成的验证码>} 处理验证码
      * @return {@link CodeImage}
      */
     public CodeImage generate(final Consumer<String> consumer) {

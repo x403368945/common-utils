@@ -24,7 +24,7 @@ import static okhttp3.internal.Util.EMPTY_RESPONSE;
 /**
  * http请求封装
  *
- * @author Jason Xie on 2017/11/21.
+ * @author 谢长春 on 2017/11/21.
  */
 @Slf4j
 @Accessors(chain = true, fluent = true)
@@ -118,7 +118,7 @@ public class Http {
     /**
      * 可以使用 org.apache.commons.beanutils.BeanMap(Object obj); 转换为 Map
      *
-     * @param params {@link Map<String, Object> } 请求参数集合
+     * @param params {@link Map}{@link Map<String, Object> } 请求参数集合
      * @return {@link Http}
      */
     public Http params(final Map<String, Object> params) {
@@ -155,7 +155,7 @@ public class Http {
     /**
      * 发送 GET 请求
      *
-     * @return {@link Optional<ResponseBody>} 响应对象
+     * @return {@link Optional}{@link Optional<ResponseBody>} 响应对象
      */
     public Optional<ResponseBody> get() {
         HttpUrl URL = HttpUrl.parse(url);
@@ -183,7 +183,7 @@ public class Http {
     /**
      * 发送 POST 请求
      *
-     * @return {@link Optional<ResponseBody>} 响应对象
+     * @return {@link Optional}{@link Optional<ResponseBody>} 响应对象
      */
     public Optional<ResponseBody> post() {
         if (log.isDebugEnabled()) {
@@ -198,7 +198,7 @@ public class Http {
     /**
      * 发送 PUT 请求
      *
-     * @return {@link Optional<ResponseBody>} 响应对象
+     * @return {@link Optional}{@link Optional<ResponseBody>} 响应对象
      */
     public Optional<ResponseBody> put() {
         if (log.isDebugEnabled()) {
@@ -213,7 +213,7 @@ public class Http {
     /**
      * 发送 PATCH 请求
      *
-     * @return {@link Optional<ResponseBody>} 响应对象
+     * @return {@link Optional}{@link Optional<ResponseBody>} 响应对象
      */
     public Optional<ResponseBody> patch() {
         if (log.isDebugEnabled()) {
@@ -228,7 +228,7 @@ public class Http {
     /**
      * 发送 DELETE 请求
      *
-     * @return {@link Optional<ResponseBody>} 响应对象
+     * @return {@link Optional}{@link Optional<ResponseBody>} 响应对象
      */
     public Optional<ResponseBody> delete() {
         if (log.isDebugEnabled()) {
@@ -243,7 +243,7 @@ public class Http {
     /**
      * 下载文件
      *
-     * @return {@link Optional<ResponseBody>} 响应对象
+     * @return {@link Optional}{@link Optional<ResponseBody>} 响应对象
      * @deprecated 暂未实现
      */
     @Deprecated
@@ -287,7 +287,7 @@ public class Http {
     /**
      * 上传文件
      *
-     * @return {@link Optional<ResponseBody>} 响应对象
+     * @return {@link Optional}{@link Optional<ResponseBody>} 响应对象
      * @deprecated 暂未实现
      */
     @Deprecated
@@ -330,7 +330,7 @@ public class Http {
                                     .url("http://localhost/api/test")
                                     .params(
                                             Maps.ofSO()
-                                                    .put("name", "Jason")
+                                                    .put("name", "JX")
                                                     .put("phone", "18700000000")
                                                     .jsonKey()
                                     )
@@ -344,7 +344,7 @@ public class Http {
                                     .url("http://localhost/api/test/{pageIndex}/{pageSize}", 1, 20)
                                     .params(
                                             Maps.ofSO()
-                                                    .put("name", "Jason")
+                                                    .put("name", "JX")
                                                     .put("phone", "18700000000")
                                                     .jsonKey()
                                     )
@@ -358,7 +358,7 @@ public class Http {
                                     .url("http://localhost/api/test", 1, 20)
                                     .params(
                                             Maps.ofSO()
-                                                    .put("name", "Jason")
+                                                    .put("name", "JX")
                                                     .put("phone", "18700000000")
                                                     .jsonKey()
                                     )
@@ -372,7 +372,7 @@ public class Http {
                                     .url("http://localhost/api/test/{id}", UUID.randomUUID().toString())
                                     .params(
                                             Maps.ofSO()
-                                                    .put("name", "Jason")
+                                                    .put("name", "JX")
                                                     .put("phone", "18700000000")
                                                     .jsonKey()
                                     )
@@ -386,7 +386,7 @@ public class Http {
                                     .url("http://localhost/api/test/{id}", UUID.randomUUID().toString())
                                     .params(
                                             Maps.ofSO()
-                                                    .put("name", "Jason")
+                                                    .put("name", "JX")
                                                     .put("phone", "18700000000")
                                                     .jsonKey()
                                     )

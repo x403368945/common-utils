@@ -1,6 +1,6 @@
 package com.utils.excel.entity;
 
-import com.alibaba.fastjson.JSON;
+import com.utils.IJson;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,7 +16,7 @@ import static com.utils.enums.Patterns.EXCEL_ADDRESS;
 /**
  * 定义excel 单元格坐标
  *
- * @author Jason Xie on 2017/10/13.
+ * @author 谢长春 on 2017/10/13.
  */
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,7 +24,7 @@ import static com.utils.enums.Patterns.EXCEL_ADDRESS;
 @Data
 @Accessors(chain = true)
 @Slf4j
-public class Position {
+public class Position implements IJson {
 
     public static Position of(final String address) {
         final Matcher m = EXCEL_ADDRESS.matcher(address);
@@ -104,7 +104,7 @@ public class Position {
 
     @Override
     public String toString() {
-        return JSON.toJSONString(this);
+        return json();
     }
 
     public static void main(String[] args) {
