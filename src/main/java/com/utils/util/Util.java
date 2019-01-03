@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.math.BigDecimal;
 import java.security.MessageDigest;
@@ -472,6 +473,50 @@ public final class Util {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * unicode 字符串编码
+     *
+     * @param value {@link String} 需要编码的字符串
+     * @return {@link String} 编码后的 unicode 字符串
+     */
+//    @SuppressWarnings("deprecation")
+    public static String encodeUnicode(final String value) {
+        Objects.requireNonNull(value, "参数【value】不能为null");
+        final StringBuilder unicode = new StringBuilder();
+        for (char c : value.toCharArray()) {
+            unicode.append("\\u").append(Integer.toHexString(c));
+        }
+        return unicode.toString();
+//        return StringEscapeUtils.escapeJava(value);
+    }
+
+    /**
+     * 严格模式：unicode 字符串编码，不足4位的前面补 0
+     *
+     * @param value {@link String} 需要编码的字符串
+     * @return {@link String} 编码后的 unicode 字符串
+     */
+    public static String encodeUnicodeStrict(final String value) {
+        Objects.requireNonNull(value, "参数【value】不能为null");
+        final StringBuilder unicode = new StringBuilder();
+        for (char c : value.toCharArray()) {
+            unicode.append("\\u").append("00".concat(Integer.toHexString(c)).replaceAll("0+(\\w{4})$", "$1"));
+        }
+        return unicode.toString();
+    }
+
+    /**
+     * unicode 字符串解码
+     *
+     * @param value {@link String} unicode 字符串
+     * @return {@link String} 解码后的字符串
+     */
+    @SuppressWarnings("deprecation")
+    public static String decodeUnicode(final String value) {
+        Objects.requireNonNull(value, "参数【value】不能为null");
+        return StringEscapeUtils.unescapeJava(value.replaceAll("\\\\u(\\w{2})(?!\\w)", "\\\\u00$1"));
+    }
+
     public static String format(String value, final Object... args) {
         if (Objects.nonNull(args)) {
             for (Object arg : args) {
@@ -594,5 +639,15 @@ public final class Util {
 //        }
 //        log.info("{}", Util.enumOf(Code.class, "SUCCESS").orElse(null));
 //		log.info("{}",Util.enumOf(Code.class, "Success").orElse(null));
+
+
+        log.info(Util.encodeUnicode("必须是 unicode 编码"));
+        log.info(Util.decodeUnicode("\\u5fc5\\u987b\\u662f\\u20\\u75\\u6e\\u69\\u63\\u6f\\u64\\u65\\u20\\u7f16\\u7801"));
+        log.info(Util.encodeUnicode("*.编Ma./*"));
+        log.info(Util.decodeUnicode("\\u2a\\u2e\\u7f16\\u4d\\u61\\u2e\\u2f\\u2a"));
+        log.info(Util.encodeUnicodeStrict("必须是 unicode 编码"));
+        log.info(Util.decodeUnicode("\\u5fc5\\u987b\\u662f\\u0020\\u0075\\u006e\\u0069\\u0063\\u006f\\u0064\\u0065\\u0020\\u7f16\\u7801"));
+        log.info(Util.encodeUnicodeStrict("*.编Ma./*"));
+        log.info(Util.decodeUnicode("\\u002a\\u002e\\u7f16\\u004d\\u0061\\u002e\\u002f\\u002a"));
     }
 }
