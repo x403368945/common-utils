@@ -951,25 +951,6 @@ public final class Dates {
             }
         }
         log.info("{}", LocalDateTime.parse("2018-12-12 00:00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-//        yyyy_MM_dd_HH_mm_ss_SSS("yyyy-MM-dd HH:mm:ss.SSS"),
-//        yyyy_MM_dd_HH_mm_ss("yyyy-MM-dd HH:mm:ss"),
-//        yyyy_MM_dd("yyyy-MM-dd"),
-//        yyyy_MM("yyyy-MM"),
-//        yy_MM_dd("yy-MM-dd"),
-//        HH_mm_ss("HH:mm:ss"),
-//        HH_mm("HH:mm"),
-//
-//        yyyyMMddHHmmssSSS("yyyyMMddHHmmssSSS"),
-//        yyyyMMddHHmmss("yyyyMMddHHmmss"),
-//        yyyyMMdd("yyyyMMdd"),
-//        yyyyMM("yyyyMM"),
-//        HHmmssSSS("HHmmssSSS"),
-//        HHmmss("HHmmss"),
-//
-//        zh_yyyy_MM_dd_HH_mm_ss("yyyy年MM月dd日 HH时mm分"),
-//        zh_yyyy_MM_dd("yyyy年MM月dd日"),
-//        zh_yyyy_MM("yyyy年MM月"),
-
         log.info("{} => {}", yyyy_MM_dd_HH_mm_ss_SSS.comment, yyyy_MM_dd_HH_mm_ss_SSS.parse("2018-12-12 00:00:00.000"));
         log.info("{} => {}", yyyy_MM_dd_HH_mm_ss.comment, yyyy_MM_dd_HH_mm_ss.parse("2018-12-12 00:00:00.000"));
         log.info("{} => {}", yyyy_MM_dd.comment, yyyy_MM_dd.parse("2018-12-12"));
