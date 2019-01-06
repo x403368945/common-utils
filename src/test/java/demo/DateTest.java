@@ -40,7 +40,7 @@ public class DateTest {
 
     @SneakyThrows
     public static void main(String[] args) {
-        {
+        if(false){
             //定义一个线程安全的HashSet
             Set<String> dates = Collections.synchronizedSet(new HashSet<String>());
             for (int i = 0; i < 100; i++) {
@@ -52,7 +52,7 @@ public class DateTest {
                     calendar.add(Calendar.DATE, finalI);
                     //通过simpleDateFormat把时间转换成字符串
                     String dateString = simpleDateFormat.format(calendar.getTime());
-//                    System.out.println(dateString);
+                    System.out.println(dateString);
                     //把字符串放入Set中
                     dates.add(dateString);
                     //countDown
@@ -62,9 +62,9 @@ public class DateTest {
             //阻塞，直到countDown数量为0
             countDownLatch.await();
             //输出去重后的时间个数，理论上应该是恒定的100个时间，实际上数量小于100
-            System.out.println(dates.size());
+            System.out.println(">"+dates.size());
         }
-        if (false) {
+        if (true) {
             countDownLatch = new CountDownLatch(100);
             //定义一个线程安全的HashSet
             Set<String> dates = Collections.synchronizedSet(new HashSet<String>());
@@ -74,6 +74,7 @@ public class DateTest {
                     String dateString = date.addDay(1).formatDateTime();
                     //把字符串放入Set中
                     dates.add(dateString);
+                    System.out.println(dateString);
                     //countDown
                     countDownLatch.countDown();
                 });
@@ -81,7 +82,7 @@ public class DateTest {
             //阻塞，直到countDown数量为0
             countDownLatch.await();
             //输出去重后的时间个数
-            System.out.println(dates.size());
+            System.out.println(">"+dates.size());
         }
     }
 }

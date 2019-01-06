@@ -38,12 +38,12 @@ public final class Dates {
      * 枚举：定义日期格式
      */
     public enum Pattern {
-        yyyy("yyyy"),
-        MM("MM"),
-        dd("dd"),
-        HH("HH"),
-        mm("mm"),
-        ss("ss"),
+//        yyyy("yyyy"),
+//        MM("MM"),
+//        dd("dd"),
+//        HH("HH"),
+//        mm("mm"),
+//        ss("ss"),
 
         yyyy_MM_dd_HH_mm_ss_SSS("yyyy-MM-dd HH:mm:ss.SSS"),
         yyyy_MM_dd_HH_mm_ss("yyyy-MM-dd HH:mm:ss"),
@@ -69,6 +69,7 @@ public final class Dates {
          */
         private final String comment;
         private final DateTimeFormatter formatter;
+        private final SimpleDateFormat format;
 
         public String value() {
             return this.comment;
@@ -77,6 +78,7 @@ public final class Dates {
         Pattern(final String comment) {
             this.comment = comment;
             this.formatter = DateTimeFormatter.ofPattern(comment);
+            this.format = new SimpleDateFormat(comment);
         }
 
         /**
@@ -95,7 +97,22 @@ public final class Dates {
          * @return {@link Dates}
          */
         public Dates parse(final String value) {
-            return new Dates(LocalDateTime.parse(value, formatter));
+            try {
+                return Dates.of(format.parse(value));
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+            // TODO java 8 新的日期操作类，格式化容错率太低了
+//            try {
+//                return new Dates(LocalDateTime.parse(value, formatter));
+//            } catch (DateTimeException e) {
+//                try {
+//                    return new Dates(LocalDate.parse(value, formatter));
+//                } catch (DateTimeException e1) {
+//                    return new Dates(LocalTime.parse(value, formatter));
+//                }
+//            }
+//            return new Dates(LocalDateTime.parse(value, formatter));
         }
 
         /**
@@ -341,6 +358,14 @@ public final class Dates {
 
     private Dates() {
         this.obj = LocalDateTime.now();
+    }
+
+    private Dates(final LocalTime value) {
+        this(value.atDate(LocalDate.now()));
+    }
+
+    private Dates(final LocalDate value) {
+        this(value.atStartOfDay());
     }
 
     private Dates(final LocalDateTime value) {
@@ -916,6 +941,39 @@ public final class Dates {
         log.info("左 <= 右 true：{}", Dates.now().beginTimeOfDay().le(Dates.now().addDay(1).beginTimeOfDay()));
         log.info("左 <= 右 false：{}", Dates.now().addDay(1).beginTimeOfDay().le(Dates.now().beginTimeOfDay()));
 
+        try {
+            log.info("{}", LocalDateTime.parse("2018-12-12", DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        } catch (DateTimeException e) {
+            try {
+                log.info("{}", LocalDate.parse("2018-12-12", DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+            } catch (DateTimeException e1) {
+                log.info("{}", LocalTime.parse("2018-12-12", DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+            }
+        }
+        log.info("{}", LocalDateTime.parse("2018-12-12 00:00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+//        yyyy_MM_dd_HH_mm_ss_SSS("yyyy-MM-dd HH:mm:ss.SSS"),
+//        yyyy_MM_dd_HH_mm_ss("yyyy-MM-dd HH:mm:ss"),
+//        yyyy_MM_dd("yyyy-MM-dd"),
+//        yyyy_MM("yyyy-MM"),
+//        yy_MM_dd("yy-MM-dd"),
+//        HH_mm_ss("HH:mm:ss"),
+//        HH_mm("HH:mm"),
+//
+//        yyyyMMddHHmmssSSS("yyyyMMddHHmmssSSS"),
+//        yyyyMMddHHmmss("yyyyMMddHHmmss"),
+//        yyyyMMdd("yyyyMMdd"),
+//        yyyyMM("yyyyMM"),
+//        HHmmssSSS("HHmmssSSS"),
+//        HHmmss("HHmmss"),
+//
+//        zh_yyyy_MM_dd_HH_mm_ss("yyyy年MM月dd日 HH时mm分"),
+//        zh_yyyy_MM_dd("yyyy年MM月dd日"),
+//        zh_yyyy_MM("yyyy年MM月"),
+
+        log.info("{} => {}", yyyy_MM_dd_HH_mm_ss_SSS.comment, yyyy_MM_dd_HH_mm_ss_SSS.parse("2018-12-12 00:00:00.000"));
+        log.info("{} => {}", yyyy_MM_dd_HH_mm_ss.comment, yyyy_MM_dd_HH_mm_ss.parse("2018-12-12 00:00:00.000"));
+        log.info("{} => {}", yyyy_MM_dd.comment, yyyy_MM_dd.parse("2018-12-12"));
+        log.info("{} => {}", yyyy_MM.comment, yyyy_MM.parse("2018-12"));
     }
 
 }
