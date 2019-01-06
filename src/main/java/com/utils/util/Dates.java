@@ -45,6 +45,7 @@ public final class Dates {
         mm("mm"),
         ss("ss"),
 
+        yyyy_MM_dd_HH_mm_ss_SSS("yyyy-MM-dd HH:mm:ss.SSS"),
         yyyy_MM_dd_HH_mm_ss("yyyy-MM-dd HH:mm:ss"),
         yyyy_MM_dd("yyyy-MM-dd"),
         yyyy_MM("yyyy-MM"),
