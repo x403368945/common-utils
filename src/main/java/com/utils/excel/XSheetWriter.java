@@ -23,6 +23,8 @@ import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import static com.utils.excel.enums.Column.*;
+
 /**
  * 【.xlsx】数据写入操作；写入完成之后需要调用 close 方法；否则可能造成内存泄露
  *
@@ -193,20 +195,20 @@ public final class XSheetWriter implements ISheetWriter<XSheetWriter>, ISheetWri
                     }
                     final XSheetWriter sheetWriter = XSheetWriter.of(workbook.getSheetAt(0))
                             .rowNew(Rownum.of(1))  // 从第1行开始写
-                            .cellNew(0).writeNumber(100)
-                            .cellNew(1).writeFormula("100*A1")
-                            .cellNew(2).writeDate(Dates.now().formatDate())
-                            .cellNew(3).writeText("蓝色单元格").writeStyle(blueStyle)
-                            .cellNew(4).writeText("绿色单元格").writeStyle(greenStyle)
-                            .cellNew(5).writeText("红色单元格").writeStyle(redStyle)
+                            .cellNew(A).writeNumber(100)
+                            .cellNew(B).writeFormula("100*A1")
+                            .cellNew(C).writeDate(Dates.now().formatDate())
+                            .cellNew(D).writeText("蓝色单元格").writeStyle(blueStyle)
+                            .cellNew(E).writeText("绿色单元格").writeStyle(greenStyle)
+                            .cellNew(F).writeText("红色单元格").writeStyle(redStyle)
                             .appendStyleOfRow(centerStyle) // 当前行所有列追加文本居中样式
                             .nextRowNew()
-                            .cellNew(0).writeNumber(100).appendStyle(centerStyle) // 当前行指定列追加文本居中样式
-                            .cellNew(1).writeFormula("100*A2")
-                            .cellNew(2).writeDate(Dates.now().date()).writeStyle(dateStyle)
-                            .cellNew(3).writeText("蓝色单元格").writeStyle(blueStyle).appendStyle(centerStyle) // 当前行指定列追加文本居中样式
-                            .cellNew(4).writeText("绿色单元格").writeStyle(greenStyle)
-                            .cellNew(5).writeText("红色单元格").writeStyle(redStyle);
+                            .cellNew(A).writeNumber(100).appendStyle(centerStyle) // 当前行指定列追加文本居中样式
+                            .cellNew(B).writeFormula("100*A2")
+                            .cellNew(C).writeDate(Dates.now().date()).writeStyle(dateStyle)
+                            .cellNew(D).writeText("蓝色单元格").writeStyle(blueStyle).appendStyle(centerStyle) // 当前行指定列追加文本居中样式
+                            .cellNew(E).writeText("绿色单元格").writeStyle(greenStyle)
+                            .cellNew(F).writeText("红色单元格").writeStyle(redStyle);
                     { // 测试 FillPatternType
                         final FillPatternType[] types = FillPatternType.values();
                         sheetWriter.nextRowNew();
@@ -263,65 +265,65 @@ public final class XSheetWriter implements ISheetWriter<XSheetWriter>, ISheetWri
                     final CellStyles centerStyle = CellStyles.builder().alignment(HorizontalAlignment.CENTER).build();
                     final XSheetWriter sheetWriter = XSheetWriter.of(workbook.getSheetAt(0))
                             .rowNew(Rownum.of(1)) // 从第1行开始写
-                            .cellNew(0).writeText("第1行")
-                            .cellNew(1).writeNumber(100)
-                            .cellNew(2).writeNumber(1)
-                            .cellNew(3).writeFormula("B1*C1")
-                            .cellNew(4).writeDate(Dates.now().date()).writeStyle(dateStyle)
-                            .cellNew(5).writeText("蓝色单元格").writeStyle(blueStyle)
-                            .cellNew(6).writeText("绿色单元格").writeStyle(greenStyle)
-                            .cellNew(7).writeText("红色单元格").writeStyle(redStyle)
+                            .cellNew(A).writeText("第1行")
+                            .cellNew(B).writeNumber(100)
+                            .cellNew(C).writeNumber(1)
+                            .cellNew(D).writeFormula("B1*C1")
+                            .cellNew(E).writeDate(Dates.now().date()).writeStyle(dateStyle)
+                            .cellNew(F).writeText("蓝色单元格").writeStyle(blueStyle)
+                            .cellNew(G).writeText("绿色单元格").writeStyle(greenStyle)
+                            .cellNew(H).writeText("红色单元格").writeStyle(redStyle)
                             .appendStyleOfRow(centerStyle) // 当前行所有列追加文本居中样式
                             .copyToNext() // 复制到下一行
 
                             .nextRowOfNew()
-                            .cell(0).writeText("第2行：从第1行复制来的")
-                            .cell(1).writeNumber(101)
-                            .cell(2).writeNumber(2)
-//                            .cell(3).writeFormula("B1*C1") // 执行复制行时会自动复制公式
-                            .cell(4).writeDate(Dates.now().addDay(1).date())
-//                            .cell(5).writeText("蓝色单元格")
-//                            .cell(6).writeText("绿色单元格")
-//                            .cell(7).writeText("红色单元格")
+                            .cell(A).writeText("第2行：从第1行复制来的")
+                            .cell(B).writeNumber(101)
+                            .cell(C).writeNumber(2)
+//                            .cell(D).writeFormula("B1*C1") // 执行复制行时会自动复制公式
+                            .cell(E).writeDate(Dates.now().addDay(1).date())
+//                            .cell(F).writeText("蓝色单元格")
+//                            .cell(G).writeText("绿色单元格")
+//                            .cell(H).writeText("红色单元格")
                             // 设置第二行的红色单元格与后面一列合并，测试合并列是否会被复制
                             .merge(Range.of("H2", "I2"))
 
                             // 从第 2 行复制到第 3 行, 复制都是使用索引
                             .copy(Rownum.of(2).index(), Rownum.of(3).index())
                             .nextRowOfNew()
-                            .cell(0).writeText("第3行：从第2行复制来的")
-                            .cell(2).writeNumber(3)
-                            .cell(3).writeFormula("100*B3")
+                            .cell(A).writeText("第3行：从第2行复制来的")
+                            .cell(C).writeNumber(3)
+                            .cell(D).writeFormula("100*B3")
                             // 将第 3 行复制，从第 6 行开始作为目标行，总共复制 5 行, 复制都是使用索引
                             .copy(Rownum.of(3).index(), Rownum.of(6).index(), 5)
                             // 切换到第5行
                             .row(Rownum.of(5))
-                            .cell(0).writeText("这是第5行，第2列和第4行已隐藏").merge(Range.of("A5:E5"))
+                            .cell(A).writeText("这是第5行，第2列和第4行已隐藏").merge(Range.of("A5:E5"))
 
                             // 切换到第6行
                             .row(Rownum.of(6))
-                            .cell(0).writeText("第6行：从第3行复制来的，清除红色单元格文字")
-                            .cell(7).setCellBlank()
+                            .cell(A).writeText("第6行：从第3行复制来的，清除红色单元格文字")
+                            .cell(H).setCellBlank()
 
                             .row(Rownum.of(7))
-                            .cell(0).writeText("第7行：从第3行复制来的，清除绿色单元格文字")
-                            .cell(6).setCellBlank()
+                            .cell(A).writeText("第7行：从第3行复制来的，清除绿色单元格文字")
+                            .cell(G).setCellBlank()
 
                             .nextRowOfNew()
-                            .cell(1).appendStyle(CellStyles.builder().fillPattern(FillPatternType.SOLID_FOREGROUND).fillForegroundColor(Colors.Red.color).build())
+                            .cell(B).appendStyle(CellStyles.builder().fillPattern(FillPatternType.SOLID_FOREGROUND).fillForegroundColor(Colors.Red.color).build())
                             .setRowBlankIgnoreFromula() // 清除整行数据，公式不清除
-                            .cell(0).writeText("第8行：从第3行复制来的,清除整行数据，公式不清除")
+                            .cell(A).writeText("第8行：从第3行复制来的,清除整行数据，公式不清除")
 
                             .nextRowOfNew()
-                            .cell(1).appendStyle(CellStyles.builder().fillPattern(FillPatternType.SOLID_FOREGROUND).fillForegroundColor(Colors.Red.color).build()).writeNumber(null)
+                            .cell(B).appendStyle(CellStyles.builder().fillPattern(FillPatternType.SOLID_FOREGROUND).fillForegroundColor(Colors.Red.color).build()).writeNumber(null)
                             .setRowBlank() // 清除整行数据，公式会被清除
-                            .cell(0).writeText("第9行：从第3行复制来的,清除整行数据，公式会被清除")
+                            .cell(A).writeText("第9行：从第3行复制来的,清除整行数据，公式会被清除")
 
                             .nextRowOfNew()
-                            .cell(0).writeText("第10行：从第3行复制来的")
+                            .cell(A).writeText("第10行：从第3行复制来的")
 
                             .nextRowOfNew()
-                            .cell(0).writeText("第11行")
+                            .cell(A).writeText("第11行")
 
                             // 隐藏第 4 行，第 2 列
                             .hideRow(Rownum.of(4).index()).hideColumn(Position.ofColumn("B").columnIndex())
@@ -348,9 +350,9 @@ public final class XSheetWriter implements ISheetWriter<XSheetWriter>, ISheetWri
                     final XSheetWriter writer = XSheetWriter
                             .of(workbook.getSheetAt(0))
                             .rowNew(Rownum.of(1)) // 从第1行开始写
-                            .cellNew(0).writeNumber(100)
-                            .cellNew(1).writeNumber(2)
-                            .cellNew(2).writeFormulaOfRebuild("A9*B9")
+                            .cellNew(A).writeNumber(100)
+                            .cellNew(B).writeNumber(2)
+                            .cellNew(C).writeFormulaOfRebuild("A9*B9")
 
 //                            .autoColumnWidth()
                             .evaluateAllFormulaCells();
@@ -373,9 +375,9 @@ public final class XSheetWriter implements ISheetWriter<XSheetWriter>, ISheetWri
                     final XSheetWriter writer = XSheetWriter.of(workbook.getSheetAt(0))
                             .setCloneStyles(Paths.get("logs/1.普通写入.xlsx").toAbsolutePath().toString()) // 指定引用样式库文件路径
                             .rowNew(Rownum.of(1)) // 从第1行开始写
-                            .cellNew(0).write(cellDatas.get(0))
-                            .cellNew(1).write(cellDatas.get(1))
-                            .cellNew(2).write(cellDatas.get(2))
+                            .cellNew(A).write(cellDatas.get(0))
+                            .cellNew(B).write(cellDatas.get(1))
+                            .cellNew(C).write(cellDatas.get(2))
 
 //                            .autoColumnWidth()
                             ;
@@ -406,25 +408,25 @@ public final class XSheetWriter implements ISheetWriter<XSheetWriter>, ISheetWri
                             .writeDropdownList("{sheetName}!A1:C1", Range.of("E3", "E10"))
 
                             .rowNew(Rownum.of(1)) // 写入下拉选项的引用值
-                            .cellNew(0).writeText("淘宝").writeComment("该单元格的值将会作为E列选项")
-                            .cellNew(1).writeText("天猫").writeComment("该单元格的值将会作为E列选项")
-                            .cellNew(2).writeText("京东").writeComment("该单元格的值将会作为E列选项")
+                            .cellNew(A).writeText("淘宝").writeComment("该单元格的值将会作为E列选项")
+                            .cellNew(B).writeText("天猫").writeComment("该单元格的值将会作为E列选项")
+                            .cellNew(C).writeText("京东").writeComment("该单元格的值将会作为E列选项")
 
                             .nextRowOfNew()
-                            .cellNew(0).writeText("下拉选项：【男，女】")
-                            .cellNew(2).writeText("下拉选项：【Java，PHP，Python】")
-                            .cellNew(3).writeDropdownList(Arrays.asList("AAA", "BBB"))
-                            .cellNew(4).writeDropdownList(Arrays.asList("CCC", "DDD", "EEE"))
+                            .cellNew(A).writeText("下拉选项：【男，女】")
+                            .cellNew(C).writeText("下拉选项：【Java，PHP，Python】")
+                            .cellNew(D).writeDropdownList(Arrays.asList("AAA", "BBB"))
+                            .cellNew(E).writeDropdownList(Arrays.asList("CCC", "DDD", "EEE"))
                             .nextRowOfNew()
-                            .cellNew(0).writeText("男")
-                            .cellNew(2).writeText("Java")
-                            .cellNew(3).writeText("Python")
+                            .cellNew(A).writeText("男")
+                            .cellNew(C).writeText("Java")
+                            .cellNew(D).writeText("Python")
 
                             // 向 A3:A10 单元格写入批注
                             .writeComments("只能输入【男、女】", Range.of("A3", "A10"))
 
                             // 冻结第 1 列 和 第 2 行
-                            .freeze(1, 2)
+                            .freeze(A, 2)
                             // 隐藏第 1 行
                             .hideRow(Rownum.of(1).index())
                             // 锁定 A1:J1，禁止编辑
@@ -455,12 +457,12 @@ public final class XSheetWriter implements ISheetWriter<XSheetWriter>, ISheetWri
                     final XSheetWriter writer = XSheetWriter.of(workbook.getSheet("Sheet1"));
                     RangeInt.of(1, 10).forEach(parent -> {
                         writer.nextRowOfNew()
-                                .cell(0).writeText(Objects.toString(parent))
-                                .cell(1).writeText("父级代码");
+                                .cell(A).writeText(Objects.toString(parent))
+                                .cell(B).writeText("父级代码");
                         final List<Integer> rowIndexs = RangeInt.of(0, Math.max(Util.randomMax(10), 1))
                                 .map(rowIndex -> writer.nextRowOfNew()
-                                        .cell(0).writeText(Objects.toString(parent + "" + (rowIndex + 1)))
-                                        .cell(1).writeText("子集代码")
+                                        .cell(A).writeText(Objects.toString(parent + "" + (rowIndex + 1)))
+                                        .cell(B).writeText("子集代码")
                                         .getRowIndex()
                                 )
                                 .collect(Collectors.toList());
