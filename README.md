@@ -118,8 +118,8 @@ com.utils.util.HtmlPdfWriter:类:将html页面写入pdf；依赖：https://githu
 com.utils.util.JSEngine:类:挂起JS引擎，执行JS代码    
 com.utils.util.Maps:类:链式构建Map  
 com.utils.util.Num:类:数字操作  
-com.utils.util.Num#Range:类:数字区间操作  
-com.utils.util.Num#RangeInt:类:int数字区间操作  
-com.utils.util.Num#RangeLong:类:long数字区间操作  
+com.utils.util.Range:类:数字区间操作  
+com.utils.util.RangeInt:类:int数字区间操作  
+com.utils.util.RangeLong:类:long数字区间操作  
 com.utils.util.QRCode:类:二维码生成；依赖：https://github.com/zxing/zxing    
 com.utils.util.Util:类:常用基础方法封装  
