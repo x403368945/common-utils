@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 
 /**
  * EXCEL数据类型定义
- * @author 谢长春 on 2018-10-3
+ * @author 谢长春 on 2018-10-3 .
  */
 public enum DataType {
     /** 数值*/

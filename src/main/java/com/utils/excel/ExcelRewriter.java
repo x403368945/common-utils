@@ -17,7 +17,7 @@ import java.util.Objects;
 /**
  * 【.xls|.xlsx】 读写同时操作；写入完成之后需要调用 close 方法；否则可能造成内存泄露
  *
- * @author 谢长春 on 2018-8-8.
+ * @author 谢长春 on 2018-8-8 .
  */
 @Slf4j
 public final class ExcelRewriter implements ISheetWriter<ExcelRewriter>, ISheetReader<ExcelRewriter>, ISheetWriter.ICopyRows<ExcelRewriter> {

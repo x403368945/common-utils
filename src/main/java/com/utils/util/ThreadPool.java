@@ -18,7 +18,7 @@ import java.util.concurrent.*;
  * https://mp.weixin.qq.com/s/zFBXJEaQ2s3dvNwYLz_MRA
  * </pre>
  *
- * @author 谢长春  2016-11-23
+ * @author 谢长春  2016-11-23 .
  */
 @Slf4j
 public abstract class ThreadPool {

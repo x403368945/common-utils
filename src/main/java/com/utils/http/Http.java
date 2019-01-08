@@ -24,7 +24,7 @@ import static okhttp3.internal.Util.EMPTY_RESPONSE;
 /**
  * http请求封装
  *
- * @author 谢长春 on 2017/11/21.
+ * @author 谢长春 on 2017/11/21 .
  */
 @Slf4j
 @Accessors(chain = true, fluent = true)

@@ -13,7 +13,7 @@ import static java.util.stream.Collectors.joining;
 /**
  * Excel 列名定义
  *
- * @author 谢长春 on 2017/10/15.
+ * @author 谢长春 on 2017/10/15 .
  */
 public enum Column {
     A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z,

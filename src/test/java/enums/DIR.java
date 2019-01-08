@@ -10,7 +10,7 @@ import java.nio.file.Paths;
 /**
  * 单元测试文件定义目录
  *
- * @author 谢长春 on 2017/12/13.
+ * @author 谢长春 on 2017/12/13 .
  */
 public enum DIR {
     ROOT("项目根目录", Paths.get("").toAbsolutePath().toString()),

@@ -23,7 +23,7 @@ import java.util.zip.ZipOutputStream;
  * 例1：当 from = D:\files\dir ；则默认 to = D:\files\dir.zip <br>
  * 例2：当 from = D:\files\content.txt ；则默认 to = D:\files\content.zip <br>
  *
- * @author 谢长春 on 2017/10/30.
+ * @author 谢长春 on 2017/10/30 .
  */
 @AllArgsConstructor
 @Slf4j

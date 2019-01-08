@@ -24,7 +24,7 @@ import java.util.function.Consumer;
 /**
  * 【.xsl|.xslx】 文件读取
  *
- * @author 谢长春 on 2018-8-8.
+ * @author 谢长春 on 2018-8-8 .
  */
 @Slf4j
 public final class ExcelReader implements ISheetReader<ExcelReader> {

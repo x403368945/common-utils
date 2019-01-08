@@ -12,7 +12,7 @@ import java.util.Objects;
 
 /**
  * 构建Map对象，支持链式构建
- * @author 谢长春 on 2018-10-3
+ * @author 谢长春 on 2018-10-3 .
  */
 @Slf4j
 public final class Maps<K, V> {

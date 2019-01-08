@@ -9,7 +9,7 @@ import java.nio.charset.Charset;
 /**
  * 字符编码
  *
- * @author 谢长春 on 2017/11/17.
+ * @author 谢长春 on 2017/11/17 .
  */
 public enum Charsets {
     // UTF-8 字符编码

@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 /**
  * 文件路径处理及文件对象操作
  *
- * @author 谢长春 on 2018/1/16.
+ * @author 谢长春 on 2018/1/16 .
  */
 @Slf4j
 public final class FPath {

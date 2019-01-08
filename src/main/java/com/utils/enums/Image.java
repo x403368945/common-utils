@@ -5,7 +5,7 @@ import java.util.Objects;
 /**
  * 图片格式定义
  *
- * @author 谢长春 on 2018/2/11.
+ * @author 谢长春 on 2018/2/11 .
  */
 public enum Image {
     // JPEG

@@ -13,7 +13,7 @@ import java.util.function.Supplier;
 /**
  * Cell单元格读取操作
  *
- * @author 谢长春 on 2018-8-8.
+ * @author 谢长春 on 2018-8-8 .
  */
 interface ICellReader<T extends ICellReader> {
     /**

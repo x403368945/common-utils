@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * 数字区间操作类
  *
- * @author 谢长春 2018/12/10
+ * @author 谢长春 2018/12/10 .
  */
 @NoArgsConstructor
 @AllArgsConstructor

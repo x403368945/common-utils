@@ -11,7 +11,7 @@ import lombok.experimental.Accessors;
 /**
  * excel 解析单元格实体
  *
- * @author 谢长春 on 2017/10/19.
+ * @author 谢长春 on 2017/10/19 .
  */
 @NoArgsConstructor
 @AllArgsConstructor

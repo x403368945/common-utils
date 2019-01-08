@@ -14,7 +14,7 @@ import java.util.Objects;
 /**
  * excel 数据行（解析得到数据行，也可以自由构建数据行）
  *
- * @author 谢长春 on 2017/11/3.
+ * @author 谢长春 on 2017/11/3 .
  */
 public class Row extends JSONObject {
     public static Row build() {

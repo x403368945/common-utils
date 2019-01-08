@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 /**
  * 系统工具类
  *
- * @author 谢长春 2016-11-23
+ * @author 谢长春 2016-11-23 .
  */
 @Slf4j
 public final class Util {

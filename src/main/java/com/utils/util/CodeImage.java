@@ -20,7 +20,7 @@ import java.util.stream.Stream;
 /**
  * 生成图片验证码
  *
- * @author 谢长春 on 2017/11/21.
+ * @author 谢长春 on 2017/11/21 .
  */
 @AllArgsConstructor
 public final class CodeImage {

@@ -10,7 +10,7 @@ import java.util.Objects;
 /**
  * Base64 编码解码工具类
  *
- * @author 谢长春  2016-11-23
+ * @author 谢长春  2016-11-23 .
  */
 public final class Base64 {
 

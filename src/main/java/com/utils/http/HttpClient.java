@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * http 客户端定义
  *
- * @author 谢长春 on 2017/11/21.
+ * @author 谢长春 on 2017/11/21 .
  */
 @Slf4j
 public class HttpClient {

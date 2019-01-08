@@ -7,7 +7,7 @@ import java.util.function.Function;
 /**
  * 构建链式调用，只能操作对象，不支持原始数据类型
  *
- * @author 谢长春 2019/1/5
+ * @author 谢长春 2019/1/5 .
  */
 public class Then<T> {
     /**

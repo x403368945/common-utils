@@ -11,7 +11,7 @@ import java.util.function.Supplier;
 /**
  * 对 {@link java.util.Optional} 友好，建议使用 {@link java.util.Optional}，因为该类的部分功能已经在 jdk11 后实现
  *
- * @author 谢长春 2018/12/20
+ * @author 谢长春 2018/12/20 .
  */
 @Slf4j
 public final class Op<T> {

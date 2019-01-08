@@ -20,7 +20,7 @@ import java.util.Objects;
 /**
  * 二维码生成；依赖 google.zxing 库
  *
- * @author 谢长春 on 2018/1/29.
+ * @author 谢长春 on 2018/1/29 .
  */
 @NoArgsConstructor
 @AllArgsConstructor

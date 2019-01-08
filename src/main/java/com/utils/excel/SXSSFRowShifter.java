@@ -19,7 +19,7 @@ package com.utils.excel;//package com.core.util.excel;
 //import java.util.List;
 //
 ///**
-// * @author 谢长春 on 2017/11/20.
+// * @author 谢长春 on 2017/11/20 .
 // */
 //public class SXSSFRowShifter  extends RowShifter {
 //    private static final POILogger logger = POILogFactory.getLogger(SXSSFRowShifter.class);

@@ -17,7 +17,7 @@ import static com.utils.util.Num.Pattern.*;
  * 数字转换类；使用此类初始化时，会尽可能的处理 null 值，避免因为 null 值抛出异常；但部分无法适配的操作依然会抛异常
  * 请谨慎使用此类，因为可以用 null 值初始化，在计算时因为数据转换产生的 null 值会产生警告，造成计算结果有差异
  *
- * @author 谢长春 on 2017/10/26.
+ * @author 谢长春 on 2017/10/26 .
  */
 @Slf4j
 public class Num {

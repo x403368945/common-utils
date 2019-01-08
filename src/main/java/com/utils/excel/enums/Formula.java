@@ -10,7 +10,7 @@ import java.util.Objects;
 /**
  * 枚举：Excel 基本公式操作
  *
- * @author 谢长春 2018/10/29
+ * @author 谢长春 2018/10/29 .
  */
 public enum Formula {
     SUM("求和"),

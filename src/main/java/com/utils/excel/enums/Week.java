@@ -15,7 +15,7 @@ import java.util.stream.Stream;
  * {@link java.time.DayOfWeek#SUNDAY}{@link java.time.DayOfWeek#SUNDAY#ordinal()}  获取周日为数字为 6 ，即：{"0":"一","1":"二","2":"三","3":"四","4":"五","5":"六","6":"日"}
  * {@link java.time.DayOfWeek#SUNDAY}{@link java.time.DayOfWeek#SUNDAY#getValue()} 获取周日为数字为 7 ，即：{"1":"一","2":"二","3":"三","4":"四","5":"五","6":"六","7":"日"}
  *
- * @author 谢长春 on 2017/11/1.
+ * @author 谢长春 on 2017/11/1 .
  */
 @Slf4j
 public enum Week {

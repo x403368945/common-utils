@@ -8,7 +8,7 @@ import java.util.Objects;
 
 /**
  * 月份
- * @author 谢长春 on 2017/10/15.
+ * @author 谢长春 on 2017/10/15 .
  */
 public enum Month {
     // 1月

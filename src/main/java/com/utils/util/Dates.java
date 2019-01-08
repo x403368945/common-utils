@@ -28,7 +28,7 @@ import static com.utils.util.Dates.Pattern.*;
 /**
  * 日期处理类
  *
- * @author 谢长春 on 2017/10/28.
+ * @author 谢长春 on 2017/10/28 .
  */
 @Slf4j
 public final class Dates {
