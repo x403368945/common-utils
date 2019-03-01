@@ -330,16 +330,16 @@ public final class Dates {
             String pattern;
             switch (value.length()) {
                 case 17:
-                    pattern = Integer.valueOf(value.substring(4, 6)) > 12 ? "yyyyddMMHHmmssSSS" : "yyyyMMddHHmmssSSS";
+                    pattern = Integer.parseInt(value.substring(4, 6)) > 12 ? "yyyyddMMHHmmssSSS" : "yyyyMMddHHmmssSSS";
                     break;
                 case 14:
-                    pattern = Integer.valueOf(value.substring(4, 6)) > 12 ? "yyyyddMMHHmmss" : "yyyyMMddHHmmss";
+                    pattern = Integer.parseInt(value.substring(4, 6)) > 12 ? "yyyyddMMHHmmss" : "yyyyMMddHHmmss";
                     break;
                 case 9:
                     pattern = "HHmmssSSS";
                     break;
                 case 8:
-                    pattern = Integer.valueOf(value.substring(4, 6)) > 12 ? "yyyyddMM" : "yyyyMMdd";
+                    pattern = Integer.parseInt(value.substring(4, 6)) > 12 ? "yyyyddMM" : "yyyyMMdd";
                     break;
                 case 6:
                     pattern = "HHmmss";

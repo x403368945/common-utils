@@ -229,7 +229,7 @@ public final class FCopy {
 
     private void copy(final File from, final File to) throws IOException {
         if (!to.getParentFile().exists()) {
-            to.getParentFile().mkdirs();
+            if(!to.getParentFile().mkdirs()) throw new NullPointerException(String.format("目录创建失败：%s", to.getAbsolutePath()));
             FPath.of(to.getParentFile()).chmod(755);
         }
         if (ops.ignore && !from.exists()) {

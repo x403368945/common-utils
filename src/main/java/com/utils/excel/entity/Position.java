@@ -28,7 +28,7 @@ public class Position implements IJson {
 
     public static Position of(final String address) {
         final Matcher m = EXCEL_ADDRESS.matcher(address);
-        return m.find() ? new Position(Integer.valueOf(m.group(2)), m.group(1)) : new Position();
+        return m.find() ? new Position(Integer.parseInt(m.group(2)), m.group(1)) : new Position();
     }
 
     public static Position ofRow(final String row) {

@@ -2,7 +2,6 @@ package com.utils.excel;
 
 import com.utils.excel.entity.Position;
 import com.utils.excel.entity.Range;
-import com.utils.excel.enums.Column;
 import com.utils.util.RangeInt;
 import lombok.*;
 import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
@@ -226,10 +225,10 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
     /**
      * 选择操作单元格，当单元格不存在时创建单元格，并设置单元格类型为 CellType.BLANK
      *
-     * @param column {@link Column} 列名
+     * @param column {@link Enum} 列名
      * @return <T extends ISheetWriter>
      */
-    default T cellOfNew(final Column column) {
+    default T cellOfNew(final Enum column) {
         return cellOfNew(column.ordinal());
     }
 
@@ -247,10 +246,10 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
     /**
      * 新建操作单元格
      *
-     * @param column {@link Column} 列名
+     * @param column {@link Enum} 列名
      * @return <T extends ISheetWriter>
      */
-    default T cellNew(final Column column) {
+    default T cellNew(final Enum column) {
         return cellOfNew(column.ordinal());
     }
 
@@ -376,11 +375,11 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
      * 冻结行和列<br>
      * freeze(1, 1) : 表示冻结第 1 列和第 1 行
      *
-     * @param column Column 冻结列号；为0表示不冻结或取消冻结
+     * @param column {@link Enum} 冻结列号；为0表示不冻结或取消冻结
      * @param row    int 冻结行号；为0表示不冻结或取消冻结
      * @return <T extends ISheetWriter>
      */
-    default T freeze(final Column column, final int row) {
+    default T freeze(final Enum column, final int row) {
         return freeze(column.ordinal() + 1, row);
     }
 
@@ -632,11 +631,11 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
     /**
      * 设置列分组
      *
-     * @param fromColumn {@link Column}  起始列，包含
-     * @param toColumn   {@link Column}  结束列，包含
+     * @param fromColumn {@link Enum}  起始列，包含
+     * @param toColumn   {@link Enum}  结束列，包含
      * @return <T extends ISheetWriter>
      */
-    default T groupColumn(final Column fromColumn, final Column toColumn) {
+    default T groupColumn(final Enum fromColumn, final Enum toColumn) {
         return groupColumn(fromColumn.ordinal(), toColumn.ordinal());
     }
 
@@ -677,10 +676,10 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
     /**
      * 隐藏列
      *
-     * @param column {@link Column} 隐藏列
+     * @param column {@link Enum} 隐藏列
      * @return <T extends ISheetWriter>
      */
-    default T hideColumn(final Column column) {
+    default T hideColumn(final Enum column) {
         return hideColumn(column.ordinal());
     }
 
@@ -698,10 +697,10 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
     /**
      * 显示列
      *
-     * @param column {@link Column} 显示列
+     * @param column {@link Enum} 显示列
      * @return <T extends ISheetWriter>
      */
-    default T showColumn(final Column column) {
+    default T showColumn(final Enum column) {
         return showColumn(column.ordinal());
     }
 
@@ -1125,10 +1124,10 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
         /**
          * 选择操作单元格
          *
-         * @param column {@link Column} 列名枚举定义
+         * @param column {@link Enum} 列名枚举定义
          * @return HoldRow
          */
-        public HoldRow cell(final Column column) {
+        public HoldRow cell(final Enum column) {
             cell(column.ordinal());
             return this;
         }

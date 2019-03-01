@@ -53,7 +53,8 @@ public final class Logs {
                 new SimpleDateFormat("yyyyMMddHHmmssSSS").format(System.currentTimeMillis()).concat("_").concat(uid).concat(".log")
         ).toAbsolutePath().toString();
         final File file = new File(filePath);
-        file.getParentFile().mkdirs();
+        if (!file.getParentFile().mkdirs())
+            throw new NullPointerException(String.format("目录创建失败：%s", file.getParentFile().getAbsolutePath()));
         writer = new FileWriter(file, true);
     }
 
@@ -105,7 +106,7 @@ public final class Logs {
             exception = sw.toString();
         }
         try {
-            writer.write(String.format("%s %s [%s:%s:%d] - %s\n%s",
+            writer.write(String.format("%s %s [%s:%s:%d] - %s%n%s",
                     new Timestamp(System.currentTimeMillis()).toString(),
                     event.toString(),
                     element.getClassName(),

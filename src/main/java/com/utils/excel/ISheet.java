@@ -1,7 +1,6 @@
 package com.utils.excel;
 
 import com.utils.excel.entity.Position;
-import com.utils.excel.enums.Column;
 import com.utils.util.FPath;
 import com.utils.util.Maps;
 import lombok.Cleanup;
@@ -216,10 +215,10 @@ public interface ISheet<T> {
     /**
      * 选择操作单元格
      *
-     * @param column {@link Column} 列名枚举定义
+     * @param column {@link Enum} 列名枚举定义
      * @return <T extends ISheet>
      */
-    default T cell(final Column column) {
+    default T cell(final Enum column) {
         cell(column.ordinal());
         return (T) this;
     }

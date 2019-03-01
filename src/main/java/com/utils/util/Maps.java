@@ -12,6 +12,7 @@ import java.util.Objects;
 
 /**
  * 构建Map对象，支持链式构建
+ *
  * @author 谢长春 on 2018-10-3 .
  */
 @Slf4j
@@ -26,36 +27,60 @@ public final class Maps<K, V> {
         return new Maps<>(new LinkedHashMap<K, V>());
     }
 
+    public static <K, V> Maps<K, V> of(Class<K> key, Class<V> value, int initialCapacity) {
+        return new Maps<>(new LinkedHashMap<K, V>(initialCapacity));
+    }
+
     public static Maps<String, Object> ofSO() {
         return new Maps<>(new LinkedHashMap<String, Object>());
+    }
+
+    public static Maps<String, Object> ofSO(int initialCapacity) {
+        return new Maps<>(new LinkedHashMap<String, Object>(initialCapacity));
     }
 
     public static Maps<String, String> ofSS() {
         return new Maps<>(new LinkedHashMap<String, String>());
     }
 
+    public static Maps<String, String> ofSS(int initialCapacity) {
+        return new Maps<>(new LinkedHashMap<String, String>(initialCapacity));
+    }
+
     public static Map<Object, Object> by(final Object key, final Object value) {
         Objects.requireNonNull(key, "参数【key】是必须的");
         Objects.requireNonNull(value, "参数【value】是必须的");
-        return new HashMap<Object, Object>(1) {{
-            put(key, value);
-        }};
+        return new HashMap<Object, Object>(1) {
+            private static final long serialVersionUID = 4983257585114540206L;
+
+            {
+                put(key, value);
+            }
+        };
     }
 
     public static Map<String, Object> bySO(final String key, final Object value) {
         Objects.requireNonNull(key, "参数【key】是必须的");
         Objects.requireNonNull(value, "参数【value】是必须的");
-        return new HashMap<String, Object>(1) {{
-            put(key, value);
-        }};
+        return new HashMap<String, Object>(1) {
+            private static final long serialVersionUID = -5600444915370162489L;
+
+            {
+                put(key, value);
+            }
+        };
     }
 
     public static Map<String, String> bySS(final String key, final String value) {
         Objects.requireNonNull(key, "参数【key】是必须的");
         Objects.requireNonNull(value, "参数【value】是必须的");
-        return new HashMap<String, String>(1) {{
-            put(key, value);
-        }};
+        return new HashMap<String, String>(1) {
+            private static final long serialVersionUID = 5814527523007359079L;
+
+            {
+                put(key, value);
+            }
+        };
     }
 
     private Maps() {

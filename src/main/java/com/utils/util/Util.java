@@ -41,7 +41,7 @@ public final class Util {
     public static String random(final int length) {
         return RandomStringUtils.randomNumeric(length);
     }
-
+    private static final Random random = new Random();
     /**
      * 获取随机数，指定随机数最大值
      *
@@ -49,7 +49,7 @@ public final class Util {
      * @return int
      */
     public static int randomMax(final int max) {
-        return new Random().nextInt(max);
+        return random.nextInt(max);
     }
 
     /**

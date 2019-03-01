@@ -1,13 +1,11 @@
 package com.utils.util;
 
-import com.utils.enums.Charsets;
-import lombok.Cleanup;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -87,7 +85,7 @@ public final class FPath {
      * @return String 文件名
      */
     public String fileName() {
-        return path.getFileName().toString();
+        return Objects.toString(path.getFileName());
     }
 
     /**
@@ -242,16 +240,19 @@ public final class FPath {
         log.info("清除目录:{}", path.toString());
         File[] files = path.toFile().listFiles();
         if (Util.isNotEmpty(files)) {
-            for (File file : files) {
+            for (File file : Objects.requireNonNull(files)) {
                 if (file.isDirectory()) {
                     FPath.of(file).deleteAll(true);
                 } else {
-                    file.delete();
+                    if (!file.delete())
+                        throw new NullPointerException(String.format("文件删除失败：%s", file.getAbsolutePath()));
                 }
             }
         }
         if (self) {
-            path.toFile().delete(); // 删除自己
+            // 删除自己
+            if (!path.toFile().delete())
+                throw new NullPointerException(String.format("文件删除失败：%s", path.toFile().getAbsolutePath()));
         }
     }
 
@@ -268,17 +269,18 @@ public final class FPath {
                 log.warn("文件不存在：{}", path.toAbsolutePath());
                 return null;
             }
-            final StringBuilder sb = new StringBuilder();
-            @Cleanup final BufferedReader reader = Files.newBufferedReader(path, Charsets.UTF_8.charset);
-            // 一次读多个字符
-            final char[] chars = new char[2048];
-            int length;
-            // 读入多个字符到字符数组中，count为一次读取字符数
-            while ((length = reader.read(chars)) != -1) {
-                sb.append(chars, 0, length);
-//                log.info(new String(chars, 0, count).replaceAll("\r\n", ""));
-            }
-            return sb.toString();
+            return new String(Files.readAllBytes(path.toFile().toPath()), StandardCharsets.UTF_8);
+//            final StringBuilder sb = new StringBuilder();
+//            @Cleanup final BufferedReader reader = Files.newBufferedReader(path, Charsets.UTF_8.charset);
+//            // 一次读多个字符
+//            final char[] chars = new char[2048];
+//            int length;
+//            // 读入多个字符到字符数组中，count为一次读取字符数
+//            while ((length = reader.read(chars)) != -1) {
+//                sb.append(chars, 0, length);
+////                log.info(new String(chars, 0, count).replaceAll("\r\n", ""));
+//            }
+//            return sb.toString();
         }
 
 //        { // ByteBuffer ；按字节读取，在构建String对象时可能产生乱码

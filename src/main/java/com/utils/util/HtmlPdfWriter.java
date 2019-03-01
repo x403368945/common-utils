@@ -3,6 +3,7 @@ package com.utils.util;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
 import com.itextpdf.tool.xml.XMLWorkerHelper;
+import lombok.Cleanup;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -103,7 +104,7 @@ public final class HtmlPdfWriter {
         }
         final Document document = new Document(rectangle);
         document.setMargins(0, 0, 0, 0);
-        final PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(pdf));
+        @Cleanup final PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(pdf));
 
         if (Objects.nonNull(pageEvent)) {
             writer.setPageEvent(pageEvent);

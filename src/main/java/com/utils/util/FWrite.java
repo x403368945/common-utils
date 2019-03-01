@@ -62,11 +62,13 @@ public final class FWrite {
         log.info("write file : {}", file.getAbsolutePath());
         Objects.requireNonNull(file, "请指定写入路径");
         if (!file.getParentFile().exists()) {
-            file.getParentFile().mkdirs();
+            if (!file.getParentFile().mkdirs())
+                throw new NullPointerException(String.format("目录创建失败：%s", file.getParentFile().getAbsolutePath()));
             FPath.of(file.getParentFile()).chmod(755);
         }
         if (!file.exists()) {
-            file.createNewFile();
+            if (!file.createNewFile())
+                throw new NullPointerException(String.format("文件创建失败：%s", file.getAbsolutePath()));
         }
     }
 

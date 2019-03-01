@@ -173,7 +173,7 @@ public final class ExcelReader implements ISheetReader<ExcelReader> {
      * @return {@link com.utils.excel.entity.Row}{@link com.utils.excel.entity.Row<int:Header对象中的index字段值, String:单元格内容>}
      */
     public com.utils.excel.entity.Row rowObject(final List<Header> headers) {
-        final LinkedHashMap<String, String> map = new LinkedHashMap<>();
+//        final LinkedHashMap<String, String> map = new LinkedHashMap<>();
         final com.utils.excel.entity.Row row = com.utils.excel.entity.Row.build();
         headers.forEach(header -> row.addCell(header.getIndex(),
                 com.utils.excel.entity.Cell.builder()
