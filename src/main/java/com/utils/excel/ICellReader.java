@@ -258,7 +258,7 @@ interface ICellReader<T extends ICellReader> {
      *
      * @return {@link Num}
      */
-    default Num numberOfZore() {
+    default Num numberOfZero() {
         return Optional.ofNullable(numberValue()).orElse(Num.of(0));
     }
 
@@ -287,7 +287,7 @@ interface ICellReader<T extends ICellReader> {
      *
      * @return int
      */
-    default int intValueOfZore() {
+    default int intValueOfZero() {
         return Optional.ofNullable(numberValue()).map(Num::intValue).orElse(0);
     }
 
@@ -316,7 +316,7 @@ interface ICellReader<T extends ICellReader> {
      *
      * @return short
      */
-    default short shortValueOfZore() {
+    default short shortValueOfZero() {
         return Optional.ofNullable(numberValue()).map(Num::shortValue).orElse((short) 0);
     }
 
@@ -345,7 +345,7 @@ interface ICellReader<T extends ICellReader> {
      *
      * @return long
      */
-    default long longValueOfZore() {
+    default long longValueOfZero() {
         return Optional.ofNullable(numberValue()).map(Num::longValue).orElse(0L);
     }
 
@@ -374,7 +374,7 @@ interface ICellReader<T extends ICellReader> {
      *
      * @return double
      */
-    default double doubleValueOfZore() {
+    default double doubleValueOfZero() {
         return Optional.ofNullable(numberValue()).map(Num::doubleValue).orElse(0D);
     }
 

@@ -286,7 +286,7 @@ public class Num {
      * @param value String
      * @return {@link Num}
      */
-    public static Num ofZore(String value) {
+    public static Num ofZero(String value) {
         return of(value, 0);
     }
 
@@ -296,7 +296,7 @@ public class Num {
      * @param value Number
      * @return {@link Num}
      */
-    public static Num ofZore(Number value) {
+    public static Num ofZero(Number value) {
         if (Objects.isNull(value)) {
             return new Num(0);
         }
