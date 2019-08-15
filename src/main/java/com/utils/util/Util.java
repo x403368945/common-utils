@@ -31,7 +31,7 @@ public final class Util {
      *
      * @return String
      */
-    public static String uuid() {
+    public static String uuid32() {
         return UUID.randomUUID().toString().replace("-", "");
     }
 
@@ -638,7 +638,7 @@ public final class Util {
     }
 
     public static void main(String[] args) {
-        log.info(uuid());
+        log.info(uuid32());
         log.info("RandomStringUtils.random : {}",
                 JSON.toJSONString(
                         Stream.iterate(0, n -> n + 1).limit(10)

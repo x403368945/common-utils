@@ -191,7 +191,7 @@ public final class CodeImage {
                             CodeImage.ofDefault()
                                     .generate(System.out::println)
                                     .write(
-                                            Paths.get("logs", Util.uuid().concat(".jpeg")).toAbsolutePath().toFile()
+                                            Paths.get("logs", Util.uuid32().concat(".jpeg")).toAbsolutePath().toFile()
                                     )
                                     .getAbsolutePath()
                     )

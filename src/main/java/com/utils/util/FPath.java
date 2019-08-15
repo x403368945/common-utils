@@ -493,7 +493,7 @@ public final class FPath {
          * @return String UUID文件名，带后缀
          */
         public String getUuidFileName() {
-            return Util.uuid() + getSubfix();
+            return Util.uuid32() + getSubfix();
         }
     }
 
