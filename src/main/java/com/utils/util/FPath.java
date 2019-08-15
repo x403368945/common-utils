@@ -85,7 +85,7 @@ public final class FPath {
      * @return String 文件名
      */
     public String fileName() {
-        return Objects.toString(path.getFileName());
+        return Objects.toString(path.getFileName(), null);
     }
 
     /**

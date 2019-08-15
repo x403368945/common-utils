@@ -1,6 +1,7 @@
-package com.utils.excel.enums;
+package com.utils.enums;
 
-import com.utils.excel.entity.Header;
+import com.utils.excel.entity.Cell;
+import com.utils.excel.enums.DataType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,10 +26,10 @@ public enum Quarter {
 
     /**
      * 按季度分组构建表格头部
-     * @param headers {@link List}{@link List<Header>}
-     * @return {@link List}{@link List<Header>}
+     * @param headers {@link List}{@link List<Cell>}
+     * @return {@link List}{@link List<Cell>}
      */
-    public static List<Header> buildHeaders(List<Header> headers) {
+    public static List<Cell> buildHeaders(List<Cell> headers) {
         if (Objects.isNull(headers)) {
             headers = new ArrayList<>();
         }
@@ -36,15 +37,15 @@ public enum Quarter {
     }
     /**
      * 按季度分组构建表格头部
-     * @param headers {@link List}{@link List<Header>}
+     * @param headers {@link List}{@link List<Cell>}
      * @param startIndex int index 起始值
-     * @return {@link List}{@link List<Header>}
+     * @return {@link List}{@link List<Cell>}
      */
-    public static List<Header> buildHeaders(List<Header> headers, int startIndex) {
+    public static List<Cell> buildHeaders(List<Cell> headers, int startIndex) {
         if (Objects.isNull(headers)) {
             headers = new ArrayList<>();
         }
-        Header.HeaderBuilder builder = Header.builder().type(DataType.NUMBER);
+        Cell.CellBuilder builder = Cell.builder().type(DataType.NUMBER);
         {
             builder.group(ONE.comment);
             headers.add(builder.index(startIndex++).label("1月").build());

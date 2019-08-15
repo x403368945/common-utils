@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 /**
@@ -32,8 +33,10 @@ import java.util.stream.Stream;
 @JSONType(orders = {"start", "end"})
 @Slf4j
 public class Range implements IJson {
+    private static final Pattern REG_RANGE = Pattern.compile("^[A-Z]+\\d+:[A-Z]+\\d+$");
+
     public static Range of(final String range) {
-        if (!range.matches("^[A-Z]+\\d+:[A-Z]+\\d+$")) {
+        if (!REG_RANGE.matcher(range).matches()) {
             throw new IllegalArgumentException("区间值不正确");
         }
         final String[] arrs = range.split(":");

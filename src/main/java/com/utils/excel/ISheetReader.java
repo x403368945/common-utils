@@ -1,6 +1,6 @@
 package com.utils.excel;
 
-import com.utils.excel.entity.Header;
+import com.utils.excel.entity.Cell;
 import com.utils.excel.enums.DataType;
 import com.utils.util.Util;
 
@@ -80,15 +80,15 @@ public interface ISheetReader<T extends ISheetReader> extends ISheet<T>, ICellRe
     /**
      * 获取头部列名加索引
      *
-     * @return {@link Header}
+     * @return {@link Cell}
      */
-    default List<Header> headers() {
-        final List<Header> headers = new ArrayList<>();
+    default List<Cell> headers() {
+        final List<Cell> headers = new ArrayList<>();
         String label;
         for (int i = 0; i < getRow().getLastCellNum(); i++) {
             cell(i);
             if (Util.isNotEmpty(label = stringValue())) {
-                headers.add(Header.builder().index(i).label(label.trim()).type(DataType.TEXT).sindex(sindex()).build());
+                headers.add(Cell.builder().index(i).label(label.trim()).type(DataType.TEXT).sindex(sindex()).build());
             }
         }
         return headers;

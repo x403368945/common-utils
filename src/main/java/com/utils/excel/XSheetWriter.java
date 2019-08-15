@@ -311,7 +311,7 @@ public final class XSheetWriter implements ISheetWriter<XSheetWriter>, ISheetWri
 
                             .nextRowOfNew()
                             .cell(B).appendStyle(CellStyles.builder().fillPattern(FillPatternType.SOLID_FOREGROUND).fillForegroundColor(Colors.Red.color).build())
-                            .setRowBlankIgnoreFromula() // 清除整行数据，公式不清除
+                            .setRowBlankIgnoreFormula() // 清除整行数据，公式不清除
                             .cell(A).writeText("第8行：从第3行复制来的,清除整行数据，公式不清除")
 
                             .nextRowOfNew()

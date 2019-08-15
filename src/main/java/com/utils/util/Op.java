@@ -45,7 +45,7 @@ public final class Op<T> {
      */
     public Op<T> ifPresent(final Consumer<T> consumer) {
         Objects.requireNonNull(consumer);
-        op.ifPresent(v -> consumer.accept(v));
+        op.ifPresent(consumer::accept);
         return this;
     }
 

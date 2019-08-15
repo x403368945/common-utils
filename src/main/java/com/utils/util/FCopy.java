@@ -1,6 +1,7 @@
 package com.utils.util;
 
 import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Sets;
 import com.utils.util.FPath.FileName;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +40,7 @@ public final class FCopy {
         /**
          * 需要复制的文件名
          */
-        private List<String> names;
+        private Set<String> names;
         /**
          * 源文件不存在时，是否忽略，不进行复制操作，也不抛异常
          * 但获取复制的新文件时可能抛出异常
@@ -109,13 +110,18 @@ public final class FCopy {
         return this;
     }
 
-    public FCopy names(List<String> names) {
+    public FCopy names(final List<String> names) {
+        ops.names = new HashSet<>(names);
+        return this;
+    }
+
+    public FCopy names(final Set<String> names) {
         ops.names = names;
         return this;
     }
 
     public FCopy names(String... names) {
-        ops.names = Arrays.asList(names);
+        ops.names = Sets.newHashSet(names);
         return this;
     }
 
@@ -229,7 +235,8 @@ public final class FCopy {
 
     private void copy(final File from, final File to) throws IOException {
         if (!to.getParentFile().exists()) {
-            if(!to.getParentFile().mkdirs()) throw new NullPointerException(String.format("目录创建失败：%s", to.getAbsolutePath()));
+            if (!to.getParentFile().mkdirs())
+                throw new NullPointerException(String.format("目录创建失败：%s", to.getAbsolutePath()));
             FPath.of(to.getParentFile()).chmod(755);
         }
         if (ops.ignore && !from.exists()) {

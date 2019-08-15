@@ -49,12 +49,15 @@ public final class CodeImage {
         @Builder.Default
         private Image type = Image.JPEG;
     }
+
     public static CodeImage ofDefault() {
         return of(Options.builder().build());
     }
+
     public static CodeImage of(final Options ops) {
         return new CodeImage(ops, null);
     }
+
     private final Options ops;
     /**
      * 图片
@@ -77,7 +80,7 @@ public final class CodeImage {
         final Random random = new Random();
         // 设定背景色
         g.setColor(getRandColor(200, 250));
-        g.fillRect(0, 0, ops.width,ops. height);
+        g.fillRect(0, 0, ops.width, ops.height);
         // 设定字体
         g.setFont(new Font("Times New Roman", Font.PLAIN,
                 ops.height / 4 + 12
@@ -183,7 +186,7 @@ public final class CodeImage {
                             .generate(System.out::println)
                             .write(Paths.get("logs", "验证码.jpeg").toAbsolutePath().toFile())
             );
-            Stream.iterate(0, n->n+1).limit(100).forEach(i ->
+            Stream.iterate(0, n -> n + 1).limit(100).forEach(i ->
                     System.out.println(
                             CodeImage.ofDefault()
                                     .generate(System.out::println)

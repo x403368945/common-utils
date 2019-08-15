@@ -28,7 +28,7 @@ import static okhttp3.internal.Util.EMPTY_RESPONSE;
  */
 @Slf4j
 @Accessors(chain = true, fluent = true)
-public class Http {
+public final class Http {
     private Http(final OkHttpClient client) {
         this.client = client;
     }

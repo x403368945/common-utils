@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Objects;
 import java.util.regex.Matcher;
 
-import static com.utils.enums.Patterns.EXCEL_ADDRESS;
+import static com.utils.enums.Regs.EXCEL_ADDRESS;
 
 /**
  * 定义excel 单元格坐标

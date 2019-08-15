@@ -1,15 +1,18 @@
 package com.utils.util;
 
+import com.utils.ICall;
+
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * 构建链式调用，只能操作对象，不支持原始数据类型
  *
  * @author 谢长春 2019/1/5 .
  */
-public class Then<T> {
+public final class Then<T> {
     /**
      * 构造链式调用对象
      *
@@ -17,7 +20,18 @@ public class Then<T> {
      * @return {@link Then}
      */
     public static <T> Then<T> of(final T obj) {
-        return new Then<>(Objects.requireNonNull(obj, "参数【obj】不能为null"));
+        return new Then<>(obj);
+    }
+
+    /**
+     * hasTrue == true 时才执行 supplier，获得新
+     *
+     * @param hasTrue  boolean
+     * @param supplier {@link Supplier}
+     * @return {@link Then}
+     */
+    public static <T> Then<T> of(final boolean hasTrue, final Supplier<T> supplier) {
+        return new Then<>(hasTrue ? supplier.get() : null);
     }
 
     private Then() {
@@ -28,7 +42,7 @@ public class Then<T> {
         this.obj = obj;
     }
 
-    private final T obj;
+    private T obj;
 
     /**
      * 获取链式操作的值
@@ -77,13 +91,106 @@ public class Then<T> {
     }
 
     /**
-     * 执行 function
+     * 重新设置值
+     *
+     * @param value <T>
+     * @return {@link Then}
+     */
+    public Then<T> map(final T value) {
+        this.obj = value;
+        return this;
+    }
+
+    /**
+     * 执行 function，获得新值
      *
      * @param function {@link Function}
      * @return {@link Then}
      */
-    public Then<T> map(final Function<T, T> function) {
+    public <R> Then<R> map(final Function<T, R> function) {
         return Then.of(Objects.requireNonNull(function, "参数【function】不能为null").apply(obj));
+    }
+
+//    /**
+//     * Objects.nonNull(value) 时才执行 supplier，获得新值
+//     *
+//     * @param value    {@link Object}
+//     * @param supplier {@link Supplier}
+//     * @return {@link Then}
+//     */
+//    public Then<T> map(final Object value, final Supplier<T> supplier) {
+//        if (Objects.nonNull(value))
+//            this.obj = Objects.requireNonNull(supplier, "参数【supplier】不能为null").get();
+//        return this;
+//    }
+
+    /**
+     * hasTrue == true 时才执行 supplier，获得新值
+     *
+     * @param hasTrue  boolean
+     * @param supplier {@link Supplier}
+     * @return {@link Then}
+     */
+    public Then<T> map(final boolean hasTrue, final Supplier<T> supplier) {
+        if (hasTrue)
+            this.obj = Objects.requireNonNull(supplier, "参数【supplier】不能为null").get();
+        return this;
+    }
+
+    /**
+     * 判断 obj != null
+     *
+     * @return {@link Boolean} true:非空，false:空
+     */
+    public boolean isPresent() {
+        return Objects.nonNull(obj);
+    }
+
+    /**
+     * <pre>
+     * 当 obj != null 时 执行 consumer 方法
+     * ifPresent(hasError->{})
+     *
+     * @param consumer {@link Consumer}
+     * @return {@link Then}
+     */
+    public Then<T> ifPresent(final Consumer<T> consumer) {
+        if (Objects.nonNull(obj)) consumer.accept(obj);
+        return this;
+    }
+
+    /**
+     * 当 obj == null 时 执行 call 方法
+     *
+     * @param call {@link ICall}
+     * @return {@link Then}
+     */
+    public Then<T> elsePresent(final ICall call) {
+        if (Objects.isNull(obj)) call.call();
+        return this;
+    }
+
+    /**
+     * 将 obj 置空
+     *
+     * @return {@link Then}
+     */
+    public Then<T> end() {
+        this.obj = null;
+        return this;
+    }
+
+    /**
+     * 判断 Then 数组任何一个值 != null ，就返回 true
+     *
+     * @param arrs {@link Then}[]
+     * @return {@link Then<Boolean>} true:有非空，false:无非空
+     */
+    public static Then<Boolean> parallelNonNull(Then... arrs) {
+        for (Then arr : arrs) {
+            if (arr.isPresent()) return Then.of(true);
+        }
+        return Then.of(null);
     }
 
     public static void main(String[] args) {
@@ -107,5 +214,4 @@ public class Then<T> {
                         .toString()
         );
     }
-
 }

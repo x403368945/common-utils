@@ -6,15 +6,18 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
-
 import java.math.BigDecimal;
 import java.security.MessageDigest;
+import java.text.MessageFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * 系统工具类
@@ -41,7 +44,9 @@ public final class Util {
     public static String random(final int length) {
         return RandomStringUtils.randomNumeric(length);
     }
+
     private static final Random random = new Random();
+
     /**
      * 获取随机数，指定随机数最大值
      *
@@ -96,7 +101,7 @@ public final class Util {
      * @param obj 转换对象
      * @return String
      */
-    public static String toempty(final Object obj) {
+    public static String toStringEmpty(final Object obj) {
         return (Objects.isNull(obj)) ? "" : obj.toString().trim();
     }
 
@@ -139,7 +144,7 @@ public final class Util {
     public static String md5(final String source) {
         try {
             final MessageDigest md5 = MessageDigest.getInstance("MD5");
-            md5.update(source.getBytes("UTF8"));
+            md5.update(source.getBytes(UTF_8));
             byte[] bytes = md5.digest();
             final StringBuilder sb = new StringBuilder();
             for (byte b : bytes) {
@@ -279,13 +284,13 @@ public final class Util {
     }
 
     /**
-     * 判断args是否包含value
+     * 判断args是否不包含value
      *
      * @param value Object
      * @param args  Object...
      * @return boolean true：args不包含value， false：args中包含value
      */
-    public static boolean notin(final Object value, Object... args) {
+    public static boolean notIn(final Object value, Object... args) {
         return !in(value, args);
     }
 
@@ -303,11 +308,11 @@ public final class Util {
     /**
      * 判断args是否包含value
      *
-     * @param value
-     * @param collection
+     * @param value      {@link Object}
+     * @param collection {@link Collection}
      * @return boolean true：args不包含value， false：args中包含value
      */
-    public static boolean notin(final Object value, final Collection collection) {
+    public static boolean notIn(final Object value, final Collection collection) {
         return !in(value, collection);
     }
 
@@ -474,6 +479,25 @@ public final class Util {
     }
 
     /**
+     * 合并list
+     *
+     * @param lists List<T>[] 需要切割的集合
+     * @return {@link List}{@link List<T>}
+     */
+    @SafeVarargs
+    public static <T> List<T> merge(final List<T>... lists) {
+        if (lists.length == 1) return lists[0];
+        if (lists.length > 1) {
+            final List<T> result = new ArrayList<>();
+            for (List<T> list : lists) {
+                result.addAll(list);
+            }
+            return result;
+        }
+        return Collections.emptyList();
+    }
+
+    /**
      * unicode 字符串编码
      *
      * @param value {@link String} 需要编码的字符串
@@ -517,49 +541,104 @@ public final class Util {
         return StringEscapeUtils.unescapeJava(value.replaceAll("\\\\u(\\w{2})(?!\\w)", "\\\\u00$1"));
     }
 
-    public static String format(String value, final Object... args) {
-        if (Objects.nonNull(args)) {
-            for (Object arg : args) {
-                if (Objects.isNull(arg)) {
-                    return value.replace("\\{(\\w+)?}", "null");
-                } else if (arg instanceof BigDecimal) {
-                    value = value.replaceFirst("\\{(\\w+)?}", ((BigDecimal) arg).toPlainString());
-                } else if (arg instanceof Double) {
-                    value = value.replaceFirst("\\{(\\w+)?}", BigDecimal.valueOf((Double) arg).toPlainString());
-                } else if (arg instanceof Float) {
-                    value = value.replaceFirst("\\{(\\w+)?}", BigDecimal.valueOf((Float) arg).toPlainString());
-                } else {
-                    value = value.replaceFirst("\\{(\\w+)?}", Objects.toString(arg));
-                }
+    /**
+     * 占位符匹配正则
+     */
+    private static final Pattern PLACEHOLDER = Pattern.compile("(?<=\\{)(\\w+)?");
+
+    /**
+     * <pre>
+     * 将字符串中使用 {key:字段名} 占位符的字段，替换为 map 集合中的值；
+     * 具体替换规则参考 {@link Util#format(String, Object...)} 方法注释
+     *
+     * 参考代码：
+     *   Util.format(
+     *     String.join(",\n", "\n单引号需要转义:''{string}''", "string:{string}", "short:{short}", "int:{int}", "float:{float}", "double:{double}", "long:{long}", "percent:{percent,number,percent}", "bigdecimal:{bigdecimal}", "bigdecimal:{bigdecimal,number,currency}", "date:{date}", "date:{date,date,short}", "date:{date,date,medium}", "date:{date,date,long}", "date:{date,date,full}", "time:{date,time,short}", "time:{date,time,medium}", "time:{date,time,long}", "time:{date,time,full}", "boolean:{boolean}", "null:{null}", "empty:{empty}"),
+     *     Maps.ofSO(2).put("string", "Conor").put("short", 10).put("int", 20).put("float", 25.1F).put("double", 30.13D).put("long", 40L).put("percent", 0.2).put("bigdecimal", BigDecimal.valueOf(Long.MAX_VALUE)).put("date", new Date()).put("boolean", true).put("null", null).put("empty", "").build()
+     *   )
+     * @param text {@link String} 将要替换的字符串，当字符串中有单引号的，需要使用双单引号转义
+     * @param map {@link Map}{@link Map<String:字段名, Object:字段值>}
+     * @return {@link String} 替换后的字符串
+     */
+    public static String format(String text, final Map<String, Object> map) {
+        if (Objects.nonNull(map) && !map.isEmpty()) {
+            final Matcher m = PLACEHOLDER.matcher(text);
+            final List<String> keys = new ArrayList<>(map.size());
+            while (m.find()) {
+                text = text.replaceAll("(?<=\\{)".concat(m.group()), String.valueOf(keys.size()));
+                keys.add(m.group());
+//                final Object v = map.get(m.group().replaceAll("^\\{(.*)}$", "$1"));
+//                if (Objects.isNull(v)) {
+//                    return value.replace(m.group(), "null");
+//                } else if (v instanceof BigDecimal) {
+//                    value = value.replaceFirst("\\{(\\w+)?}", ((BigDecimal) v).toPlainString());
+//                } else if (v instanceof Double) {
+//                    value = value.replaceFirst(m.group(), BigDecimal.valueOf((Double) v).toPlainString());
+//                } else if (v instanceof Float) {
+//                    value = value.replaceFirst(m.group(), BigDecimal.valueOf((Float) v).toPlainString());
+//                } else {
+//                    value = value.replace(m.group(), Objects.toString(v));
+//                }
             }
+            return MessageFormat.format(text, keys.stream().map(map::get).toArray());
         }
-        return value;
+        return text;
     }
 
-    private static final Pattern FORMAT_PATTERN = Pattern.compile("\\{\\w+?}");
-
-    public static String format(String value, final Map<String, Object> map) {
-        if (Objects.nonNull(map)) {
-            final Matcher m = FORMAT_PATTERN.matcher(value);
+    /**
+     * <pre>
+     * 将字符串中使用 {key:字段名} 占位符的字段，替换为 values 数组中的值；
+     * 将会使用 {@link MessageFormat#format(String, Object...)} 替换规则，不同的地方在于 {@link Util}.{@link Util#format(String, Object...)}可以使用 {key:任意字符占位}，然后将 {key} 顺序替换为位置索引
+     * 警告：{@link MessageFormat#format(String, Object...)} 传入数字时，默认使用【{0..n,number,#,###}】规则会加千位符，解决方案有两种
+     *      1：将数字转换成字符串 => String.valueOf(value)
+     *      2：按实际情况指定数字替换格式，改变默认规则 => {0..n,number,#}
+     *
+     * {@link MessageFormat#format(String, Object...)} 与 {@link Util}.{@link Util#format(String, Object...)} 之间的差异在于
+     * 前者使用 [0-9] 占位 values 的索引位置，且索引位置可以重复使用，如果参数多了不利于阅读代码
+     * 后者使用 [0-9A-Za-z] 任意字符串占位，将占位符再替换为索引位置，也兼容原生的索引占位方式，但是索引占位符顺序不能颠倒（且不支持重复占位），否则会出现替换错误的问题；
+     *         Util.format("错误示例：{1},{0},{2},{0}, 期望输出 B,A,C,B","A","B","C")     将会输出 "B,B,C,B"，该案例使用 MessageFormat.format() 方法是可以的，但这里不支持
+     *         Util.format("正确示例：{0},{1},{2},{0}, 期望输出 B,A,C,B","B","A","C","B") 将会输出 "B,A,C,B"
+     *         Util.format("正确示例：{b},{a},{c},{b}, 期望输出 B,A,C,B",Maps.ofSO().put("a","A").put("b","B").put("c","C").build()) 将会输出 "B,A,C,B"
+     * 建议优先使用 {@link MessageFormat#format(String, Object...)} 直接操作，避免不必要的逻辑判断
+     *
+     * 参考代码：
+     *   Util.format(
+     *     String.join(",\n", "\n单引号需要转义:''{string}''", "string:{string}", "short:{short}", "int:{int}", "float:{float}", "double:{double}", "long:{long}", "percent:{percent,number,percent}", "bigdecimal:{bigdecimal}", "bigdecimal:{bigdecimal,number,currency}", "date:{date}", "date:{date,date,short}", "date:{date,date,medium}", "date:{date,date,long}", "date:{date,date,full}", "time:{date,time,short}", "time:{date,time,medium}", "time:{date,time,long}", "time:{date,time,full}", "boolean:{boolean}", "null:{null}", "empty:{empty}"),
+     *     Maps.ofSO(2).put("string", "Conor").put("short", 10).put("int", 20).put("float", 25.1F).put("double", 30.13D).put("long", 40L).put("percent", 0.2).put("bigdecimal", BigDecimal.valueOf(Long.MAX_VALUE)).put("date", new Date()).put("boolean", true).put("null", null).put("empty", "").build()
+     *   )
+     * @param text {@link String} 将要替换的字符串，当字符串中有单引号的，需要使用双单引号转义
+     * @param values {@link Object}[]
+     * @return {@link String} 替换后的字符串
+     */
+    public static String format(String text, final Object... values) {
+        if (Objects.nonNull(values) && values.length > 0) {
+            final Matcher m = PLACEHOLDER.matcher(text);
+            final AtomicInteger counter = new AtomicInteger(0);
             while (m.find()) {
-                final Object v = map.get(m.group().replaceAll("^\\{(.*)}$", "$1"));
-                if (Objects.isNull(v)) {
-                    return value.replace(m.group(), "null");
-                } else if (v instanceof BigDecimal) {
-                    value = value.replaceFirst("\\{(\\w+)?}", ((BigDecimal) v).toPlainString());
-                } else if (v instanceof Double) {
-                    value = value.replaceFirst(m.group(), BigDecimal.valueOf((Double) v).toPlainString());
-                } else if (v instanceof Float) {
-                    value = value.replaceFirst(m.group(), BigDecimal.valueOf((Float) v).toPlainString());
-                } else {
-                    value = value.replace(m.group(), Objects.toString(v));
-                }
+                text = text.replaceAll("(?<=\\{)".concat(m.group()), String.valueOf(counter.getAndIncrement()));
             }
+            return MessageFormat.format(text, values);
         }
-        return value;
+        return text;
+    }
+
+    /**
+     * <pre>
+     * 通过 {@link Objects}{@link Objects#equals(Object, Object)} 方法比对 a,b ，对比对结果取反
+     *
+     * Util.nonEquals(1,1) => false
+     * Util.nonEquals(1,2) => true
+     *
+     * @param a {@link Object}
+     * @param b {@link Object}
+     * @return {@link Boolean}
+     */
+    public static boolean nonEquals(final Object a, final Object b) {
+        return !Objects.equals(a, b);
     }
 
     public static void main(String[] args) {
+        log.info(uuid());
         log.info("RandomStringUtils.random : {}",
                 JSON.toJSONString(
                         Stream.iterate(0, n -> n + 1).limit(10)
@@ -600,8 +679,75 @@ public final class Util {
                         , SerializerFeature.PrettyFormat
                 )
         );
-        log.info(uuid());
-        log.info(format("/page/{index}/{}/{size}", 1, null, "100"));
+        log.info(format(
+                String.join(",\n",
+                        "\n单引号需要转义:''{string}''",
+                        "string:{string}",
+                        "short:{short}",
+                        "int:{int}",
+                        "float:{float}",
+                        "double:{double}",
+                        "long:{long}",
+                        "数字默认格式修正:{long,number,#}",
+                        "percent:{percent,number,percent}",
+                        "bigdecimal:{bigdecimal}",
+                        "bigdecimal:{bigdecimal,number,currency}",
+                        "date:{date}",
+                        "date:{date,date,short}",
+                        "date:{date,date,medium}",
+                        "date:{date,date,long}",
+                        "date:{date,date,full}",
+                        "time:{date,time,short}",
+                        "time:{date,time,medium}",
+                        "time:{date,time,long}",
+                        "time:{date,time,full}",
+                        "boolean:{boolean}",
+                        "null:{null}",
+                        "empty:{empty}"),
+                Maps.ofSO(2)
+                        .put("string", "Conor")
+                        .put("short", 10)
+                        .put("int", 20)
+                        .put("float", 25.1F)
+                        .put("double", 30.13D)
+                        .put("long", 4000000L)
+                        .put("percent", 0.2)
+                        .put("bigdecimal", BigDecimal.valueOf(Long.MAX_VALUE))
+                        .put("date", new Date())
+                        .put("boolean", true)
+                        .put("null", null)
+                        .put("empty", "").build()
+        ));
+        log.info(format(
+                String.join(",\n",
+                        "\n单引号需要转义:''{string}''",
+                        "short:{short}",
+                        "int:{int}",
+                        "float:{float}",
+                        "double:{double}",
+                        "long:{long}",
+                        "数字默认格式修正:{long,number,#}",
+                        "percent:{percent,number,percent}",
+                        "bigdecimal:{bigdecimal}",
+                        "date:{date,date,medium}",
+                        "boolean:{boolean}",
+                        "null:{null}",
+                        "empty:{empty}"),
+                "Conor",
+                10,
+                20,
+                25.1F,
+                30.13D,
+                4000000L,
+                4000000L,
+                0.2,
+                BigDecimal.valueOf(Long.MAX_VALUE),
+                new Date(),
+                true,
+                null,
+                ""
+        ));
+        log.info(format("empty:{}", 1));
 //		log.info("{}", Code.SUCCESS);
 //		log.info("{}", in(Code.NO_PERMISSION, Code.SUCCESS, Code.FAILURE));
 //		log.info("{}", in(Code.SUCCESS, Code.SUCCESS, Code.FAILURE));
@@ -649,5 +795,6 @@ public final class Util {
         log.info(Util.decodeUnicode("\\u5fc5\\u987b\\u662f\\u0020\\u0075\\u006e\\u0069\\u0063\\u006f\\u0064\\u0065\\u0020\\u7f16\\u7801"));
         log.info(Util.encodeUnicodeStrict("*.编Ma./*"));
         log.info(Util.decodeUnicode("\\u002a\\u002e\\u7f16\\u004d\\u0061\\u002e\\u002f\\u002a"));
+        log.info(JSON.toJSONString(merge(Arrays.asList("a", "b"), Arrays.asList("C", "D"))));
     }
 }

@@ -13,14 +13,22 @@ import java.util.stream.Stream;
  * @author 谢长春 on 2018-10-3 .
  */
 public enum DataType {
-    /** 数值*/
+    SEQ("序列：特殊处理预留项", CellType.NUMERIC),
+    // 数值 ************************************************************************************************************
     NUMBER("数值", CellType.NUMERIC),
-    /** 文本*/
+    BIGDECIMAL("数值", CellType.NUMERIC),
+    DOUBLE("数值", CellType.NUMERIC),
+    FLOAT("数值", CellType.NUMERIC),
+    LONG("数值", CellType.NUMERIC),
+    INTEGER("数值", CellType.NUMERIC),
+    SHORT("数值", CellType.NUMERIC),
+    // 文本 *************************************************************************************************************
+    STRING("文本", CellType.STRING),
     TEXT("文本", CellType.STRING),
-    /** 日期*/
+    // *****************************************************************************************************************
     DATE("日期", CellType.NUMERIC),
-    /** 百分比*/
     PERCENT("百分比", CellType.NUMERIC),
+    FORMULA("公式", CellType.FORMULA),
     ;
     /**
      * 枚举属性说明

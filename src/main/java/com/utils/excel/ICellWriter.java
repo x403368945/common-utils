@@ -8,10 +8,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddressList;
 
 import java.sql.Timestamp;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Supplier;
 
 import static com.utils.util.Dates.Pattern.yyyy_MM_dd;
@@ -21,13 +18,31 @@ import static com.utils.util.Dates.Pattern.yyyy_MM_dd;
  *
  * @author 谢长春 on 2018-8-8 .
  */
-interface ICellWriter<T extends ICellWriter> {
+public interface ICellWriter<T extends ICellWriter> {
     /**
      * 获取当前操作单元格
      *
      * @return {@link Cell}
      */
     Cell getCell();
+
+//    /**
+//     * 选择操作单元格
+//     *
+//     * @param columnIndex int 列索引
+//     * @return <T extends ISheet>
+//     */
+//    T cell(final int columnIndex);
+//
+//    /**
+//     * 选择操作单元格
+//     *
+//     * @param column {@link Enum} 列名枚举定义
+//     * @return HoldRow
+//     */
+//    default T cell(final Enum column) {
+//        return cell(column.ordinal());
+//    }
 
     /**
      * 获取克隆源样式
@@ -42,7 +57,7 @@ interface ICellWriter<T extends ICellWriter> {
      * @return <T extends ICellWriter>
      */
     default T setCellBlank() {
-        getCell().setCellType(CellType.BLANK);
+        getCell().setBlank();
         return (T) this;
     }
 
@@ -53,7 +68,7 @@ interface ICellWriter<T extends ICellWriter> {
      */
     default T setCellBlankIgnoreFormula() {
         if (!(CellType.FORMULA == getCell().getCellType() || CellType.FORMULA == getCell().getCachedFormulaResultType())) {
-            getCell().setCellType(CellType.BLANK);
+            getCell().setBlank();
         }
         return (T) this;
     }
@@ -79,15 +94,31 @@ interface ICellWriter<T extends ICellWriter> {
         }
         switch (data.getType()) {
             case DATE:
-                if (Objects.nonNull(data.getValue())) {
-                    writeDate(data.getDate().date());
-                }
+                if (Objects.nonNull(data.getValue()))
+                    writeDate(data.date().date());
+                break;
+            case BIGDECIMAL:
+                if (Objects.nonNull(data.getValue()))
+                    writeNumber(data.number().bigDecimalValue());
+                break;
+            case LONG:
+                if (Objects.nonNull(data.getValue()))
+                    writeNumber(data.number().longValue());
+                break;
+            case INTEGER:
+                if (Objects.nonNull(data.getValue()))
+                    writeNumber(data.number().intValue());
+                break;
+            case SHORT:
+                if (Objects.nonNull(data.getValue()))
+                    writeNumber(data.number().shortValue());
                 break;
             case NUMBER:
+            case DOUBLE:
+            case FLOAT:
             case PERCENT:
-                if (Objects.nonNull(data.getValue())) {
-                    writeNumber(data.getNumber().doubleValue());
-                }
+                if (Objects.nonNull(data.getValue()))
+                    writeNumber(data.number().doubleValue());
                 break;
             default:
                 writeText(data.getText());
@@ -138,10 +169,10 @@ interface ICellWriter<T extends ICellWriter> {
         } else {
             switch (type) {
                 case FORMULA:
-                    writeFormula(Objects.toString(value));
+                    writeFormula(Objects.toString(value, null));
                     break;
                 case NUMERIC:
-                    final String v = Objects.toString(value).trim();
+                    final String v = Objects.toString(value, "").trim();
                     if (v.matches("^[+-]?\\d+$")) {
                         writeNumber(Num.of(value).longValue());
                     } else if (v.matches("^[+-]?\\d+\\.\\d+$")) {
@@ -158,8 +189,74 @@ interface ICellWriter<T extends ICellWriter> {
                 case ERROR:
                 case _NONE:
                 default:
-                    writeText(Objects.toString(value));
+                    writeText(Objects.toString(value, null));
             }
+            }
+        return (T) this;
+    }
+
+    /**
+     * 向当前单元格写入数据
+     *
+     * @param type  {@link DataType} 写入数据类型
+     * @param value Object 写入值
+     * @return <T extends ICellWriter>
+     */
+    default T write(final DataType type, final Object value) {
+        if (Objects.isNull(value)) {
+            setCellBlank();
+        } else if (value instanceof Timestamp) {
+            writeDate((Timestamp) value);
+        } else if (value instanceof Date) {
+            writeDate((Date) value);
+        } else {
+            switch (type) {
+                case SEQ:
+                case NUMBER:
+                case BIGDECIMAL:
+                case DOUBLE:
+                case FLOAT:
+                case LONG:
+                case INTEGER:
+                case SHORT:
+                case PERCENT:
+                    writeNumber(Num.of(value).doubleValue());
+                    break;
+                case STRING:
+                case TEXT:
+                    writeText(Objects.toString(value, null));
+                    break;
+                case DATE:
+                    writeDate(Dates.of(Objects.toString(value), yyyy_MM_dd).timestamp());
+                    break;
+                case FORMULA:
+                    writeFormula(Objects.toString(value, null));
+                    break;
+            }
+//            switch (type) {
+//                case FORMULA:
+//                    writeFormula(Objects.toString(value));
+//                    break;
+//                case NUMERIC:
+//                    final String v = Objects.toString(value).trim();
+//                    if (v.matches("^[+-]?\\d+$")) {
+//                        writeNumber(Num.of(value).longValue());
+//                    } else if (v.matches("^[+-]?\\d+\\.\\d+$")) {
+//                        writeNumber(Num.of(value).doubleValue());
+//                    } else if (v.matches("^[+-]?\\d{4}-\\d{1,2}-\\d{1,2}$")) {
+//                        writeDate(Dates.of(Objects.toString(value), yyyy_MM_dd).timestamp());
+//                    } else {
+//                        writeText(v);
+//                    }
+//                    break;
+//                case BLANK:
+//                case STRING:
+//                case BOOLEAN: // Util.toBoolean(value)
+//                case ERROR:
+//                case _NONE:
+//                default:
+//                    writeText(Objects.toString(value));
+//            }
         }
         return (T) this;
     }
@@ -174,10 +271,19 @@ interface ICellWriter<T extends ICellWriter> {
         if (Objects.isNull(value)) {
             setCellBlank();
         } else {
-            getCell().setCellType(CellType.STRING);
             getCell().setCellValue(value);
         }
         return (T) this;
+    }
+
+    /**
+     * 向当前行单元格写入文本内容
+     *
+     * @param value String 文本内容
+     * @return <T extends ICellWriter>
+     */
+    default T writeString(final String value) {
+        return writeText(value);
     }
 
     /**
@@ -190,7 +296,7 @@ interface ICellWriter<T extends ICellWriter> {
         if (Objects.isNull(value)) {
             setCellBlank(); // 设置为 BLANK 可以清空单元格内容，保留样式
         } else {
-            getCell().setCellType(CellType.NUMERIC);
+//            getCell().setCellType(CellType.NUMERIC);
             getCell().setCellValue(value.doubleValue());
         }
         return (T) this;

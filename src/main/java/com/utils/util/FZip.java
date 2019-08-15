@@ -101,43 +101,48 @@ public final class FZip {
      *
      * @return {@link FZip}
      */
-    public FZip zip() throws Exception {
-        { // 检查参数是否正确
-            Objects.requireNonNull(from, "文件或目录不存在:".concat(from.getAbsolutePath()));
-            Objects.requireNonNull(from.exists() ? true : null, "文件或目录不存在:".concat(from.getAbsolutePath()));
-            if (Util.isEmpty(to)) {
-                to = from.getParentFile()
-                        .toPath()
-                        .resolve(
-                                (from.isDirectory() ? getFromFileName() : FPath.FileName.of(getFromFileName()).getPrefix()).concat(".zip")
-                        )
-                        .toFile();
-            } else {
-                Objects.requireNonNull(to.getName().endsWith(".zip") ? true : null, "目标后缀必须是 .zip 的文件，不能是目录或其他后缀:".concat(to.getAbsolutePath()));
-            }
-        }
-//        Dates dates = Dates.now();
-        final File[] files = from.isDirectory()
-                ? from.listFiles((dir, name) -> Objects.isNull(ops.exclude) || !ops.exclude.test(name))
-                : new File[]{from};
-        Objects.requireNonNull(files, "压缩目录文件列表为空");
-        @Cleanup final BufferedOutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(to.toPath()));
-        @Cleanup final ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream);
-        int p = 0; // 进度
-        for (int i = 0; i < files.length; i++) {
-            write(files[i], zipOutputStream, Paths.get(""));
-            if (Objects.nonNull(ops.progress)) {
-                if ((int) ((i + 1.0) / files.length * 100) > p) {
-                    p = (int) ((i + 1.0) / files.length * 100);
-                    ops.progress.accept(p);
+    public FZip zip() throws RuntimeException {
+        try {
+            { // 检查参数是否正确
+                Objects.requireNonNull(from, "文件或目录不存在:".concat(from.getAbsolutePath()));
+                Objects.requireNonNull(from.exists() ? true : null, "文件或目录不存在:".concat(from.getAbsolutePath()));
+                if (Util.isEmpty(to)) {
+                    to = from.getParentFile()
+                            .toPath()
+                            .resolve(
+                                    (from.isDirectory() ? getFromFileName() : FPath.FileName.of(getFromFileName()).getPrefix()).concat(".zip")
+                            )
+                            .toFile();
+                } else {
+                    Objects.requireNonNull(to.getName().endsWith(".zip") ? true : null, "目标后缀必须是 .zip 的文件，不能是目录或其他后缀:".concat(to.getAbsolutePath()));
                 }
             }
-        }
-        zipOutputStream.finish();
-        zipOutputStream.flush();
+//        Dates dates = Dates.now();
+            final File[] files = from.isDirectory()
+                    ? from.listFiles((dir, name) -> Objects.isNull(ops.exclude) || !ops.exclude.test(name))
+                    : new File[]{from};
+            Objects.requireNonNull(files, "压缩目录文件列表为空");
+            @Cleanup final BufferedOutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(to.toPath()));
+            @Cleanup final ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream);
+            int p = 0; // 进度
+            for (int i = 0; i < files.length; i++) {
+                write(files[i], zipOutputStream, Paths.get(""));
+                if (Objects.nonNull(ops.progress)) {
+                    if ((int) ((i + 1.0) / files.length * 100) > p) {
+                        p = (int) ((i + 1.0) / files.length * 100);
+                        ops.progress.accept(p);
+                    }
+                }
+            }
+            zipOutputStream.finish();
+            zipOutputStream.flush();
 //        System.out.println(dates.getTimeConsuming());
-        FPath.of(to.getParentFile()).chmod(755);
-        FPath.of(to).chmod(644);
+            FPath.of(to.getParentFile()).chmod(755);
+            FPath.of(to).chmod(644);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw new RuntimeException(e);
+        }
         return this;
     }
 

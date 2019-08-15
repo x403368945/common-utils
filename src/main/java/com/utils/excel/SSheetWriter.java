@@ -308,7 +308,7 @@ public final class SSheetWriter implements ISheetWriter<SSheetWriter>, ISheetWri
 
                             .nextRowOfNew()
                             .cell(B).appendStyle(CellStyles.builder().fillPattern(FillPatternType.SOLID_FOREGROUND).fillForegroundColor(Colors.Red.color).build())
-                            .setRowBlankIgnoreFromula() // 清除整行数据，公式不清除
+                            .setRowBlankIgnoreFormula() // 清除整行数据，公式不清除
                             .cell(A).writeText("第8行：从第3行复制来的,清除整行数据，公式不清除")
 
                             .nextRowOfNew()
@@ -454,7 +454,7 @@ public final class SSheetWriter implements ISheetWriter<SSheetWriter>, ISheetWri
                     final SSheetWriter writer = SSheetWriter.of(workbook.getSheet("Sheet1"));
                     RangeInt.of(1, 10).forEach(parent -> {
                         writer.nextRowOfNew()
-                                .cell(A).writeText(Objects.toString(parent))
+                                .cell(A).writeText(Objects.toString(parent, null))
                                 .cell(B).writeText("父级代码");
                         final List<Integer> rowIndexs = RangeInt.of(0, Math.max(Util.randomMax(10), 1))
                                 .map(rowIndex -> writer.nextRowOfNew()

@@ -12,7 +12,6 @@ import lombok.experimental.Accessors;
  * @author 谢长春 on 2017/10/15 .
  */
 @NoArgsConstructor
-@AllArgsConstructor
 @Data
 @Accessors(chain = true)
 @JSONType(orders = {"index","name","table"})

@@ -8,13 +8,14 @@ import java.util.regex.Pattern;
  *
  * @author 谢长春 on 2018-10-3 .
  */
-public enum Patterns {
+public enum Regs {
     // \d+ 匹配纯数字
-    d("\\d+ 匹配纯数字", Pattern.compile("\\d+")),
-    d_FIND("(\\d+) 匹配并获取纯数字", Pattern.compile("(\\d+)")),
+    d("\\d+ 匹配纯数字", Pattern.compile("^\\d+$")),
+    d_FIND("(\\d+) 匹配并获取纯数字", Pattern.compile("^(\\d+)$")),
     A_Z("[A-Z]+ 匹配[A-Z]", Pattern.compile("[A-Z]+")),
     A_Z_FIND("([A-Z]+) 匹配并获取[A-Z]", Pattern.compile("([A-Z]+)")),
-    EXCEL_ADDRESS("Excel 坐标匹配并获取", Pattern.compile("^([A-Z]+)([0-9]+)$"))
+    EXCEL_ADDRESS("Excel 坐标匹配并获取", Pattern.compile("^([A-Z]+)([0-9]+)$")),
+    NUMBER("数字匹配", Pattern.compile("^[+-]?\\d+(\\.\\d+)?$")),
     ;
     public final String comment;
     public final Pattern pattern;
@@ -22,11 +23,12 @@ public enum Patterns {
     public Matcher matcher(final String value) {
         return pattern.matcher(value);
     }
+
     public boolean test(final String value) {
         return pattern.matcher(value).matches();
     }
 
-    Patterns(final String comment, final Pattern pattern) {
+    Regs(final String comment, final Pattern pattern) {
         this.comment = comment;
         this.pattern = pattern;
     }

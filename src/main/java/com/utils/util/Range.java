@@ -22,7 +22,7 @@ import java.util.List;
 @Data
 @JSONType(orders = {"min", "max"})
 @Slf4j
-public class Range<T extends Number> implements Num.IRange<T> {
+public final class Range<T extends Number> implements Num.IRange<T> {
     private T min;
     private T max;
 

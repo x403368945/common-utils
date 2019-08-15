@@ -1,5 +1,6 @@
 package com.utils.excel;
 
+import com.utils.excel.enums.Column;
 import com.utils.exception.NotFoundException;
 import com.utils.util.Dates;
 import com.utils.util.FCopy;
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.nio.file.Paths;
 import java.util.Objects;
 
@@ -58,7 +60,9 @@ public final class ExcelRewriter implements ISheetWriter<ExcelRewriter>, ISheetR
         if (!file.getName().matches("[\\s\\S]*\\.xls(x)?$")) {
             throw new IllegalArgumentException("未知的文件后缀");
         }
-        return new ExcelRewriter(WorkbookFactory.create(file, password, false), ops);
+//        return new ExcelRewriter(WorkbookFactory.create(file, password, false), ops);
+        // 用 new FileInputStream(file) 初始化可以防止篡改模板
+        return new ExcelRewriter(WorkbookFactory.create(new FileInputStream(file), password), ops);
     }
 
     @Getter
@@ -227,8 +231,7 @@ public final class ExcelRewriter implements ISheetWriter<ExcelRewriter>, ISheetR
                     .cellOfNew(1).writeText("Joe")
                     .cellOfNew(2).writeText("187-0000-0003")
                     .cellOfNew(3).writeText("Joe@gmail.com")
-                    .cellOfNew(4).writeDate(Dates.now().timestamp())
-                    ;
+                    .cellOfNew(4).writeDate(Dates.now().timestamp());
             log.info(String.format("写入路径：%s", rwriter.saveWorkBook(FPath.of("logs", "联系人-111111-重写.xlsx")).absolute()));
         }
         {
@@ -264,9 +267,26 @@ public final class ExcelRewriter implements ISheetWriter<ExcelRewriter>, ISheetR
                     .cellOfNew(1).writeText("Joe")
                     .cellOfNew(2).writeText("187-0000-0003")
                     .cellOfNew(3).writeText("Joe@gmail.com")
-                    .cellOfNew(4).writeDate(Dates.now().timestamp())
-                    ;
+                    .cellOfNew(4).writeDate(Dates.now().timestamp());
             log.info(String.format("写入路径：%s", rwriter.saveWorkBook(FPath.of("logs", "联系人-111111-重写.xls")).absolute()));
         }
+        {
+            @Cleanup final ExcelRewriter rwriter = ExcelRewriter
+                    .of(
+                            FPath.of("src/test/files/excel/模板文件.xlsx").file(),
+                            Options.builder().build()
+//                            , "111111"
+                    )
+                    .sheet(0)
+                    .rowNew(Rownum.of(2)) // 选定第二行
+                    .cellNew(Column.A).writeNumber(1)
+                    .cellNew(Column.B).writeText("187-0000-0000")
+
+                    .nextRowNew()
+                    .cellNew(Column.A).writeNumber(2)
+                    .cellNew(Column.B).writeText("187-0000-0001");
+            log.info(String.format("写入路径：%s", rwriter.saveWorkBook(FPath.of("logs", "模板文件-重写.xlsx")).absolute()));
+        }
+
     }
 }

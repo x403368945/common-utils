@@ -26,8 +26,8 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 
-import static com.utils.enums.Patterns.A_Z_FIND;
-import static com.utils.enums.Patterns.d_FIND;
+import static com.utils.enums.Regs.A_Z_FIND;
+import static com.utils.enums.Regs.d_FIND;
 
 /**
  * Sheet 写操作相关的方法封装
@@ -186,7 +186,7 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
      * @return <T extends ISheetWriter>
      */
     default T setRowBlank() {
-        getRow().forEach(cell -> cell.setCellType(CellType.BLANK));
+        getRow().forEach(cell -> cell.setBlank());
         return (T) this;
     }
 
@@ -195,7 +195,7 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
      *
      * @return <T extends ISheetWriter>
      */
-    default T setRowBlankIgnoreFromula() {
+    default T setRowBlankIgnoreFormula() {
         getRow().forEach(cell -> {
             switch (cell.getCellType()) {
                 case BLANK:
@@ -203,7 +203,7 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
                     break;
                 default:
 //                    if (CellType.FORMULA != cell.getCachedFormulaResultTypeEnum())
-                    cell.setCellType(CellType.BLANK);
+                    cell.setBlank();
             }
         });
         return (T) this;
@@ -598,10 +598,24 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
      *
      * @param fromRowIndex int 起始行索引，包含
      * @param toRowIndex   int 结束行索引，包含
+     * @param collapse boolean true:收起，false：展开
+     * @return <T extends ISheetWriter>
+     */
+    default T groupRow(final int fromRowIndex, final int toRowIndex, final boolean collapse) {
+        getSheet().groupRow(fromRowIndex, toRowIndex);
+        if (collapse) getSheet().setRowGroupCollapsed(fromRowIndex, collapse);
+        return (T) this;
+    }
+
+    /**
+     * 设置行分组
+     *
+     * @param fromRowIndex int 起始行索引，包含
+     * @param toRowIndex   int 结束行索引，包含
      * @return <T extends ISheetWriter>
      */
     default T groupRow(final int fromRowIndex, final int toRowIndex) {
-        getSheet().groupRow(fromRowIndex, toRowIndex);
+        groupRow(fromRowIndex, toRowIndex, false);
         return (T) this;
     }
 
@@ -612,7 +626,7 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
      * @return <T extends ISheetWriter>
      */
     default T groupRow(final RangeInt range) {
-        groupRow(range.getMin(), range.getMax());
+        groupRow(range.getMin(), range.getMax(), false);
         return (T) this;
     }
 
@@ -650,6 +664,65 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
         return (T) this;
     }
 
+    /**
+     * 显示当前操作的sheet
+     *
+     * @return <T extends ISheetWriter>
+     */
+    default T showSheet() {
+        return showSheet(getSheet().getSheetName());
+    }
+
+    /**
+     * 显示指定名称的 sheet
+     *
+     * @param name {@link String} sheet 名称
+     * @return <T extends ISheetWriter>
+     */
+    default T showSheet(final String name) {
+        return showSheet(getWorkbook().getSheetIndex(name));
+    }
+
+    /**
+     * 显示指定索引的 sheet
+     *
+     * @param index {@link int} 索引从 0 开始
+     * @return <T extends ISheetWriter>
+     */
+    default T showSheet(final int index) {
+        getWorkbook().setSheetVisibility(index, SheetVisibility.VISIBLE);
+        return (T) this;
+    }
+
+    /**
+     * 隐藏当前操作的sheet
+     *
+     * @return <T extends ISheetWriter>
+     */
+    default T hideSheet() {
+        return hideSheet(getSheet().getSheetName());
+    }
+
+    /**
+     * 隐藏指定名称的 sheet
+     *
+     * @param name {@link String} sheet 名称
+     * @return <T extends ISheetWriter>
+     */
+    default T hideSheet(final String name) {
+        return hideSheet(getWorkbook().getSheetIndex(name));
+    }
+
+    /**
+     * 隐藏指定索引的 sheet
+     *
+     * @param index {@link int} 索引从 0 开始
+     * @return <T extends ISheetWriter>
+     */
+    default T hideSheet(final int index) {
+        getWorkbook().setSheetVisibility(index, SheetVisibility.HIDDEN);
+        return (T) this;
+    }
 
     /**
      * 隐藏行
@@ -937,7 +1010,7 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
                                                     );
                                                     break;
                                                 case BLANK:
-                                                    destCell.setCellType(CellType.BLANK);
+                                                    destCell.setBlank();
                                                     break;
                                                 case BOOLEAN:
                                                     destCell.setCellValue(srcCell.getBooleanCellValue());
@@ -1247,8 +1320,6 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
 ////         */
 ////        class XSSFSheetCopy implements ICopy {
 //////            @Builder
-//////            @NoArgsConstructor
-//////            @AllArgsConstructor
 //////            class Options {
 //////                private XSSFSheet sheet;
 //////                private XSSFRow fromRow;

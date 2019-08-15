@@ -22,7 +22,9 @@ public final class Logs {
         // 调试日志
         DEBUG("调试日志"),
         INFO("基本信息日志"),
-        ERROR("异常日志"),;
+        WARN("警告日志"),
+        ERROR("异常日志"),
+        ;
         /**
          * 枚举属性说明
          */
@@ -35,6 +37,14 @@ public final class Logs {
 
     private final String filePath;
     private final FileWriter writer;
+
+    @SneakyThrows
+    private Logs(final File file) {
+        this.filePath = file.getAbsolutePath();
+        if (!file.getParentFile().mkdirs())
+            throw new NullPointerException(String.format("目录创建失败：%s", file.getParentFile().getAbsolutePath()));
+        this.writer = new FileWriter(file, true);
+    }
 
     @SneakyThrows
     private Logs(Class<?> clazz, String uid) {
@@ -69,6 +79,10 @@ public final class Logs {
         return new Logs(clazz, uid);
     }
 
+    public static Logs start(final File file) {
+        return new Logs(file);
+    }
+
     /**
      * 获取日志文件路径
      *
@@ -80,6 +94,7 @@ public final class Logs {
 
     /**
      * 写入日志结束，关闭文件
+     *
      * @return String 文件绝对路径
      */
     public String end() {
@@ -91,6 +106,13 @@ public final class Logs {
             }
         }
         return this.filePath;
+    }
+
+    /**
+     * 关闭日志文件，同 {@link Logs#end()} 一样
+     */
+    public void close() {
+        this.end();
     }
 
 
@@ -150,6 +172,22 @@ public final class Logs {
     public Logs i(String message, Exception exception) {
         write(Thread.currentThread().getStackTrace()[(Objects.isNull(message) || Objects.isNull(exception)) ? 3 : 2]
                 , Event.INFO, message, exception);
+        return this;
+    }
+
+    public Logs w(String message) {
+        w(message, null);
+        return this;
+    }
+
+    public Logs w(Exception exception) {
+        w(null, exception);
+        return this;
+    }
+
+    public Logs w(String message, Exception exception) {
+        write(Thread.currentThread().getStackTrace()[(Objects.isNull(message) || Objects.isNull(exception)) ? 3 : 2]
+                , Event.WARN, message, exception);
         return this;
     }
 

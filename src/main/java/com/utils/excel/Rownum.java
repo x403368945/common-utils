@@ -55,6 +55,14 @@ public final class Rownum {
     public int get() {
         return rownum;
     }
+    /**
+     * 返回当前行号，然后行号 +1
+     *
+     * @return int
+     */
+    public int poll() {
+        return rownum++;
+    }
 
     /**
      * 获取行索引
@@ -65,10 +73,18 @@ public final class Rownum {
         return rownum - 1;
     }
 
+    @Override
+    public String toString() {
+        return String.valueOf(rownum);
+    }
+
     public static void main(String[] args) {
         final Rownum rownum = Rownum.of(0);
         for (int i = 0; i < 10; i++) {
             System.out.println(Arrays.asList(rownum.next().get(), rownum.index()));
         }
+        final Rownum rm = Rownum.of(1);
+        System.out.println(rm.poll());
+        System.out.println(rm.poll());
     }
 }

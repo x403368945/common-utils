@@ -2,7 +2,7 @@ package com.utils.util;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.annotation.JSONField;
-import com.utils.excel.enums.Week;
+import com.utils.enums.Week;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -124,6 +125,16 @@ public final class Dates {
         public String format(final LocalDateTime value) {
             return value.format(formatter);
         }
+
+        /**
+         * 格式化日期
+         *
+         * @param value {@link Date} or {@link Timestamp}
+         * @return {@link String}
+         */
+        public String format(final Date value) {
+            return format.format(value);
+        }
     }
 
     /**
@@ -138,16 +149,16 @@ public final class Dates {
         /**
          * 开始
          */
-        @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+        @JSONField(format = "yyyy-MM-dd HH:mm:ss.SSS")
         private Timestamp begin;
         /**
          * 结束
          */
-        @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+        @JSONField(format = "yyyy-MM-dd HH:mm:ss.SSS")
         private Timestamp end;
 
         /**
-         * 以当天时间初始化区间 yyyy-MM-dd 00:00:00.00 - yyyy-MM-dd 23:59:59.999
+         * 以当天时间初始化区间 yyyy-MM-dd 00:00:00.000 - yyyy-MM-dd 23:59:59.999
          *
          * @return {@link Range}
          */
@@ -214,6 +225,46 @@ public final class Dates {
             }
             if (Objects.nonNull(end)) {
                 end = Dates.of(end).endTimeOfDay().timestamp();
+            }
+            return this;
+        }
+
+        /**
+         * 校验开始时间必须小于结束时间
+         *
+         * @return {@link Boolean}
+         */
+        public boolean check() {
+            try {
+                check(null);
+                return true;
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return false;
+            }
+        }
+
+        /**
+         * 校验开始时间必须小于结束时间
+         *
+         * @return {@link Range}
+         */
+        public Range check(final Supplier<? extends RuntimeException> exSupplier) {
+            if (Objects.isNull(begin)) {
+                if (Objects.isNull(exSupplier))
+                    throw new NullPointerException("begin is null");
+                else
+                    throw exSupplier.get();
+            }
+            if (Objects.nonNull(end)) {
+                if (Dates.of(begin).gt(Dates.of(end))) {
+                    if (Objects.isNull(exSupplier))
+                        throw new RuntimeException("begin > end");
+                    else
+                        throw exSupplier.get();
+                }
+            } else {
+                end = Dates.now().timestamp();
             }
             return this;
         }

@@ -48,6 +48,12 @@ public interface ISheet<T> {
      */
     Sheet getSheet();
 
+//    /**
+//     * 记住指定区间
+//     * @return {@link Map}{@link Map<String:自定义key, RangeInt:记忆区间>}
+//     */
+//    Map<String, RangeInt> rememberRangeInt();
+
     /**
      * 判断sheet是否存在
      *
@@ -61,7 +67,9 @@ public interface ISheet<T> {
     }
 
     /**
+     * <pre>
      * 判断sheet是否存在，不存在则抛出用户指定异常，若不指定异常，则不抛出
+     * hasSheet(()-> new RuntimeException(""))
      *
      * @param ex {@link Supplier}{@link Supplier<RuntimeException>} 自定义异常
      * @return <T extends ISheet>
@@ -74,13 +82,18 @@ public interface ISheet<T> {
     }
 
     /**
-     * 以当前行索引为基础，跳过指定行数
+     * <pre>
+     * 判断sheet是否存在
+     * 不存在则执行 hasFalse.accept((T) this);
+     * 存在则执行 hasTrue.accept((T) this);
      *
-     * @param hasTrue  {@link Consumer}{@link Consumer<ISheet>} 为 true 时执行
+     * hasSheet(sheetNotExist->{},sheetExist->{})
+     *
      * @param hasFalse {@link Consumer}{@link Consumer<ISheet>} 为 false 时执行
+     * @param hasTrue  {@link Consumer}{@link Consumer<ISheet>} 为 true 时执行
      * @return <T extends ISheet>
      */
-    default T hasSheet(final Consumer<T> hasTrue, final Consumer<T> hasFalse) {
+    default T hasSheet(final Consumer<T> hasFalse, final Consumer<T> hasTrue) {
         if (Objects.nonNull(getSheet())) {
             if (Objects.nonNull(hasTrue)) hasTrue.accept((T) this);
         } else {
@@ -145,7 +158,7 @@ public interface ISheet<T> {
      * @return <T extends ISheet>
      */
     default T skip(final int count) {
-        setRowIndex(getRowIndex() + count - 1);
+        setRowIndex(getRowIndex() + count);
         return (T) this;
     }
 

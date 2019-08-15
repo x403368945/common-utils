@@ -43,7 +43,7 @@ public class ParseConfig implements IJson {
      * {index: 1, label: '工资', type: 'Number', group: "固定成本",tag:"标签"}
      * ]
      */
-    private List<Header> header;
+    private List<Cell> header;
     /**
      * <pre>
      * 数据表合计行配置
@@ -149,8 +149,8 @@ public class ParseConfig implements IJson {
         config.setStartRowNum(6);
         int index = 1;
         {
-            List<Header> headers = new ArrayList<>();
-            Header.HeaderBuilder builder = Header.builder();
+            List<Cell> headers = new ArrayList<>();
+            Cell.CellBuilder builder = Cell.builder();
             builder.group("主营业务收入");
             headers.add(builder.index(index++).label("产品/项目/服务名称").type(DataType.TEXT).build());
             headers.add(builder.index(index++).label("规格型号").type(DataType.TEXT).build());
