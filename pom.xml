@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.ccx.utils</groupId>
+    <groupId>com.github.x403368945</groupId>
     <artifactId>common-utils</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
@@ -19,7 +19,7 @@
     </properties>
     <distributionManagement>
         <repository>
-            <id>repository</id>
+            <id>ossrh</id>
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
         <snapshotRepository>
@@ -128,15 +128,15 @@
         </license>
     </licenses>
     <scm>
-        <url>https://github.com/x403368945/common-utils.git</url>
+        <url>https://github.com/x403368945/common-utils</url>
         <connection>https://github.com/x403368945/common-utils.git</connection>
-        <developerConnection></developerConnection>
+        <developerConnection>https://github.com/x403368945/common-utils.git</developerConnection>
+        <tag>${project.version}</tag>
     </scm>
     <developers>
         <developer>
             <name>Conor Xie</name>
             <email>x403368945@126.com</email>
-            <url></url>
         </developer>
     </developers>
 
