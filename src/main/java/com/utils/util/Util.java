@@ -3,15 +3,16 @@ package com.utils.util;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
+
 import java.math.BigDecimal;
 import java.security.MessageDigest;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -26,6 +27,17 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 @Slf4j
 public final class Util {
+    /**
+     * 获取UUID；中间的 - 剔除
+     *
+     * @return String
+     * @deprecated 方法名有歧义，已重命名为：{@link com.utils.util.Util#uuid32()}
+     */
+    @Deprecated
+    public static String uuid() {
+        return UUID.randomUUID().toString().replace("-", "");
+    }
+
     /**
      * 获取UUID；中间的 - 剔除
      *
@@ -79,7 +91,7 @@ public final class Util {
      */
     public static boolean booleanValue(final Object obj) {
         Boolean value = toBoolean(obj);
-        return isNotEmpty(value) && value;
+        return Objects.nonNull(value) && value;
     }
 
     /**
@@ -87,7 +99,9 @@ public final class Util {
      *
      * @param obj 转换对象
      * @return String
+     * @deprecated 请使用 Objects.toString(value)
      */
+    @Deprecated
     public static String tostring(final Object obj) {
         if (Objects.isNull(obj)) {
             return null;
@@ -100,20 +114,22 @@ public final class Util {
      *
      * @param obj 转换对象
      * @return String
+     * @deprecated 请使用 Objects.toString(value, "")
      */
+    @Deprecated
     public static String toStringEmpty(final Object obj) {
         return (Objects.isNull(obj)) ? "" : obj.toString().trim();
     }
 
-    /**
-     * 验证数字是否大于0
-     *
-     * @param value Number对象
-     * @return true大于0，false小于等于0
-     */
-    public static boolean checkNumber(final Number value) {
-        return Objects.nonNull(value) && value.doubleValue() > 0;
-    }
+//    /**
+//     * 验证数字是否大于0
+//     *
+//     * @param value Number对象
+//     * @return true大于0，false小于等于0
+//     */
+//    public static boolean checkNumber(final Number value) {
+//        return Objects.nonNull(value) && value.doubleValue() > 0;
+//    }
 
     /**
      * 判断Boolean值是否为true，为null时表示false
@@ -140,7 +156,9 @@ public final class Util {
      *
      * @param source 加密字符串
      * @return String 密文字符串
+     * @deprecated 请使用 org.apache.commons.codec.digest.DigestUtils.md5Hex
      */
+    @Deprecated
     public static String md5(final String source) {
         try {
             final MessageDigest md5 = MessageDigest.getInstance("MD5");
@@ -165,7 +183,9 @@ public final class Util {
      *
      * @param collections 集合
      * @return boolean true空 false非空
+     * @deprecated 请使用 org.apache.commons.collections4.CollectionUtils.isEmpty()
      */
+    @Deprecated
     public static boolean isEmpty(final Collection<?> collections) {
         return Objects.isNull(collections) || collections.isEmpty();
     }
@@ -175,7 +195,9 @@ public final class Util {
      *
      * @param collections 集合
      * @return boolean true非空 false空
+     * @deprecated 请使用 org.apache.commons.collections4.CollectionUtils.isNotEmpty()
      */
+    @Deprecated
     public static boolean isNotEmpty(final Collection<?> collections) {
         return !isEmpty(collections);
     }
@@ -185,7 +207,9 @@ public final class Util {
      *
      * @param map 集合
      * @return boolean true空 false非空
+     * @deprecated 请使用 org.apache.commons.collections4.MapUtils.isNotEmpty()
      */
+    @Deprecated
     public static boolean isEmpty(final Map<?, ?> map) {
         return Objects.isNull(map) || map.isEmpty();
     }
@@ -195,7 +219,9 @@ public final class Util {
      *
      * @param map 集合
      * @return boolean true非空 false空
+     * @deprecated 请使用 org.apache.commons.collections4.MapUtils.isNotEmpty()
      */
+    @Deprecated
     public static boolean isNotEmpty(final Map<?, ?> map) {
         return !isEmpty(map);
     }
@@ -225,19 +251,11 @@ public final class Util {
      *
      * @param obj Object 对象
      * @return boolean true空 false非空
+     * @deprecated 请使用 Objects.isNull()
      */
+    @Deprecated
     public static boolean isEmpty(final Object obj) {
         return Objects.isNull(obj);
-    }
-
-    /**
-     * 判断对象是否为非空
-     *
-     * @param obj Object 对象
-     * @return boolean true非空 false空
-     */
-    public static boolean isNotEmpty(final Object obj) {
-        return !isEmpty(obj);
     }
 
     /**
@@ -245,7 +263,9 @@ public final class Util {
      *
      * @param obj String 对象
      * @return boolean true空 false非空
+     * @deprecated 请使用 org.apache.commons.lang3.StringUtils.isEmpty()
      */
+    @Deprecated
     public static boolean isEmpty(final String obj) {
         return Objects.isNull(obj) || "".equals(obj.trim());
     }
@@ -255,9 +275,11 @@ public final class Util {
      *
      * @param obj String 对象
      * @return boolean true非空 false空
+     * @deprecated 请使用 org.apache.commons.lang3.StringUtils.isNotEmpty()
      */
+    @Deprecated
     public static boolean isNotEmpty(final String obj) {
-        return !isEmpty(obj);
+        return !Util.isEmpty(obj);
     }
 
     /**
@@ -269,7 +291,7 @@ public final class Util {
     public static String[] toStringArray(final Object[] array) {
         return isEmpty(array)
                 ? new String[]{}
-                : Arrays.stream(array).map(Object::toString).toArray(String[]::new);
+                : Arrays.stream(array).filter(Objects::nonNull).map(Object::toString).toArray(String[]::new);
     }
 
     /**
@@ -280,7 +302,7 @@ public final class Util {
      * @return boolean true：args中包含value， false：args不包含value
      */
     public static boolean in(final Object value, Object... args) {
-        return Objects.nonNull(value) && Objects.nonNull(args) && Arrays.asList(args).contains(value);
+        return Objects.nonNull(value) && Objects.nonNull(args) && Sets.newHashSet(args).contains(value);
     }
 
     /**
@@ -301,7 +323,7 @@ public final class Util {
      * @param collection Collection
      * @return boolean true：args中包含value， false：args不包含value
      */
-    public static boolean in(final Object value, final Collection collection) {
+    public static boolean in(final Object value, final Collection<?> collection) {
         return Objects.nonNull(value) && Objects.nonNull(collection) && collection.contains(value);
     }
 
@@ -312,7 +334,7 @@ public final class Util {
      * @param collection {@link Collection}
      * @return boolean true：args不包含value， false：args中包含value
      */
-    public static boolean notIn(final Object value, final Collection collection) {
+    public static boolean notIn(final Object value, final Collection<?> collection) {
         return !in(value, collection);
     }
 
@@ -409,44 +431,6 @@ public final class Util {
     }
 
     /**
-     * obj.toString之后打印日志，并返回原对象
-     *
-     * @param obj <T>
-     * @return T
-     */
-    public static <T> T peek(final T obj) {
-        log.info(isEmpty(obj) ? "obj is null" : Objects.toString(obj));
-        return obj;
-    }
-
-    /**
-     * 打印日志，并返回原对象；可以自定义日志输出
-     *
-     * @param obj      <T>
-     * @param consumer {@link Consumer}{@link Consumer<T>}
-     * @return T
-     */
-    public static <T> T peek(final T obj, final Consumer<T> consumer) {
-        if (Objects.isNull(consumer)) {
-            log.info(isEmpty(obj) ? "obj is null" : Objects.toString(obj));
-        } else {
-            consumer.accept(obj);
-        }
-        return obj;
-    }
-
-    /**
-     * 将对象格式化成json字符串打印日志，并返回原对象
-     *
-     * @param obj <T>
-     * @return T
-     */
-    public static <T> T peekJson(final T obj) {
-        log.info(isEmpty(obj) ? "obj is null" : JSON.toJSONString(obj, SerializerFeature.PrettyFormat));
-        return obj;
-    }
-
-    /**
      * 转换枚举
      *
      * @param elementType Class<E> 枚举类
@@ -468,7 +452,9 @@ public final class Util {
      * @param list List 需要切割的集合
      * @param size int 每个集合的大小
      * @return {@link List}{@link List<List<T>>}
+     * @deprecated 请使用 com.google.common.collect.Lists.partition()
      */
+    @Deprecated
     public static <T> List<List<T>> partition(final List<T> list, final int size) {
         final int max = list.size();
         return Stream.iterate(0, n -> n + 1)
@@ -483,7 +469,9 @@ public final class Util {
      *
      * @param lists List<T>[] 需要切割的集合
      * @return {@link List}{@link List<T>}
+     * @deprecated 请使用 org.apache.commons.collections4.CollectionUtils.union()
      */
+    @Deprecated
     @SafeVarargs
     public static <T> List<T> merge(final List<T>... lists) {
         if (lists.length == 1) return lists[0];
@@ -503,7 +491,6 @@ public final class Util {
      * @param value {@link String} 需要编码的字符串
      * @return {@link String} 编码后的 unicode 字符串
      */
-//    @SuppressWarnings("deprecation")
     public static String encodeUnicode(final String value) {
         Objects.requireNonNull(value, "参数【value】不能为null");
         final StringBuilder unicode = new StringBuilder();
@@ -535,7 +522,6 @@ public final class Util {
      * @param value {@link String} unicode 字符串
      * @return {@link String} 解码后的字符串
      */
-    @SuppressWarnings("deprecation")
     public static String decodeUnicode(final String value) {
         Objects.requireNonNull(value, "参数【value】不能为null");
         return StringEscapeUtils.unescapeJava(value.replaceAll("\\\\u(\\w{2})(?!\\w)", "\\\\u00$1"));
@@ -626,14 +612,14 @@ public final class Util {
      * <pre>
      * 通过 {@link Objects}{@link Objects#equals(Object, Object)} 方法比对 a,b ，对比对结果取反
      *
-     * Util.nonEquals(1,1) => false
-     * Util.nonEquals(1,2) => true
+     * Util.notEquals(1,1) => false
+     * Util.notEquals(1,2) => true
      *
      * @param a {@link Object}
      * @param b {@link Object}
      * @return {@link Boolean}
      */
-    public static boolean nonEquals(final Object a, final Object b) {
+    public static boolean notEquals(final Object a, final Object b) {
         return !Objects.equals(a, b);
     }
 

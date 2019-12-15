@@ -186,8 +186,8 @@ public final class Then<T> {
      * @param arrs {@link Then}[]
      * @return {@link Then<Boolean>} true:有非空，false:无非空
      */
-    public static Then<Boolean> parallelNonNull(Then... arrs) {
-        for (Then arr : arrs) {
+    public static Then<Boolean> parallelNonNull(Then<Boolean>... arrs) {
+        for (Then<Boolean> arr : arrs) {
             if (arr.isPresent()) return Then.of(true);
         }
         return Then.of(null);

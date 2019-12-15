@@ -34,8 +34,7 @@ import static com.utils.enums.Regs.d_FIND;
  *
  * @author 谢长春 on 2018-8-8 .
  */
-@SuppressWarnings("unchecked")
-public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWriter<T> {
+public interface ISheetWriter<T extends ISheetWriter<T>> extends ISheet<T>, ICellWriter<T> {
     @Builder
     class Options {
         /**
@@ -186,7 +185,7 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
      * @return <T extends ISheetWriter>
      */
     default T setRowBlank() {
-        getRow().forEach(cell -> cell.setBlank());
+        getRow().forEach(Cell::setBlank);
         return (T) this;
     }
 
@@ -228,7 +227,7 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
      * @param column {@link Enum} 列名
      * @return <T extends ISheetWriter>
      */
-    default T cellOfNew(final Enum column) {
+    default T cellOfNew(final Enum<?> column) {
         return cellOfNew(column.ordinal());
     }
 
@@ -249,7 +248,7 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
      * @param column {@link Enum} 列名
      * @return <T extends ISheetWriter>
      */
-    default T cellNew(final Enum column) {
+    default T cellNew(final Enum<?> column) {
         return cellOfNew(column.ordinal());
     }
 
@@ -379,7 +378,7 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
      * @param row    int 冻结行号；为0表示不冻结或取消冻结
      * @return <T extends ISheetWriter>
      */
-    default T freeze(final Enum column, final int row) {
+    default T freeze(final Enum<?> column, final int row) {
         return freeze(column.ordinal() + 1, row);
     }
 
@@ -622,7 +621,7 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
     /**
      * 设置行分组
      *
-     * @param range {@link com.utils.util.RangeInt} 分组行索引区间
+     * @param range {@link RangeInt} 分组行索引区间
      * @return <T extends ISheetWriter>
      */
     default T groupRow(final RangeInt range) {
@@ -656,7 +655,7 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
     /**
      * 设置列分组
      *
-     * @param range {@link com.utils.util.RangeInt} 分组列索引区间
+     * @param range {@link RangeInt} 分组列索引区间
      * @return <T extends ISheetWriter>
      */
     default T groupColumn(final RangeInt range) {
@@ -752,7 +751,7 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
      * @param column {@link Enum} 隐藏列
      * @return <T extends ISheetWriter>
      */
-    default T hideColumn(final Enum column) {
+    default T hideColumn(final Enum<?> column) {
         return hideColumn(column.ordinal());
     }
 
@@ -773,7 +772,7 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
      * @param column {@link Enum} 显示列
      * @return <T extends ISheetWriter>
      */
-    default T showColumn(final Enum column) {
+    default T showColumn(final Enum<?> column) {
         return showColumn(column.ordinal());
     }
 
@@ -1200,7 +1199,7 @@ public interface ISheetWriter<T extends ISheetWriter> extends ISheet<T>, ICellWr
          * @param column {@link Enum} 列名枚举定义
          * @return HoldRow
          */
-        public HoldRow cell(final Enum column) {
+        public HoldRow cell(final Enum<?> column) {
             cell(column.ordinal());
             return this;
         }

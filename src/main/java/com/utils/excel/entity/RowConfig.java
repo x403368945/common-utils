@@ -40,9 +40,4 @@ public class RowConfig implements IJson {
         return Rownum.of(from);
     }
 
-    @Override
-    public String toString() {
-        return json();
-    }
-
 }

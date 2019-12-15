@@ -62,10 +62,4 @@ public interface IJson {
         );
     }
 
-    /*
-    @Override
-    public String toString() {
-        return json();
-    }
-    */
 }

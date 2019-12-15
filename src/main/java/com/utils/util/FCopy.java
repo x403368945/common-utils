@@ -130,7 +130,7 @@ public final class FCopy {
     }
 
     public Optional<File> getNewFile(int index) {
-        return (Util.isEmpty(newFiles)) ? Optional.empty() : Optional.of(newFiles.get(index));
+        return (Objects.isNull(newFiles)) ? Optional.empty() : Optional.of(newFiles.get(index));
     }
 
     public Optional<String> getNewFilePath() {

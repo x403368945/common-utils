@@ -164,7 +164,7 @@ public class Cell implements IJson {
      *
      * @param sheet {@link ISheet} 单元格写入器
      */
-    public Cell cell(final ISheet sheet) {
+    public Cell cell(final ISheet<?> sheet) {
         if (Objects.nonNull(address)) // 坐标不为空时优先使用
             sheet.cell(position());
         else
@@ -178,7 +178,7 @@ public class Cell implements IJson {
      * @param writer {@link ICellWriter} T extends {@link ICellWriter} 单元格写入器
      * @param row    {@link JSONObject} 数据行对象
      */
-    public <T extends ICellWriter> T write(final T writer, final JSONObject row) {
+    public <T extends ICellWriter<T>> T write(final T writer, final JSONObject row) {
         writer.write(type, row.getOrDefault(alias, row.get(label)));
         return writer;
     }
@@ -190,7 +190,7 @@ public class Cell implements IJson {
      * @param row    {@link JSONObject} 数据行对象
      * @param seq    {@link Supplier<Integer>} 带有序列
      */
-    public <T extends ICellWriter> T write(final T writer, final JSONObject row, final Supplier<Integer> seq) {
+    public <T extends ICellWriter<T>> T write(final T writer, final JSONObject row, final Supplier<Integer> seq) {
         if (Objects.equals(type, DataType.SEQ)) {
             writer.writeNumber(seq.get());
         } else {
@@ -205,7 +205,7 @@ public class Cell implements IJson {
      * @param writer          {@link ICellWriter} T extends {@link ICellWriter} 单元格写入器
      * @param formulaFunction {@link Function<String:重构前的公式, String:重构后的公式>} 公式重构，替换占位符，默认将 formula 中 {column} 占位符替换为 {@link Column#name()}
      */
-    public <T extends ICellWriter> T write(final T writer, final Function<String, String> formulaFunction) {
+    public <T extends ICellWriter<T>> T write(final T writer, final Function<String, String> formulaFunction) {
         writer.writeFormula(formulaFunction.apply(
                 Optional.ofNullable(formula)
                         .orElse("")
@@ -221,7 +221,7 @@ public class Cell implements IJson {
      * @param row             {@link JSONObject} 数据行对象
      * @param formulaFunction {@link Function<String:重构前的公式, String:重构后的公式>} 公式重构，替换占位符，默认将 formula 中 {column} 占位符替换为 {@link Column#name()}
      */
-    public <T extends ICellWriter> T write(final T writer, final JSONObject row, final Function<String, String> formulaFunction) {
+    public <T extends ICellWriter<T>> T write(final T writer, final JSONObject row, final Function<String, String> formulaFunction) {
         if (Objects.equals(type, DataType.FORMULA) && Objects.nonNull(formulaFunction)) {
             writer.writeFormula(formulaFunction.apply(
                     Optional.ofNullable(formula)
@@ -242,7 +242,7 @@ public class Cell implements IJson {
      * @param seq             {@link Supplier<Integer>} 带有序列
      * @param formulaFunction {@link Function<String:重构前的公式, String:重构后的公式>} 公式重构，替换占位符，默认将 formula 中 {column} 占位符替换为 {@link Column#name()}
      */
-    public <T extends ICellWriter> T write(final T writer, final JSONObject row, final Supplier<Integer> seq, final Function<String, String> formulaFunction) {
+    public <T extends ICellWriter<T>> T write(final T writer, final JSONObject row, final Supplier<Integer> seq, final Function<String, String> formulaFunction) {
         if (Objects.equals(type, DataType.SEQ)) {
             writer.writeNumber(seq.get());
         } else if (Objects.equals(type, DataType.FORMULA) && Objects.nonNull(formulaFunction)) {
@@ -257,11 +257,6 @@ public class Cell implements IJson {
         return writer;
     }
 
-    @Override
-    public String toString() {
-        return json();
-    }
-
     public static void main(String[] args) {
         {
             CellBuilder builder = Cell.builder().label("列名").type(DataType.NUMBER).group("分组").tag("标签");
@@ -274,7 +269,7 @@ public class Cell implements IJson {
         }
         {
             List<Cell> headers = new ArrayList<>();
-            Cell.CellBuilder builder = Cell.builder();
+            CellBuilder builder = Cell.builder();
             int index = 0; // 索引从0开始
             {
                 builder.group("主营业务收入");

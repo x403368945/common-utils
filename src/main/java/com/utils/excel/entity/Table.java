@@ -71,11 +71,6 @@ public class Table implements IJson {
      */
     private JSONObject extras;
 
-    @Override
-    public String toString() {
-        return json();
-    }
-
     /**
      * 将 header + body 转换为 map 对象；优先使用别名
      *

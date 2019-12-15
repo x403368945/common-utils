@@ -80,11 +80,6 @@ public class TotalRange implements IJson {
         return this;
     }
 
-    @Override
-    public String toString() {
-        return json();
-    }
-
     public static void main(String[] args) {
     }
 }

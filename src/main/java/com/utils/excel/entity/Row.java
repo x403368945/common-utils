@@ -9,6 +9,7 @@ import com.utils.util.Maps;
 import com.utils.util.Num;
 import com.utils.util.Util;
 import lombok.NoArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.*;
 
@@ -64,7 +65,7 @@ public class Row extends JSONObject {
      * @return {@link Row}
      */
     public Row addChilds(final List<Row> rows) {
-        if (Util.isNotEmpty(rows)) {
+        if (CollectionUtils.isNotEmpty(rows)) {
             super.put("childs", rows);
         }
         return this;
@@ -77,7 +78,7 @@ public class Row extends JSONObject {
      * @return {@link Row}
      */
     public Row addTable(final Table table) {
-        if (Util.isNotEmpty(table)) {
+        if (Objects.nonNull(table)) {
             super.put("table", table);
         }
         return this;

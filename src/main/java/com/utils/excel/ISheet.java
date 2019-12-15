@@ -9,6 +9,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellAddress;
 
 import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -231,7 +232,7 @@ public interface ISheet<T> {
      * @param column {@link Enum} 列名枚举定义
      * @return <T extends ISheet>
      */
-    default T cell(final Enum column) {
+    default T cell(final Enum<?> column) {
         cell(column.ordinal());
         return (T) this;
     }
@@ -277,6 +278,12 @@ public interface ISheet<T> {
         getWorkbook().write(fileOutputStream);
         path.chmod(644); // 设置文件权限
         return path;
+    }
+
+    @SneakyThrows
+    default void saveWorkBookByStream(final OutputStream outputStream) {
+        getWorkbook().write(outputStream);
+        outputStream.close();
     }
 
     /**

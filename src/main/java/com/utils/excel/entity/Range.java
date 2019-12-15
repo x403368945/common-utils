@@ -127,11 +127,6 @@ public class Range implements IJson {
         return list.stream();
     }
 
-    @Override
-    public String toString() {
-        return json();
-    }
-
     public static void main(String[] args) {
         log.info("{}", Range.of("B1:C2"));
         log.info("{}", Range.of("B1:C20"));

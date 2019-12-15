@@ -5,9 +5,9 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.utils.util.FWrite;
 import com.utils.util.Op;
-import lombok.SneakyThrows;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Objects;
@@ -56,18 +56,23 @@ public interface IJsonFile {
      *
      * @return {@link Optional<File>}
      */
-    @SneakyThrows
     default Optional<String> readJson() {
         return Optional
                 .of(Objects.requireNonNull(getFile(), "必须实现【com.utils.IJsonFile#getFile()】方法"))
                 .filter(File::exists)
-                .map(file -> new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8));
+                .map(file -> {
+                    try {
+                        return new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e.getMessage(), e);
+                    }
+                });
     }
 
     /**
      * 检查文件是否存在
      *
-     * @return {@link Op <File>}
+     * @return {@link Op<File>}
      */
     default Optional<File> jsonExist() {
         return Optional

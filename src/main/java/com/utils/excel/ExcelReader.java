@@ -245,7 +245,7 @@ public final class ExcelReader implements ISheetReader<ExcelReader> {
                 do {
                     sb.append("<tr>\n");
                     columnIndexs.forEach(index ->
-                            sb.append("<td class=\"text-x-small p-3" + (index == 0 ? " text-left" : "") + "\">")
+                            sb.append("<td class=\"text-x-small p-3").append(index == 0 ? " text-left" : "").append("\">")
                                     .append(reader.cell(index).stringOfEmpty())
                                     .append("</td>\n")
                     );

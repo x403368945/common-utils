@@ -479,7 +479,7 @@ public final class Num {
      * @return BigDecimal
      */
     public BigDecimal toBigDecimal() {
-        return (Objects.isNull(value)) ? null : new BigDecimal(value.doubleValue());
+        return (Objects.isNull(value)) ? null : BigDecimal.valueOf(value.doubleValue());
     }
 
     /**
@@ -488,7 +488,7 @@ public final class Num {
      * @return BigDecimal
      */
     public BigDecimal bigDecimalValue() {
-        return (Objects.isNull(value)) ? BigDecimal.ZERO : new BigDecimal(value.doubleValue());
+        return (Objects.isNull(value)) ? BigDecimal.ZERO : BigDecimal.valueOf(value.doubleValue());
     }
 
     /**

@@ -102,11 +102,6 @@ public class Position implements IJson {
         return value - 1;
     }
 
-    @Override
-    public String toString() {
-        return json();
-    }
-
     public static void main(String[] args) {
         log.info("{}", Position.of("A1"));
         log.info("{}", Position.of("AB12"));

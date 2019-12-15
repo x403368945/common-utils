@@ -5,6 +5,7 @@ import lombok.SneakyThrows;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * 字符编码
@@ -13,12 +14,12 @@ import java.nio.charset.Charset;
  */
 public enum Charsets {
     // UTF-8 字符编码
-    UTF_8("UTF-8", Charset.forName("UTF-8")),
+    UTF_8("UTF-8", StandardCharsets.UTF_8),
     GBK("GBK", Charset.forName("GBK")),
-    ISO_8859_1("ISO-8859-1", Charset.forName("ISO-8859-1")),
-    UTF_16BE("UTF-16BE", Charset.forName("UTF-16BE")),
-    UTF_16LE("UTF-16LE", Charset.forName("UTF-16LE")),
-    UTF_16("UTF-16", Charset.forName("UTF-16")),;
+    ISO_8859_1("ISO-8859-1", StandardCharsets.ISO_8859_1),
+    UTF_16BE("UTF-16BE", StandardCharsets.UTF_16BE),
+    UTF_16LE("UTF-16LE", StandardCharsets.UTF_16LE),
+    UTF_16("UTF-16", StandardCharsets.UTF_16),;
     public final String comment;
     public final Charset charset;
 

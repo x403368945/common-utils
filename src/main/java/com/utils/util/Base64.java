@@ -2,6 +2,7 @@ package com.utils.util;
 
 import com.alibaba.fastjson.JSON;
 import com.utils.enums.Charsets;
+import org.apache.commons.lang3.StringUtils;
 
 import java.nio.charset.Charset;
 import java.util.HashMap;
@@ -32,10 +33,10 @@ public final class Base64 {
      * @return String 返回Base64编码字符串
      */
     public static String encode(final String content, Charset charset) {
-        if (Util.isEmpty(content)) {
+        if (StringUtils.isEmpty(content)) {
             return null;
         }
-        if (Util.isEmpty(charset)) {
+        if (Objects.isNull(charset)) {
             charset = Charsets.UTF_8.charset;
         }
         return org.apache.commons.codec.binary.Base64.encodeBase64String(content.getBytes(charset));
@@ -59,10 +60,10 @@ public final class Base64 {
      * @return String 返回指定编码字符串
      */
     public static String decode(final String content, Charset charset) {
-        if (Util.isEmpty(content)) {
+        if (StringUtils.isEmpty(content)) {
             return null;
         }
-        if (Util.isEmpty(charset)) {
+        if (Objects.isNull(charset)) {
             charset = Charsets.UTF_8.charset;
         }
         return new String(org.apache.commons.codec.binary.Base64.decodeBase64(content), charset);
@@ -88,7 +89,7 @@ public final class Base64 {
      * @return String 返回指定编码字符串
      */
     public static byte[] decoder(String content) {
-        if (Util.isEmpty(content)) {
+        if (StringUtils.isEmpty(content)) {
             return null;
         }
         return org.apache.commons.codec.binary.Base64.decodeBase64(content);

@@ -139,11 +139,6 @@ public class ParseConfig implements IJson {
         return footer("合计", "A");
     }
 
-    @Override
-    public String toString() {
-        return json();
-    }
-
     public static void main(String[] args) {
         ParseConfig config = new ParseConfig();
         config.setStartRowNum(6);

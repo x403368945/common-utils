@@ -29,8 +29,4 @@ public class Sheet implements IJson {
      */
     private Table table;
 
-    @Override
-    public String toString() {
-        return json();
-    }
 }

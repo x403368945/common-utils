@@ -106,7 +106,7 @@ public final class FZip {
             { // 检查参数是否正确
                 Objects.requireNonNull(from, "文件或目录不存在:".concat(from.getAbsolutePath()));
                 Objects.requireNonNull(from.exists() ? true : null, "文件或目录不存在:".concat(from.getAbsolutePath()));
-                if (Util.isEmpty(to)) {
+                if (Objects.isNull(to)) {
                     to = from.getParentFile()
                             .toPath()
                             .resolve(

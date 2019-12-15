@@ -1,7 +1,10 @@
 package com.utils.util;
 
+import com.google.common.base.Strings;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.nio.charset.Charset;
@@ -211,11 +214,11 @@ public final class FPath {
      * @param names {@link List}{@link List<String>} 文件名
      */
     public void delete(final List<String> names) {
-        if (Util.isEmpty(names)) {
+        if (CollectionUtils.isEmpty(names)) {
             return;
         }
         names.forEach(name -> {
-            if (Util.isNotEmpty(name)) {
+            if (StringUtils.isNotBlank(name)) {
                 boolean delete = path.resolve(name).toFile().delete();
                 if (log.isDebugEnabled()) {
                     log.debug("删除文件【{}】{}", path.resolve(name).toString(), delete);

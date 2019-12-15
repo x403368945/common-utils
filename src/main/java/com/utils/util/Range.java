@@ -42,7 +42,7 @@ public final class Range<T extends Number> implements Num.IRange<T> {
      * @param values {@link Number}[] 从数组中获取最小值和最大值区间
      * @return {@link Range} {@link Range<T extends Number>}
      */
-    public static <T extends Number> Range of(final T[] values) {
+    public static <T extends Number> Range<T> of(final T[] values) {
         Arrays.sort(values);
         return new Range<T>(values[0], values[values.length - 1]);
     }

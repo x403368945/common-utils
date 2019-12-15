@@ -13,6 +13,7 @@ import java.util.function.Supplier;
  *
  * @author 谢长春 2018/12/20 .
  */
+@SuppressWarnings("unchecked")
 @Slf4j
 public final class Op<T> {
 
