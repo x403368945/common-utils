@@ -1,6 +1,7 @@
 package com.utils.excel;
 
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 定义行号获取和自增规则；由于在匿名内部类或stream操作时，直接使用int值无法进行增量操作，故将值和增量方法定义类属性和行为
@@ -9,7 +10,7 @@ import java.util.Arrays;
  */
 public final class Rownum {
     private Rownum(int rownum) {
-        this.rownum = rownum;
+        this.rownum.set(rownum);
     }
 
     public static Rownum ofOne() {
@@ -23,7 +24,7 @@ public final class Rownum {
     /**
      * rownum 初始行值1，rowIndex 初始值为 0
      */
-    private int rownum;
+    private AtomicInteger rownum = new AtomicInteger(1);
 
     /**
      * 获取行号并执行自增量操作
@@ -31,7 +32,7 @@ public final class Rownum {
      * @return {@link Rownum}
      */
     public Rownum next() {
-        ++rownum;
+        rownum.incrementAndGet();
         return this;
     }
     /**
@@ -43,7 +44,7 @@ public final class Rownum {
         if (value < 0) {
             throw new IllegalArgumentException("value 不能小于0");
         }
-        this.rownum = value;
+        this.rownum.set(value);
         return this;
     }
 
@@ -53,7 +54,7 @@ public final class Rownum {
      * @return int
      */
     public int get() {
-        return rownum;
+        return rownum.get();
     }
     /**
      * 返回当前行号，然后行号 +1
@@ -61,7 +62,7 @@ public final class Rownum {
      * @return int
      */
     public int poll() {
-        return rownum++;
+        return rownum.getAndIncrement();
     }
 
     /**
@@ -70,7 +71,7 @@ public final class Rownum {
      * @return int
      */
     public int index() {
-        return rownum - 1;
+        return rownum.get() - 1;
     }
 
     @Override

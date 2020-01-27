@@ -1,6 +1,5 @@
 package com.utils.util;
 
-import com.google.common.base.Strings;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -267,7 +266,7 @@ public final class FPath {
     @SneakyThrows
     public String read() {
         { // 按字符读取文件内容不会出现乱码
-            log.debug("read file:{}", path.toString());
+            if(log.isDebugEnabled()) log.debug("read file:{}", path.toString());
             if (!path.toFile().exists()) {
                 log.warn("文件不存在：{}", path.toAbsolutePath());
                 return null;
@@ -329,7 +328,7 @@ public final class FPath {
      */
     @SneakyThrows
     public byte[] readByte() {
-        log.debug("read file:{}", path.toString());
+        if(log.isDebugEnabled()) log.debug("read file:{}", path.toString());
         return Files.readAllBytes(path);
 //        { // MappedByteBuffer 比 ByteBuffer快 ；按字节读取，在构建String对象时可能产生乱码；必须要读完之后才能toString()
 //            long start = System.currentTimeMillis();
@@ -358,7 +357,7 @@ public final class FPath {
      */
     @SneakyThrows
     public List<String> readLines() {
-        log.debug("read file:{}", path.toString());
+        if(log.isDebugEnabled()) log.debug("read file:{}", path.toString());
         return Files.readAllLines(path);
     }
 
@@ -370,7 +369,7 @@ public final class FPath {
      */
     @SneakyThrows
     public List<String> readLines(final Charset charset) {
-        log.debug("read file:{}", path.toString());
+        if(log.isDebugEnabled()) log.debug("read file:{}", path.toString());
         return Files.readAllLines(path, charset);
     }
 
@@ -381,7 +380,7 @@ public final class FPath {
      */
     @SneakyThrows
     public Stream<String> lines() {
-        log.debug("read file:{}", path.toString());
+        if(log.isDebugEnabled()) log.debug("read file:{}", path.toString());
         return Files.lines(path);
     }
 
@@ -393,7 +392,7 @@ public final class FPath {
      */
     @SneakyThrows
     public Stream<String> lines(final Charset charset) {
-        log.debug("read file:{}", path.toString());
+        if(log.isDebugEnabled()) log.debug("read file:{}", path.toString());
         return Files.lines(path, charset);
     }
 

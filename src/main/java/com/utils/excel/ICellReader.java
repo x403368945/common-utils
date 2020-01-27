@@ -6,6 +6,7 @@ import com.utils.util.Num;
 import org.apache.poi.ss.usermodel.*;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -18,6 +19,7 @@ import static com.utils.util.Dates.Pattern.yyyy_MM_dd_HH_mm_ss;
  *
  * @author 谢长春 on 2018-8-8 .
  */
+@SuppressWarnings("unchecked")
 public interface ICellReader<T extends ICellReader<T>> {
     /**
      * 获取当前操作单元格
@@ -213,32 +215,6 @@ public interface ICellReader<T extends ICellReader<T>> {
     /**
      * 获取单元格数值，空值和非数字默认为null
      *
-     * @return {@link BigDecimal}
-     */
-    default BigDecimal bigDecimalValue() {
-        if (cellIsBlank()) {
-            return null;
-        }
-        switch (getCell().getCellType()) {
-            case STRING:
-                return new BigDecimal(getCell().getStringCellValue());
-            case NUMERIC:
-                return new BigDecimal(Double.toString(getCell().getNumericCellValue()));
-            case FORMULA:
-                switch (getCell().getCachedFormulaResultType()) {
-                    case NUMERIC:
-                        return new BigDecimal(Double.toString(getCell().getNumericCellValue()));
-                    case STRING:
-                        return new BigDecimal(getCell().getStringCellValue());
-                }
-                break;
-        }
-        return null;
-    }
-
-    /**
-     * 获取单元格数值，空值和非数字默认为null
-     *
      * @return {@link Num}
      */
     default Num numberValue() {
@@ -276,6 +252,24 @@ public interface ICellReader<T extends ICellReader<T>> {
                 break;
         }
         return Num.of(getCell().getNumericCellValue());
+    }
+
+    /**
+     * 转换为 BigDecimal 默认 四舍五入保留两位小数
+     *
+     * @return {@link BigDecimal}
+     */
+    default BigDecimal bigDecimalValue() {
+        return bigDecimalValue(2, RoundingMode.HALF_UP);
+    }
+
+    /**
+     * 转换为 BigDecimal 需要指定规则
+     *
+     * @return {@link BigDecimal}
+     */
+    default BigDecimal bigDecimalValue(final int fixed, final RoundingMode mode) {
+        return Optional.ofNullable(numberValue()).map(Num::toBigDecimal).map(value -> value.setScale(fixed, mode)).orElse(null);
     }
 
     /**

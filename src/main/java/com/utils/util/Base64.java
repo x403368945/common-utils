@@ -96,7 +96,7 @@ public final class Base64 {
     }
 
     public static void main(String[] args) {
-        System.out.println(Base64.encode(JSON.toJSONString(new HashMap<String, String>() {{
+        System.out.println(Base64.encode(JSON.toJSONString(new HashMap<String, String>(1) {{
             put("", "");
         }})));
         System.out.println(Base64.encode("{\"name\":\"JX\"} "));

@@ -35,8 +35,6 @@ import static com.utils.util.Dates.Pattern.*;
  */
 @Slf4j
 public final class Dates {
-    private static final ZoneId ZONE_ID = ZoneId.of("GMT+8");
-
     public interface IPattern {
         /**
          * 日期 + 时间 格式化对象
@@ -102,80 +100,98 @@ public final class Dates {
     }
 
     public interface IDateTimePatternAdapter extends IPattern {
+        @Override
         default String now() {
             return LocalDateTime.now().format(getFormatter());
         }
 
+        @Override
         default String format(final LocalDateTime value) {
             return value.format(getFormatter());
         }
 
+        @Override
         default String format(final LocalDate value) {
             return value.atStartOfDay().format(getFormatter());
         }
 
+        @Override
         default String format(final LocalTime value) {
             return value.atDate(LocalDate.now()).format(getFormatter());
         }
 
+        @Override
         default String format(final Timestamp value) {
             return value.toLocalDateTime().format(getFormatter());
         }
 
+        @Override
         default String format(final Date value) {
-            return getFormatter().format(value.toInstant());
+            return getFormatter().format(value.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
         }
     }
 
     public interface IDatePatternAdapter extends IPattern {
+        @Override
         default String now() {
             return LocalDate.now().format(getFormatter());
         }
 
+        @Override
         default String format(final LocalDateTime value) {
             return value.toLocalDate().format(getFormatter());
         }
 
+        @Override
         default String format(final LocalDate value) {
             return value.format(getFormatter());
         }
 
+        @Override
         default String format(final LocalTime value) {
             throw new IllegalArgumentException("无法将 LocalTime 格式化成 LocalDate");
         }
 
+        @Override
         default String format(final Timestamp value) {
             return value.toLocalDateTime().toLocalDate().format(getFormatter());
         }
 
+        @Override
         default String format(final Date value) {
-            return getFormatter().format(LocalDate.from(value.toInstant()));
+            return getFormatter().format(value.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
         }
     }
 
     public interface ITimePatternAdapter extends IPattern {
+        @Override
         default String now() {
             return LocalTime.now().format(getFormatter());
         }
 
+        @Override
         default String format(final LocalDateTime value) {
             return value.toLocalTime().format(getFormatter());
         }
 
+        @Override
         default String format(final LocalDate value) {
             throw new IllegalArgumentException("无法将 LocalDate 格式化成 LocalTime");
         }
 
+        @Override
         default String format(final LocalTime value) {
             return value.format(getFormatter());
         }
 
+        @Override
         default String format(final Timestamp value) {
             return value.toLocalDateTime().toLocalTime().format(getFormatter());
         }
 
+        @Override
         default String format(final Date value) {
-            return getFormatter().format(LocalTime.from(value.toInstant()));
+            return getFormatter().format(value.toInstant().atZone(ZoneId.systemDefault()).toLocalTime());
         }
     }
 
@@ -685,6 +701,7 @@ public final class Dates {
          *
          * @return {@link String}
          */
+        @Override
         public String now() {
             return adapter.now();
         }
@@ -695,6 +712,7 @@ public final class Dates {
          * @param value String 日期
          * @return {@link Dates}
          */
+        @Override
         public Dates parse(final String value) {
             return Objects.requireNonNull(
                     adapter.parse(Objects.requireNonNull(value, "date string value is not null")),
@@ -720,6 +738,7 @@ public final class Dates {
          * @param value {@link LocalDateTime}
          * @return {@link String}
          */
+        @Override
         public String format(final LocalDateTime value) {
             return Objects.isNull(value) ? null : adapter.format(value);
         }
@@ -730,6 +749,7 @@ public final class Dates {
          * @param value {@link LocalDate}
          * @return {@link String}
          */
+        @Override
         public String format(final LocalDate value) {
             return Objects.isNull(value) ? null : adapter.format(value);
         }
@@ -740,6 +760,7 @@ public final class Dates {
          * @param value {@link LocalTime}
          * @return {@link String}
          */
+        @Override
         public String format(final LocalTime value) {
             return Objects.isNull(value) ? null : adapter.format(value);
         }
@@ -750,6 +771,7 @@ public final class Dates {
          * @param value {@link Timestamp}
          * @return {@link String}
          */
+        @Override
         public String format(final Timestamp value) {
             return Objects.isNull(value) ? null : adapter.format(value);
         }
@@ -760,6 +782,7 @@ public final class Dates {
          * @param value {@link Date} or {@link Timestamp}
          * @return {@link String}
          */
+        @Override
         public String format(final Date value) {
             return Objects.isNull(value) ? null : adapter.format(value);
         }
@@ -897,6 +920,10 @@ public final class Dates {
             return this;
         }
 
+        @Override
+        public String toString() {
+            return JSON.toJSONString(this);
+        }
     }
 
     /**
@@ -1837,6 +1864,8 @@ public final class Dates {
         log.info("{}.parse({}) => {}", yyyy_MM_dd_HH_mm_ss.name(), yyyy_MM_dd_HH_mm_ss.comment, yyyy_MM_dd_HH_mm_ss.parse("2019-1-2 3:4:5.6"));
         log.info("{}.parse({}) => {}", HH_mm.name(), HH_mm.comment, HH_mm.parse("3:4:5.6"));
         log.info("{}.parse({}) => {}", HH_mm_ss.name(), HH_mm_ss.comment, HH_mm_ss.parse("3:4:5.6"));
+        log.info("{}", yyyy_MM_dd.format(Dates.now().timestamp()));
+        log.info("{}", yyyy_MM_dd.format(Dates.now().date()));
     }
 
 }

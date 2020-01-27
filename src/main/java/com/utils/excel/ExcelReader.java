@@ -14,6 +14,7 @@ import org.apache.poi.ss.usermodel.*;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -56,6 +57,11 @@ public final class ExcelReader implements ISheetReader<ExcelReader> {
         } else {
             throw new IllegalArgumentException("未知的文件后缀");
         }
+    }
+
+    @SneakyThrows
+    public static ExcelReader of(final InputStream is) {
+        return new ExcelReader(WorkbookFactory.create(is));
     }
 
     @SneakyThrows

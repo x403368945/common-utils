@@ -26,6 +26,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @author 谢长春 2016-11-23 .
  */
 @Slf4j
+@SuppressWarnings({"unchecked"})
 public final class Util {
     /**
      * 获取UUID；中间的 - 剔除
@@ -77,7 +78,7 @@ public final class Util {
      */
     public static Boolean toBoolean(final Object obj) {
         try {
-            return isEmpty(obj) ? null : Boolean.valueOf(obj.toString());
+            return Objects.isNull(obj) ? null : Boolean.valueOf(obj.toString());
         } catch (Exception e) {
             return null;
         }
@@ -207,7 +208,7 @@ public final class Util {
      *
      * @param map 集合
      * @return boolean true空 false非空
-     * @deprecated 请使用 org.apache.commons.collections4.MapUtils.isNotEmpty()
+     * @deprecated 请使用 org.apache.commons.collections4.MapUtils.isEmpty()
      */
     @Deprecated
     public static boolean isEmpty(final Map<?, ?> map) {

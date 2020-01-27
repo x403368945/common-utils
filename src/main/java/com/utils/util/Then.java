@@ -12,6 +12,7 @@ import java.util.function.Supplier;
  *
  * @author 谢长春 2019/1/5 .
  */
+@SuppressWarnings({"unchecked"})
 public final class Then<T> {
     /**
      * 构造链式调用对象

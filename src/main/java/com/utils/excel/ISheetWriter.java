@@ -34,6 +34,7 @@ import static com.utils.enums.Regs.d_FIND;
  *
  * @author 谢长春 on 2018-8-8 .
  */
+@SuppressWarnings("unchecked")
 public interface ISheetWriter<T extends ISheetWriter<T>> extends ISheet<T>, ICellWriter<T> {
     @Builder
     class Options {

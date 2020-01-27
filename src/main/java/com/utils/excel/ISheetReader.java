@@ -12,6 +12,7 @@ import java.util.function.Consumer;
  *
  * @author 谢长春 on 2018-8-8 .
  */
+@SuppressWarnings("unchecked")
 public interface ISheetReader<T extends ISheetReader<T>> extends ISheet<T>, ICellReader<T> {
 
     /**

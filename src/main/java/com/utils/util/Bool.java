@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 /**
  * 补充 java8 下 {@link Optional} 对 boolean 判断不友好的地方
  */
+@SuppressWarnings("unchecked")
 public final class Bool<T> {
     private boolean booleanValue;
     private Optional<T> optional;
