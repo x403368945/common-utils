@@ -52,7 +52,7 @@ maven setting.xml 修改 mirrorOf
     <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
   </mirror>
 ```
-项目 pom 文件新增仓库配置
+项目 pom 文件新增仓库配置,注意本地 maven 仓库如果存在 com/github 目录需要先删除 
 ```
 <!-- jitpack.io 用来依赖 github 开源项目 -->
 <repositories>
@@ -67,7 +67,7 @@ maven setting.xml 修改 mirrorOf
     <dependency>
         <groupId>com.github.x403368945</groupId>
         <artifactId>common-utils</artifactId>
-        <version>1.0.1</version>
+        <version>1.0.3</version>
     </dependency>
 </dependencies>
 ```
