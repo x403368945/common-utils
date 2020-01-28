@@ -4,5 +4,5 @@
 /log
 /src/test/files/temp/
 /*.iml
-!/pom.xml.releaseBackup
-!/release.properties
+pom.xml.releaseBackup
+release.properties
