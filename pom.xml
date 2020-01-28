@@ -4,7 +4,7 @@
 
     <groupId>com.github.x403368945</groupId>
     <artifactId>common-utils</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -38,7 +38,7 @@
         <url>https://github.com/x403368945/common-utils</url>
         <connection>scm:git:https://github.com/x403368945/common-utils.git</connection>
         <developerConnection>scm:git:https://github.com/x403368945/common-utils.git</developerConnection>
-        <tag>${project.version}</tag>
+        <tag>common-utils-1.0.0</tag>
     </scm>
     <developers>
         <developer>
@@ -211,7 +211,7 @@
                 </configuration>
             </plugin>
             <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-gpg-plugin -->
-            <plugin>
+            <!--<plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
                 <version>1.6</version>
@@ -224,7 +224,7 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin>-->
             <!-- 默认打包源码 -->
             <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-source-plugin -->
             <plugin>
