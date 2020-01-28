@@ -7,7 +7,7 @@ JAVA 开发常用的工具类封装，并不是每一处都合理，欢迎大家
 https://gitee.com/xcc/common-utils  
 https://github.com/x403368945/common-utils  
 
-## 安装步骤
+### 本地安装步骤
 下载源码
 ```
 git clone https://gitee.com/xcc/common-utils.git
@@ -34,6 +34,43 @@ maven 依赖
 </dependency>
 ```
 
+### 发布 release 流程
+可以通过 jitpack.io 依赖任何开源仓库的 release 版本
+```
+# 预发布环境准备,将代码推送到 github , 失败后可重新执行
+mvn release:prepare -Dresume=false -X
+# 回滚预发布环境
+mvn release:rollback -X
+```
+### jitpack 依赖 github 开源项目配置
+maven setting.xml 修改 mirrorOf
+```
+  <mirror>
+    <id>aliyun-maven</id>
+    <name>aliyun maven</name>
+    <mirrorOf>*,!jitpack.io</mirrorOf>
+    <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+  </mirror>
+```
+项目 pom 文件新增仓库配置
+```
+<!-- jitpack.io 用来依赖 github 开源项目 -->
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
+
+<!-- 添加依赖 -->
+<dependencies>
+    <dependency>
+        <groupId>com.github.x403368945</groupId>
+        <artifactId>common-utils</artifactId>
+        <version>1.0.1</version>
+    </dependency>
+</dependencies>
+```
 
 ### 常用注解说明
 ```
