@@ -17,12 +17,12 @@ git clone https://github.com/x403368945/common-utils.git
 ```
 mvn install
 # 默认会打包源码并跳过测试
-# mvn install == mvn source:jar install -Dmaven.test.skip=true
+# mvn install 等同于 mvn source:jar install -Dmaven.test.skip=true
 ```
 maven 依赖
 ```
 <dependency>
-    <groupId>com.ccx.utils.parent</groupId>
+    <groupId>com.github.x403368945</groupId>
     <artifactId>common-utils</artifactId>
     <version>1.0.0</version>
     <exclusions>
@@ -43,15 +43,6 @@ mvn release:prepare -Dresume=false -X
 mvn release:rollback -X
 ```
 ### jitpack 依赖 github 开源项目配置
-maven setting.xml 修改 mirrorOf
-```
-  <mirror>
-    <id>aliyun-maven</id>
-    <name>aliyun maven</name>
-    <mirrorOf>*,!jitpack.io</mirrorOf>
-    <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
-  </mirror>
-```
 项目 pom 文件新增仓库配置,注意本地 maven 仓库如果存在 com/github 目录需要先删除 
 ```
 <!-- jitpack.io 用来依赖 github 开源项目 -->
