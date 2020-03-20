@@ -54,7 +54,7 @@ public interface IJsonFile {
     /**
      * 读取 json 文件内容，读取前检查文件是否存在
      *
-     * @return {@link Optional<File>}
+     * @return {@link Optional<String>}
      */
     default Optional<String> readJson() {
         return Optional
