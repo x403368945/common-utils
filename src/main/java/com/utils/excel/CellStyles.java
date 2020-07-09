@@ -233,8 +233,10 @@ public final class CellStyles
         if (Objects.nonNull(topBorderColor)) cellStyle.setTopBorderColor(topBorderColor.index);
         if (Objects.nonNull(bottomBorderColor)) cellStyle.setBottomBorderColor(bottomBorderColor.index);
         if (Objects.nonNull(fillPattern)) cellStyle.setFillPattern(fillPattern);
-        if (Objects.nonNull(fillBackgroundColor)) cellStyle.setFillBackgroundColor(new XSSFColor(fillBackgroundColor, new DefaultIndexedColorMap()));
-        if (Objects.nonNull(fillForegroundColor)) cellStyle.setFillForegroundColor(new XSSFColor(fillForegroundColor, new DefaultIndexedColorMap()));
+        if (Objects.nonNull(fillBackgroundColor))
+            cellStyle.setFillBackgroundColor(new XSSFColor(fillBackgroundColor, new DefaultIndexedColorMap()));
+        if (Objects.nonNull(fillForegroundColor))
+            cellStyle.setFillForegroundColor(new XSSFColor(fillForegroundColor, new DefaultIndexedColorMap()));
         return cellStyle;
     }
 //    /**

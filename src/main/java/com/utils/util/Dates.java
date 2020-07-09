@@ -97,6 +97,22 @@ public final class Dates {
          * @return {@link String}
          */
         String format(final Date value);
+
+        /**
+         * 格式化日期
+         *
+         * @param value {@link Long}
+         * @return {@link String}
+         */
+        String format(final Long value);
+
+        /**
+         * 格式化日期
+         *
+         * @param value {@link Instant}
+         * @return {@link String}
+         */
+        String format(final Instant value);
     }
 
     public interface IDateTimePatternAdapter extends IPattern {
@@ -128,6 +144,16 @@ public final class Dates {
         @Override
         default String format(final Date value) {
             return getFormatter().format(value.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+        }
+
+        @Override
+        default String format(final Long value) {
+            return getFormatter().format(Instant.ofEpochMilli(value).atZone(ZoneId.systemDefault()).toLocalDateTime());
+        }
+
+        @Override
+        default String format(final Instant value) {
+            return getFormatter().format(value.atZone(ZoneId.systemDefault()).toLocalDateTime());
         }
     }
 
@@ -161,6 +187,16 @@ public final class Dates {
         default String format(final Date value) {
             return getFormatter().format(value.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
         }
+
+        @Override
+        default String format(final Long value) {
+            return getFormatter().format(Instant.ofEpochMilli(value).atZone(ZoneId.systemDefault()).toLocalDate());
+        }
+
+        @Override
+        default String format(final Instant value) {
+            return getFormatter().format(value.atZone(ZoneId.systemDefault()).toLocalDate());
+        }
     }
 
     public interface ITimePatternAdapter extends IPattern {
@@ -192,6 +228,16 @@ public final class Dates {
         @Override
         default String format(final Date value) {
             return getFormatter().format(value.toInstant().atZone(ZoneId.systemDefault()).toLocalTime());
+        }
+
+        @Override
+        default String format(final Long value) {
+            return getFormatter().format(Instant.ofEpochMilli(value).atZone(ZoneId.systemDefault()).toLocalTime());
+        }
+
+        @Override
+        default String format(final Instant value) {
+            return getFormatter().format(value.atZone(ZoneId.systemDefault()).toLocalTime());
         }
     }
 
@@ -786,6 +832,28 @@ public final class Dates {
         public String format(final Date value) {
             return Objects.isNull(value) ? null : adapter.format(value);
         }
+
+        /**
+         * 格式化日期
+         *
+         * @param value {@link Long}
+         * @return {@link String}
+         */
+        @Override
+        public String format(final Long value) {
+            return Objects.isNull(value) ? null : adapter.format(value);
+        }
+
+        /**
+         * 格式化日期
+         *
+         * @param value {@link Long}
+         * @return {@link String}
+         */
+        @Override
+        public String format(final Instant value) {
+            return Objects.isNull(value) ? null : adapter.format(value);
+        }
     }
 
     /**
@@ -819,6 +887,14 @@ public final class Dates {
                     .begin(now.beginTimeOfDay().timestamp())
                     .end(now.endTimeOfDay().timestamp())
                     .build();
+        }
+
+        public Date toBeginDate() {
+            return new Date(begin.getTime());
+        }
+
+        public Date toEndDate() {
+            return new Date(end.getTime());
         }
 
         /**
@@ -902,17 +978,19 @@ public final class Dates {
          */
         public Range check(final Supplier<? extends RuntimeException> exSupplier) {
             if (Objects.isNull(begin)) {
-                if (Objects.isNull(exSupplier))
+                if (Objects.isNull(exSupplier)) {
                     throw new NullPointerException("begin is null");
-                else
+                } else {
                     throw exSupplier.get();
+                }
             }
             if (Objects.nonNull(end)) {
                 if (Dates.of(begin).gt(Dates.of(end))) {
-                    if (Objects.isNull(exSupplier))
+                    if (Objects.isNull(exSupplier)) {
                         throw new RuntimeException("begin > end");
-                    else
+                    } else {
                         throw exSupplier.get();
+                    }
                 }
             } else {
                 end = Dates.now().timestamp();
@@ -1554,8 +1632,12 @@ public final class Dates {
      */
     public int compare(Dates destDate) {
         final long value = this.getTimeMillis() - destDate.getTimeMillis();
-        if (value < 0) return -1;
-        if (value > 0) return 1;
+        if (value < 0) {
+            return -1;
+        }
+        if (value > 0) {
+            return 1;
+        }
         return 0;
     }
 

@@ -60,7 +60,7 @@ public class Excel {
                     .cell(G).writeNumber(row.getCount())
             ;
             rownum.next();
-            });
+        });
         rewriter.evaluateAllFormulaCells();
         log.info(String.format("写入路径：%s", rewriter.saveWorkBook(FPath.of("logs", "data-row-template-重写.xlsx")).absolute()));
     }

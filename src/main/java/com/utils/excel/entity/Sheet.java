@@ -2,19 +2,19 @@ package com.utils.excel.entity;
 
 import com.alibaba.fastjson.annotation.JSONType;
 import com.utils.IJson;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
  * Excel sheet 实体对象
+ *
  * @author 谢长春 on 2017/10/15 .
  */
 @NoArgsConstructor
 @Data
 @Accessors(chain = true)
-@JSONType(orders = {"index","name","table"})
+@JSONType(orders = {"index", "name", "table"})
 public class Sheet implements IJson {
     /**
      * excel sheet 标签页索引

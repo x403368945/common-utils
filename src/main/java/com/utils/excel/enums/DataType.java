@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 
 /**
  * EXCEL数据类型定义
+ *
  * @author 谢长春 on 2018-10-3 .
  */
 public enum DataType {
@@ -40,6 +41,7 @@ public enum DataType {
         this.comment = comment;
         this.cellType = cellType;
     }
+
     public static void main(String[] args) {
         { // 构建 js 枚举文件
             val name = "枚举：EXCEL数据类型定义";

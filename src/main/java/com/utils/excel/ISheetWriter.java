@@ -598,7 +598,7 @@ public interface ISheetWriter<T extends ISheetWriter<T>> extends ISheet<T>, ICel
      *
      * @param fromRowIndex int 起始行索引，包含
      * @param toRowIndex   int 结束行索引，包含
-     * @param collapse boolean true:收起，false：展开
+     * @param collapse     boolean true:收起，false：展开
      * @return <T extends ISheetWriter>
      */
     default T groupRow(final int fromRowIndex, final int toRowIndex, final boolean collapse) {
@@ -1259,7 +1259,7 @@ public interface ISheetWriter<T extends ISheetWriter<T>> extends ISheet<T>, ICel
 //         * @param repeatCount       int 重复次数
 //         * @param cellCopyPolicy    CellCopyPolicy POI Excel 复制行规则；
 //         */
-//        
+//
 //
 ////        /**
 ////         * 复制指定行到目标行

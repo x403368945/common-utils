@@ -11,7 +11,7 @@ public enum ContentType {
     xlsx(".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
     html(".html", "text/html"),
     json(".json", "application/json"),
-    xml(".xml", "text/xml")
+    xml(".xml", "text/xml"),
     ;
     public final String comment;
     public final String type;
@@ -20,6 +20,7 @@ public enum ContentType {
         this.comment = comment;
         this.type = type;
     }
+
     public String utf8() {
         return type.concat(";charset=utf-8");
     }

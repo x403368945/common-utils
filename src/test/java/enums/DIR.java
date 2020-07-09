@@ -15,7 +15,8 @@ import java.nio.file.Paths;
 public enum DIR {
     ROOT("项目根目录", Paths.get("").toAbsolutePath().toString()),
     FILES("test/files目录", ROOT.absolute("src/test/files")),
-    TEMP("文件上传及临时文件存储目录", FILES.absolute("temp")),;
+    TEMP("文件上传及临时文件存储目录", FILES.absolute("temp")),
+    ;
     /**
      * 枚举属性说明
      */

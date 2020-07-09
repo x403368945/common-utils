@@ -9,6 +9,7 @@ import java.util.Objects;
 
 /**
  * 季度
+ *
  * @author 谢长春 on 2017/10/15 .
  */
 public enum Quarter {
@@ -18,14 +19,18 @@ public enum Quarter {
     THREE("第三季度"),
     FOUR("第四季度"),
     ;
-    /**枚举属性说明*/
+    /**
+     * 枚举属性说明
+     */
     final String comment;
+
     Quarter(String comment) {
         this.comment = comment;
     }
 
     /**
      * 按季度分组构建表格头部
+     *
      * @param headers {@link List}{@link List<Cell>}
      * @return {@link List}{@link List<Cell>}
      */
@@ -35,9 +40,11 @@ public enum Quarter {
         }
         return buildHeaders(headers, headers.size());
     }
+
     /**
      * 按季度分组构建表格头部
-     * @param headers {@link List}{@link List<Cell>}
+     *
+     * @param headers    {@link List}{@link List<Cell>}
      * @param startIndex int index 起始值
      * @return {@link List}{@link List<Cell>}
      */

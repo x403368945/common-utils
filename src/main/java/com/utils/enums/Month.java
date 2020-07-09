@@ -9,6 +9,7 @@ import java.util.Objects;
 
 /**
  * 月份
+ *
  * @author 谢长春 on 2017/10/15 .
  */
 public enum Month {
@@ -26,14 +27,18 @@ public enum Month {
     Nov("11月"),
     Dec("12月"),
     ;
-    /**枚举属性说明*/
+    /**
+     * 枚举属性说明
+     */
     final String comment;
+
     Month(String comment) {
         this.comment = comment;
     }
 
     /**
      * 构建表格头部
+     *
      * @param headers {@link List}{@link List< Cell >}
      * @return {@link List}{@link List< Cell >}
      */

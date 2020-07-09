@@ -19,7 +19,8 @@ public enum Charsets {
     ISO_8859_1("ISO-8859-1", StandardCharsets.ISO_8859_1),
     UTF_16BE("UTF-16BE", StandardCharsets.UTF_16BE),
     UTF_16LE("UTF-16LE", StandardCharsets.UTF_16LE),
-    UTF_16("UTF-16", StandardCharsets.UTF_16),;
+    UTF_16("UTF-16", StandardCharsets.UTF_16),
+    ;
     public final String comment;
     public final Charset charset;
 

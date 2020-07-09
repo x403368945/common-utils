@@ -39,7 +39,7 @@ public class DateTest {
 
     @SneakyThrows
     public static void main(String[] args) {
-        if(false){
+        if (false) {
             //定义一个线程安全的HashSet
             Set<String> dates = Collections.synchronizedSet(new HashSet<String>());
             for (int i = 0; i < 100; i++) {
@@ -61,7 +61,7 @@ public class DateTest {
             //阻塞，直到countDown数量为0
             countDownLatch.await();
             //输出去重后的时间个数，理论上应该是恒定的100个时间，实际上数量小于100
-            System.out.println(">"+dates.size());
+            System.out.println(">" + dates.size());
         }
         if (true) {
             countDownLatch = new CountDownLatch(100);
@@ -81,7 +81,7 @@ public class DateTest {
             //阻塞，直到countDown数量为0
             countDownLatch.await();
             //输出去重后的时间个数
-            System.out.println(">"+dates.size());
+            System.out.println(">" + dates.size());
         }
     }
 }

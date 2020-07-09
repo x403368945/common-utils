@@ -24,7 +24,7 @@ public class Row extends JSONObject {
      *
      * @param ordered {@link Boolean} true:{@link LinkedHashMap}, false:{@link HashMap}
      */
-    public Row(final boolean ordered){
+    public Row(final boolean ordered) {
         super(ordered);
     }
 

@@ -35,6 +35,7 @@ public final class Rownum {
         rownum.incrementAndGet();
         return this;
     }
+
     /**
      * 指定 rownum 值
      *
@@ -56,6 +57,7 @@ public final class Rownum {
     public int get() {
         return rownum.get();
     }
+
     /**
      * 返回当前行号，然后行号 +1
      *
